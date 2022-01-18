@@ -1,5 +1,5 @@
 # set working directory and import file, recode new variable 'Area'  
-# create dataframe
+# create dataframe from the original file
 safeguarding <- orders
 
 #Create Area variable and set to 0
