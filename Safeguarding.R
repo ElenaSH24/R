@@ -2,6 +2,9 @@
 # create dataframe from the original file
 safeguarding <- orders
 
+# import outcome of url query with the url links to admin on the sh24 number
+links = read.csv("20220124_links_to_admin.csv")
+
 #Create Area variable and set to 0
 safeguarding$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
