@@ -60,9 +60,10 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
                  DF[,varname5]=="Ireland - Galway" | DF[,varname5]=="Ireland - Mayo" |
                  DF[,varname5]=="Ireland - Laois" | DF[,varname5]=="Ireland - Roscommon" |
                  DF[,varname5]=="Ireland - Donegal" | DF[,varname5]=="Ireland - Sligo" |
-                 DF[,varname5]=="Ireland - Leitrim"
+                 DF[,varname5]=="Ireland - Leitrim" | DF[,varname5]=="Ireland - Limerick" |
+                 DF[,varname5]=="Ireland - Clare" | DF[,varname5]=="Ireland - Tipperary"
                ] <- "Ireland"
-  
+
   DF[,varname][DF[,varname5]=="Nottingham"] <- "Nottingham"
   DF[,varname][DF[,varname2]=="ARAS Bucuresti"] <- "Romania"
   
