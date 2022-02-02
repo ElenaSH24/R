@@ -689,13 +689,13 @@ ECNow <- rename(ECNow, Region = region)
 ECNow$Area <- recodeContraception(DF= ECNow,varname="Area",varname2="Region")
 
 # subset per each drug 
-ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','count')]
-ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','count')]
+      ### ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','count')]
+      ### ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','count')]
 
+ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','Drug')]
 ECNowLevonelle <- ECNow [(ECNow$Drug=="Levonelle"),c('Area','Drug')]
 # convert into data frame
 ECNowLevonelle = as.data.frame(table(ECNowLevonelle$Area), useNA = "always")
-
 ECNowEllaone <- ECNow [(ECNow$Drug=="EllaOne"),c('Area','Drug')]
 # convert into data frame
 ECNowEllaone = as.data.frame(table(ECNowEllaone$Area), useNA = "always")
