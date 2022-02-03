@@ -685,27 +685,30 @@ ECFuture$Area[ECFuture$region=="Fettle"] <- "Fettle"
 ECNow$Area <- 0
 #rename 'region'
 ECNow <- rename(ECNow, Region = region)
-#run recoding function (in Saskia Tab) and save output in Area; important to write your variable names in colons (but not the data frame name)
+#run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
 ECNow$Area <- recodeContraception(DF= ECNow,varname="Area",varname2="Region")
 
-# subset per each drug 
+# subset per drug 
       ### ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','count')]
       ### ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','count')]
 
 ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','Drug')]
+ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','Drug')]
 ECNowLevonelle <- ECNow [(ECNow$Drug=="Levonelle"),c('Area','Drug')]
-# convert into data frame
-ECNowLevonelle = as.data.frame(table(ECNowLevonelle$Area), useNA = "always")
 ECNowEllaone <- ECNow [(ECNow$Drug=="EllaOne"),c('Area','Drug')]
-# convert into data frame
-ECNowEllaone = as.data.frame(table(ECNowEllaone$Area), useNA = "always")
-
 ECNowLevonor <- ECNow [(ECNow$Drug=="Levonorgestrel 1.5mg"),c('Area','Drug')]
+
 # convert into data frame
+ECFutureLevonelle = as.data.frame(table(ECFutureLevonelle$Area), useNA = "always")
+ECFutureEllaone = as.data.frame(table(ECFutureEllaone$Area), useNA = "always")
+ECNowLevonelle = as.data.frame(table(ECNowLevonelle$Area), useNA = "always")
+ECNowEllaone = as.data.frame(table(ECNowEllaone$Area), useNA = "always")
 ECNowLevonor = as.data.frame(table(ECNowLevonor$Area), useNA = "always")
 
 # rename second column
+colnames(ECFutureLevonelle)[1] <- "Area"
 colnames(ECFutureLevonelle)[2] <- "EC.Levonelle"
+colnames(ECFutureEllaone)[1] <- "Area"
 colnames(ECFutureEllaone)[2] <- "EC.EllaOne"
 colnames(ECNowLevonelle)[1] <- "Area"
 colnames(ECNowLevonelle)[2] <- "EC.Levonelle"
@@ -714,7 +717,8 @@ colnames(ECNowEllaone)[2] <- "EC.EllaOne"
 colnames(ECNowLevonor)[1] <- "Area"
 colnames(ECNowLevonor)[2] <- "EC.Levonor"
 
-# sum all the Levonells together (future and now), and all the EllaOne together, set 'NA' to '0', convert character to integer, and sum columns
+# sum Levonells together (future and now), and EllaOne together, set 'NA' to '0'
+# convert character to integer, and sum columns
 ECLevonelle = merge(x = ECFutureLevonelle, y = ECNowLevonelle, by = "Area", all = TRUE)
 ECLevonelle[is.na(ECLevonelle)] <- "0"
 ECLevonelle$EC.Levonelle.x <- as.integer(ECLevonelle$EC.Levonelle.x)
