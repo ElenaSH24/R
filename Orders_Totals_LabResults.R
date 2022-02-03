@@ -689,9 +689,6 @@ ECNow <- rename(ECNow, Region = region)
 ECNow$Area <- recodeContraception(DF= ECNow,varname="Area",varname2="Region")
 
 # subset per drug 
-      ### ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','count')]
-      ### ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','count')]
-
 ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','Drug')]
 ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','Drug')]
 ECNowLevonelle <- ECNow [(ECNow$Drug=="Levonelle"),c('Area','Drug')]
@@ -759,7 +756,11 @@ PhotoTreatm <- rename(PhotoTreatm, Region = name)
 PhotoConsult$Area <- recodeContraception(DF= PhotoConsult,varname="Area",varname2="Region")
 PhotoTreatm$Area <- recodeContraception(DF= PhotoTreatm,varname="Area",varname2="Region")
 
-PhotoConsult1 <- PhotoConsult 
+PhotoConsult1 <- PhotoConsult
+class(PhotoConsult1$diagnosed_at)
+PhotoConsult1$diagnosed_at <- as.Date(PhotoConsult1$diagnosed_at, format = "%Y-%m-%d")
+PhotoConsult1 <- PhotoConsult1[(PhotoConsult1$diagnosed_at >= "2022-01-01" & PhotoConsult1$diagnosed_at <= "2022-01-31"),]
+
 #convert to data.frame
 PhotoConsult1 = as.data.frame(table(PhotoConsult1$Area), useNA = "always")
 colnames(PhotoConsult1)[1] <- "Area"
