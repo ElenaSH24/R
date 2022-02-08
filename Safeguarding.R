@@ -1,3 +1,6 @@
+#Clean the environment
+rm(list = ls())
+
 # set working directory and import file, recode new variable 'Area'  
 # create dataframe from the original file
 safeguarding <- orders
@@ -17,7 +20,7 @@ SelectedColumns <- safeguarding[,(c("SH24.UID","Customer.ID","Created.at","Creat
                   "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C"))]
 
 #'table' gives a table with the selected variable and the number of occurrences
-table(SelectedColumns$Dispatched.at.month.year=="2021-11")
+table(SelectedColumns$Dispatched.at.month.year=="2022-01")
 
 
 #Create subsets (data frames) for the two safeguarding reports:
@@ -29,8 +32,11 @@ str(SelectedColumns$Age)
 #create a subset with people under 18 ***CHANGE MONTH*** ----
 #There's a comma at the end of the command because we are selecting certain rows but all the columns.
 YoungPeople <- SelectedColumns [(SelectedColumns$Age<18 
-                            & SelectedColumns$Created.at.month.year=="2021-11"),]
-nrow(YoungPeople)
+                            & SelectedColumns$Created.at.month.year=="2022-01"),]
+
+links <- rename(links, SH24.UID = sh24_uid)
+                                    
+YoungPeople <- merge(x = YoungPeople, links[,c("SH24.UID","admin_url")], by = 'SH24.UID', all.x = TRUE)
 
 ZeroArea <- YoungPeople[(YoungPeople$Area=="0"),] 
 rm(ZeroArea)
@@ -106,14 +112,16 @@ YoungPeople$FlagsTogether <- paste(YoungPeople$Flag_Assaulted,"" ,YoungPeople$Fl
 YoungPeopleFlags <- YoungPeople [YoungPeople$Any_Flag==1,]
 
 #order columns:
-YoungPeopleFlagsOrdered <- YoungPeopleFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","SH24.UID","Gender","Genitals","Age","Ethnicity",
+YoungPeopleFlagsOrdered <- YoungPeopleFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","SH24.UID","admin_url","Gender","Genitals","Age","Ethnicity",
             "Sexual.preference","Sexuality","Area","FlagsTogether","Sum.Flags","Flag_SA","Flag_PS","Flag_PAID","Flag_DD","Flag_DEP","Flag_PARTNER",
             "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C")]
 
 
 #create subset for Adults ***CHANGE MONTH***
 Adults <- SelectedColumns [(SelectedColumns$Age>17 
-                           & SelectedColumns$Created.at.month.year=="2021-11"),]
+                           & SelectedColumns$Created.at.month.year=="2022-01"),]
+
+Adults <- merge(x = Adults, links[,c("SH24.UID","admin_url")], by = 'SH24.UID', all.x = TRUE)
 
 ZeroArea <- Adults[(Adults$Area=="0"),] 
 rm(ZeroArea)
@@ -128,15 +136,9 @@ table(Adults$Sexually.assaulted.risk.assessment, Adults$Flag_SA)
 
 #create new subset with only adult users with flags
 AdultsFlags <- Adults [Adults$Flag_SA==1,]
-AdultsFlagOrdered <- AdultsFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","SH24.UID","Gender","Genitals","Age","Ethnicity","Sexual.preference",
+AdultsFlagOrdered <- AdultsFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","SH24.UID", "admin_url","Gender","Genitals","Age","Ethnicity","Sexual.preference",
                                     "Sexuality","Area","Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C")]
 
 #export data to csv (export the data of the ordered file). Use double \\ when setting destination file----
-write.table (YoungPeopleFlagsOrdered, file="/Users/ElenaArdines1/Documents/Reports/1. Monthly Reports/Clinical Team Reports/Safeguarding/YoungPeople.csv", row.names=F, sep=",")
-write.table(AdultsFlagOrdered, file="/Users/ElenaArdines1/Documents/Reports/1. Monthly Reports/Clinical Team Reports/Safeguarding/Adults.csv", row.names=F, sep=",")
-
-write.table (Adults, file="/Users/ElenaArdines1/Documents/Reports/1. Monthly Reports/Clinical Team Reports/Safeguarding/Adults.csv", row.names=F, sep=",")
-
-
-#Clean the environment
-rm(list = ls())
+write.table (YoungPeopleFlagsOrdered, file="/Users/francescaboyle/Desktop/YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
+write.table (AdultsFlagOrdered, file="/Users/francescaboyle/Desktop/AdultsFlagOrdered.csv", row.names=F, sep=",")
