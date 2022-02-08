@@ -1,4 +1,3 @@
-# working directory: Masters for sharing
 # read files from 'Backing.Data' Tab
 # Install 'dplyr' (for 'rename' function)
 # Install 'data.table' (for setDT, to convert row names to a column)
@@ -6,7 +5,10 @@
 #Install the relevant libraries - do this one time
 install.packages("data.table")
 install.packages("dplyr")
- 
+
+#clean up the environment----
+rm(list = ls())
+
 #create data frame with selected columns----
 OrdersMonth <- orders[,c('SH24.UID','Customer.ID','Reason.for.visit','LA.of.residence','Default.LA','Site','Age',
           'Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
@@ -779,31 +781,6 @@ PD <- merge(x = PhotoConsult1, y = PhotoTreatm1, by = "Area", all = TRUE)
 
 Summary92 = merge(x = Summary91, y = PD, by = "Area", all = TRUE)
 
-# MOVE TO INVOICING: name drugs from sql code
-# PhotoTreatm$DrugName[PhotoTreatm$Drug=="3005"] <- "imiquimod"
-# PhotoTreatm$DrugName[PhotoTreatm$Drug=="3006"] <- "podophyllotoxin"
-# PhotoTreatm$DrugName[PhotoTreatm$Drug=="3007"] <- "aciclovir_episodic"
-# PhotoTreatm$DrugName[PhotoTreatm$Drug=="3008"] <- "aciclovir_suppressive"
-# PhotoTreatm$DrugName[PhotoTreatm$Drug=="3030"] <- "condyline"
-
-### DOES IT WORK?:
-# PD.Treatment.Imiquimod <- PhotoTreatm[(PhotoTreatm$DrugName=="imiquimod"),]
-# PD.Treatment.Imiquimod = as.data.frame(table(PD.Treatment.Imiquimod$Area), useNA = "always")
-# colnames(PD.Treatment.Imiquimod)[1] <- "Area"
-# colnames(PD.Treatment.Imiquimod)[2] <- "PD.Treatment.Imiquimod"
-# 
-# PD.Treatment.Podophyllotoxin <- PhotoTreatm[(PhotoTreatm$DrugName=="podophyllotoxin"),]
-# PD.Treatment.Podophyllotoxin = as.data.frame(table(PD.Treatment.Podophyllotoxin$Area), useNA = "always")
-# colnames(PD.Treatment.Podophyllotoxin)[1] <- "Area"
-# colnames(PD.Treatment.Podophyllotoxin)[2] <- "PD.Treatment.Podophyllotoxin"
-# 
-# PD.Treatment.AcicEpisodic <- PhotoTreatm[(PhotoTreatm$DrugName=="aciclovir_episodic"),]
-# PD.Treatment.AcicEpisodic = as.data.frame(table(PD.Treatment.Podophyllotoxin$Area), useNA = "always")
-# colnames(PD.Treatment.AcicEpisodic)[1] <- "Area"
-# colnames(PD.Treatment.AcicEpisodic)[2] <- "PD.Treatment.AcicEpisodic"
-
-# write.table (PhotoTreatm, file="\\Users\\Elena Ardines\\Documents\\Reports\\1. Monthly Reports\\Performance Reports\\2020\\2020 08\\PhotoTreatments.DrugNames.csv", col.names = F, row.names=T, sep=",")
-##### FIX ABOVE? - TREATMENTS
 
 #kits dispatched and returned that include Syphilis RPR (for the invoicing report)----
 RPR.Dispatched <- KitsDispatched[grep('RPR',KitsDispatched$Test.regime),]
@@ -833,8 +810,6 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_01/SummaryPerformance.2022.01.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_01/SummaryPerformance.2022.01_v1.csv", col.names = F, row.names=T, sep=",")
 
-################################
-#clean up the environment
-rm(list = ls())
+
