@@ -562,8 +562,9 @@ write.table (Treatment_Bucks, file="/Users/ElenaArdines1/Documents/Reports/1.Mon
 Data_Wirral <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Wirral"),]
 write.table (Data_Wirral, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.01.31 Wirral_Justin.csv", row.names=F, sep=",")
 
-# 2022.02.15
-
+# 2022.02.15 Blake Freetesting - Warwickshire
+Data_Warwickshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Freetesting - Warwickshire"),]
+write.table (Data_Warwickshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.02.15 Freetesting_Warwickshire.csv", row.names=F, sep=",")
 
 
 # END One-off
