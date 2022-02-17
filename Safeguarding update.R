@@ -112,7 +112,7 @@ YoungPeople$FlagsTogether <- paste(YoungPeople$Flag_Assaulted,"" ,YoungPeople$Fl
 YoungPeopleFlags <- YoungPeople [YoungPeople$Any_Flag==1,]
 
 #order columns:
-YoungPeopleFlagsOrdered <- YoungPeopleFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","SH24.UID","admin_url","Gender","Genitals","Age","Ethnicity",
+YoungPeopleFlagsOrdered <- YoungPeopleFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","admin_url","Gender","Genitals","Age","Ethnicity",
             "Sexual.preference","Sexuality","Area","FlagsTogether","Sum.Flags","Flag_SA","Flag_PS","Flag_PAID","Flag_DD","Flag_DEP","Flag_PARTNER",
             "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C")]
 
@@ -136,7 +136,7 @@ table(Adults$Sexually.assaulted.risk.assessment, Adults$Flag_SA)
 
 #create new subset with only adult users with flags
 AdultsFlags <- Adults [Adults$Flag_SA==1,]
-AdultsFlagOrdered <- AdultsFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID","SH24.UID", "admin_url","Gender","Genitals","Age","Ethnicity","Sexual.preference",
+AdultsFlagOrdered <- AdultsFlags [c("Created.at","Dispatched.at","Notified.at","Customer.ID", "admin_url","Gender","Genitals","Age","Ethnicity","Sexual.preference",
                                     "Sexuality","Area","Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C")]
 
 #export data to csv (export the data of the ordered file). Use double \\ when setting destination file----
