@@ -339,15 +339,6 @@ write.table (Data_Ireland, file="/Users/ElenaArdines1/Documents/Reports/1.Monthl
 
 # END Ireland Justin----
 
-
-# 2021.11.18 Hertfordshire Blake one-off
-Data_Hertfordshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Hertfordshire"),]
-class (Data_Hertfordshire$Created.at)
-Data_Hertfordshire$Created.at <- as.Date(Data_Hertfordshire$Created.at, format = "%Y-%m-%d")
-Data_Hertfordshire <- Data_Hertfordshire [(Data_Hertfordshire$Created.at>'2021-07-01'),]
-Data_Hertfordshire$Customer.ID = NULL
-write.table (Data_Hertfordshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2021.10 Hertfordshire.csv", row.names=F, sep=",")
-
 #Remove 'Area' from the files (no need to include it)
 Data_DerbyshireDerby$Area=NULL
 
@@ -550,6 +541,14 @@ rm(list =ls())
 
 
 # One-off ----
+# 2021.11.18 Hertfordshire Blake
+Data_Hertfordshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Hertfordshire"),]
+class (Data_Hertfordshire$Created.at)
+Data_Hertfordshire$Created.at <- as.Date(Data_Hertfordshire$Created.at, format = "%Y-%m-%d")
+Data_Hertfordshire <- Data_Hertfordshire [(Data_Hertfordshire$Created.at>'2021-07-01'),]
+Data_Hertfordshire$Customer.ID = NULL
+write.table (Data_Hertfordshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2021.10 Hertfordshire.csv", row.names=F, sep=",")
+
 # 2022.01.31 Negar/Justin add sh24 uids to Bucks data and CT treatment data with sh24 uids
 Data_Bucks <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Buckinghamshire"),]
 Data_Bucks$Created.at <- as.Date(Data_Bucks$Created.at, format = "%Y-%m-%d")
@@ -562,6 +561,25 @@ write.table (Treatment_Bucks, file="/Users/ElenaArdines1/Documents/Reports/1.Mon
 # 2022.01.31 Justin Wirral data to check safeguarding
 Data_Wirral <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Wirral"),]
 write.table (Data_Wirral, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.01.31 Wirral_Justin.csv", row.names=F, sep=",")
+
+# 2022.02.15 Blake Freetesting - Warwickshire
+Data_Warwickshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Freetesting - Warwickshire"),]
+write.table (Data_Warwickshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.02.15 Freetesting_Warwickshire.csv", row.names=F, sep=",")
+
+# 2022.02.17 Blake Nottinghamshire
+Data_Notting <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Nottingham" | 
+                              BackingMin_noSH24$Default.LA=="Freetesting - Nottingham" |
+                              BackingMin_noSH24$Default.LA=="Freetesting - Nottinghamshire" ),]
+
+class(Data_Notting$Created.at)
+Data_Notting$Created.at <- as.Date(Data_Notting$Created.at, format = "%Y-%m-%d")
+Data_Notting <- Data_Notting[(Data_Notting$Created.at >= "2021-10-01" & 
+                                                        Data_Notting$Created.at <= "2021-12-31"),]
+Data_Notting$SplitAge <- 0
+Data_Notting$SplitAge = ifelse(Data_Notting$Age>24,"25+","Under 25")
+table(Data_Notting$SplitAge)
+write.table (Data_Notting, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.02.17 Data_Notting.csv", row.names=F, sep=",")
+
 
 # END One-off
 
