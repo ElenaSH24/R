@@ -566,6 +566,20 @@ write.table (Data_Wirral, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly
 Data_Warwickshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Freetesting - Warwickshire"),]
 write.table (Data_Warwickshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.02.15 Freetesting_Warwickshire.csv", row.names=F, sep=",")
 
+# 2022.02.17 Blake Nottinghamshire
+Data_Notting <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Nottingham" | 
+                              BackingMin_noSH24$Default.LA=="Freetesting - Nottingham" |
+                              BackingMin_noSH24$Default.LA=="Freetesting - Nottinghamshire" ),]
+
+class(Data_Notting$Created.at)
+Data_Notting$Created.at <- as.Date(Data_Notting$Created.at, format = "%Y-%m-%d")
+Data_Notting <- Data_Notting[(Data_Notting$Created.at >= "2021-10-01" & 
+                                                        Data_Notting$Created.at <= "2021-12-31"),]
+Data_Notting$SplitAge <- 0
+Data_Notting$SplitAge = ifelse(Data_Notting$Age>24,"25+","Under 25")
+table(Data_Notting$SplitAge)
+write.table (Data_Notting, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022.02.17 Data_Notting.csv", row.names=F, sep=",")
+
 
 # END One-off
 
