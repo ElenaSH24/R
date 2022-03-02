@@ -34,8 +34,8 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
   DF[,varname][(DF[,varname5]=="Halton")] <- "Halton"
   DF[,varname][DF[,varname2]=="iSH Hereford"] <- "Herefordshire"
   DF[,varname][DF[,varname2]=="Hertford Clinic"] <- "Hertfordshire"
-  DF[,varname][DF[,varname2]=="The Tudor Centre"|
-                 DF[,varname2]=="Hesa Primary Care Centre"] <- "Hillingdon"
+  DF[,varname][DF[,varname5]=="Hillingdon"] <- "Hillingdon"
+  
   DF[,varname][(DF[,varname5]=="Kirklees")] <- "Kirklees"
   DF[,varname][DF[,varname5]=="Knowsley"] <- "Knowsley"
   
@@ -61,7 +61,8 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
                  DF[,varname5]=="Ireland - Laois" | DF[,varname5]=="Ireland - Roscommon" |
                  DF[,varname5]=="Ireland - Donegal" | DF[,varname5]=="Ireland - Sligo" |
                  DF[,varname5]=="Ireland - Leitrim" | DF[,varname5]=="Ireland - Limerick" |
-                 DF[,varname5]=="Ireland - Clare" | DF[,varname5]=="Ireland - Tipperary"
+                 DF[,varname5]=="Ireland - Clare" | DF[,varname5]=="Ireland - Tipperary" |
+                 DF[,varname5]=="Ireland - Carlow" | DF[,varname5]=="Ireland - Kilkenny"
                ] <- "Ireland"
 
   DF[,varname][DF[,varname5]=="Nottingham"] <- "Nottingham"
