@@ -9,11 +9,11 @@ library(reshape2)
 # install openxlsx package: Read, Write and Edit XLSX File, no need to install Java.
 #library("openxlsx", lib.loc="~/R/win-library/4.0.4")
 
-setwd("/Users/ElenaArdinesTomas/Documents/Reports/2022-02")
+setwd("/Users/ElenaArdinesTomas/Documents/Reports/2022-03")
 setwd("~/Documents/Reports/0. Master for sharing")
 setwd("~/Documents/Reports/2. Ad-hoc reports/Feedback")
 
-orders = read.csv("20220202_sti_orders.csv")
+orders = read.csv("20220302_sti_orders.csv")
 inv = read.csv("Invoic_Test.csv")
 
 # REPEATS INVESTIGATION----
@@ -27,23 +27,23 @@ table(orders1$test_kit_index,orders1$DispatchedMonthYr=="2021-06")
 
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
-Treatments = read.csv("CT_Treatments.csv")
-ContCOC = read.csv("Contraception_COC.csv")
-ContPOP = read.csv("Contraception_POP.csv")
-ECFuture = read.csv("20220201_EC_future_month.csv")
-ECNow = read.csv("20220201_EC_now_month.csv")
-PhotoConsult = read.csv("PD_consultations.csv")
-PhotoTreatm = read.csv("PD_treatments.csv")
-Injectable = read.csv("Contraception_Injectable.csv")
-Patch = read.csv("Contraception_Patch.csv")  
-Ring = read.csv("Contraception_Ring.csv")
+Treatments = read.csv("20220301_CT_Treatments.csv")
+ContCOC = read.csv("20220301_COC.csv")
+ContPOP = read.csv("20220301_POP.csv")
+ECFuture = read.csv("20220302_EC_future_month.csv")
+ECNow = read.csv("20220302_EC_now_month.csv")
+PhotoConsult = read.csv("20220301_PD_consultations.csv")
+PhotoTreatm = read.csv("20220301_PD_treatments.csv")
+Injectable = read.csv("20220301_Injectable.csv")
+Patch = read.csv("20220301_Patch.csv")  
+Ring = read.csv("20220301_Ring.csv")
 
 
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
 reactivity = read.csv("20210506_Reactivity_levels_PHE.csv")
 
-FranECNow = read.csv("20220221_ECNow_disaggregated.csv")
-FranECFut = read.csv("20220221_ECFuture_disaggregat.csv")
+FranECNow = read.csv("20220301_ECNow_disaggregated.csv")
+FranECFut = read.csv("20220301_ECFuture_disaggregat.csv")
 
 LSOA = read.csv("Lower_Layer_Super_Output_Area_(2011)_to_Ward_(2019)_Lookup_in_England_and_Wales.csv") # England and Wales
 
