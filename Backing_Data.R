@@ -42,8 +42,8 @@ Ring = read.csv("Contraception_Ring.csv")
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
 reactivity = read.csv("20210506_Reactivity_levels_PHE.csv")
 
-FranECNow = read.csv("20220111_ECNow_disaggregated_FranRepeats.csv")
-FranECFut = read.csv("20220111_ECFuture_disaggregated_FranRepeats.csv")
+FranECNow = read.csv("20220221_ECNow_disaggregated.csv")
+FranECFut = read.csv("20220221_ECFuture_disaggregat.csv")
 
 LSOA = read.csv("Lower_Layer_Super_Output_Area_(2011)_to_Ward_(2019)_Lookup_in_England_and_Wales.csv") # England and Wales
 
@@ -112,6 +112,13 @@ OrdersToWork$Unprotected.sex.in.last.3.days <- ""
 OrdersToWork$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
 OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+
+
+   Bucks <- OrdersToWork[(OrdersToWork$Default.LA=='Buckinghamshire'),]
+   table(Bucks$Created.at.month.year)
+   
+table(OrdersToWork$Default.LA)
+-----------------------------------------
 
 # check that all orders are allocated to an Area
 Zero <- OrdersToWork[(OrdersToWork$Area==0),]

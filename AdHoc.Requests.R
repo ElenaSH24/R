@@ -58,7 +58,7 @@ table(DataStack$Type)
 DataStackFettle <- DataStack[(DataStack$Default.LA == "Fettle"),]
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="/Users/ElenaArdines1/Documents/Reports/2.Ad-hoc-reports/2022.01.11.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="/Users/ElenaArdines1/Documents/Reports/2.Ad-hoc-reports/2022.02.21.DataStack_Fettle.csv", row.names=F, sep=",")
 
 # metrics
 nrow(DataStackFettle) #number of orders from all Fettle products
