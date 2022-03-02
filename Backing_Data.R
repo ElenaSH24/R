@@ -9,7 +9,7 @@ library(reshape2)
 # install openxlsx package: Read, Write and Edit XLSX File, no need to install Java.
 #library("openxlsx", lib.loc="~/R/win-library/4.0.4")
 
-setwd("~/Documents/Reports/2022-02")
+setwd("/Users/ElenaArdinesTomas/Documents/Reports/2022-02")
 setwd("~/Documents/Reports/0. Master for sharing")
 setwd("~/Documents/Reports/2. Ad-hoc reports/Feedback")
 
@@ -344,8 +344,9 @@ Data_DerbyshireDerby$Area=NULL
 
 #export data to csv (export the data of the ordered file). Use double \\ when setting destination file----
 write.table (Data_Berkshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022 Month Berkshire STI.csv", row.names=F, sep=",")
-write.table (Data_Bromley, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022 Month Bromley STI.csv"
+write.table (Data_Bromley, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_01\\BackingData\\2022.02.22 Bromley STI.csv"
              , row.names=F, sep=",")
+
 write.table (Data_Buckinghamshire, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022 Month Buckinghamshire STI.csv", row.names=F, sep=",")
 write.table (Data_Cornwall, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022 Month Cornwall_Southe_Blackb STI.csv", row.names=F, sep=",")
 write.table (Data_DerbyshireDerby, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/Invoicing/2022/2022_01/BackingData/2022 Month DerbyshireDerby STI.csv", row.names=F, sep=",")
