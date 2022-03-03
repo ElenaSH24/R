@@ -116,7 +116,7 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
 
 #once the function is done, save it on a script.
 # use source func to call my funct
-source("file.path")
+#source("file.path")
 
 
 # DF = name of data frame // varname = variable that needs to be recoded (Area) // varname2 = variable that is used for conditioning (Region)
