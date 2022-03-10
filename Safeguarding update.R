@@ -6,7 +6,7 @@ rm(list = ls())
 safeguarding <- orders
 
 # import outcome of url query with the url links to admin on the sh24 number
-links = read.csv("20220124_links_to_admin.csv")
+links = read.csv("20220310_urls_safeguarding.csv")
 
 #Create Area variable and set to 0
 safeguarding$Area <- 0
@@ -20,7 +20,7 @@ SelectedColumns <- safeguarding[,(c("SH24.UID","Customer.ID","Created.at","Creat
                   "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C"))]
 
 #'table' gives a table with the selected variable and the number of occurrences
-table(SelectedColumns$Dispatched.at.month.year=="2022-01")
+table(SelectedColumns$Dispatched.at.month.year=="2022-02")
 
 
 #Create subsets (data frames) for the two safeguarding reports:
@@ -32,7 +32,7 @@ str(SelectedColumns$Age)
 #create a subset with people under 18 ***CHANGE MONTH*** ----
 #There's a comma at the end of the command because we are selecting certain rows but all the columns.
 YoungPeople <- SelectedColumns [(SelectedColumns$Age<18 
-                            & SelectedColumns$Created.at.month.year=="2022-01"),]
+                            & SelectedColumns$Created.at.month.year=="2022-02"),]
 
 links <- rename(links, SH24.UID = sh24_uid)
                                     
@@ -142,3 +142,8 @@ AdultsFlagOrdered <- AdultsFlags [c("Created.at","Dispatched.at","Notified.at","
 #export data to csv (export the data of the ordered file). Use double \\ when setting destination file----
 write.table (YoungPeopleFlagsOrdered, file="/Users/francescaboyle/Desktop/YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
 write.table (AdultsFlagOrdered, file="/Users/francescaboyle/Desktop/AdultsFlagOrdered.csv", row.names=F, sep=",")
+
+# export to Elena's machine
+write.table (YoungPeopleFlagsOrdered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\Safeguarding\\2022\\YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
+
+
