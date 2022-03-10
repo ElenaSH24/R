@@ -3,10 +3,10 @@
 
 invoicing = read.csv("20220303_Invoicing_AprToFeb.csv")
 
-invoicing$Region <- invoicing$default_la
 names(invoicing)
 table(invoicing$Region)
 
+invoicing$Region <- invoicing$default_la
 invoicing$Region[grepl("Freetesting -", invoicing$default_la)] <- "Freetesting"
 invoicing$Region[grepl("Ireland -", invoicing$default_la)] <- "Ireland"
 invoicing$Region[grepl("Northern Ireland ", invoicing$default_la)] <- "Northern Ireland"
