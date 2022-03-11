@@ -12,12 +12,19 @@ invoicing$Region[grepl("Ireland -", invoicing$default_la)] <- "Ireland"
 invoicing$Region[grepl("Northern Ireland ", invoicing$default_la)] <- "Northern Ireland"
 invoicing$Region[grepl("PrEP Trial -", invoicing$default_la)] <- "PrEP Trial"
 
+class(invoicing$order_created_at)
+class(invoicing$processed_at)
 
+# convert character to date, first set the format the date is shown 
+invoicing$order_created_at <- as.Date(invoicing$order_created_at,"%Y-%m-%d")
+invoicing$processed_at <- as.Date(invoicing$processed_at,"%Y-%m-%d")
 
+# extract month from day date
+invoicing$Created_Month <- format(as.Date(invoicing$order_created_at),"%Y-%m")
+invoicing$Processed_Month <- format(as.Date(invoicing$processed_at),"%Y-%m")
 
-
-orders1$Dispatched_day <- as.Date(orders1$dispatched_at, "%Y-%m-%d")
-orders1$DispatchedMonthYr <- format(as.Date(orders1$dispatched_at), "%Y-%m")
+table(invoicing$Processed_Month, invoicing$overall_type=='kits_sent')
+table(invoicing$Processed_Month, invoicing$overall_type=='kits_tested')
 
 
 
