@@ -64,9 +64,45 @@ table(invMonth$Description, invMonth$overall_type=='Orders')
 # first half of the invoice number is the month
 invMonth$Invoice <- 'Inv2022.02-'
 # second half of the invoice number is associated to the specific Trust/Region, which we call ContactName in this script
-invMonth$Number <- 0
+invMonth$Number <- ""
+invMonth$Number[invMonth$ContactName == "Essex"] <- "0001"
+invMonth$Number[invMonth$ContactName == "Shropshire"] <- "0002"
+invMonth$Number[invMonth$ContactName == "Telford and Wrekin"] <- "0003"
+invMonth$Number[invMonth$ContactName == "Worcestershire"] <- "0005"
+invMonth$Number[invMonth$ContactName == "London Northwest Healthcare"] <- "0006"
+invMonth$Number[invMonth$ContactName == "County Durham and Darlington NHS Foundation Trust"] <- "0007"
+invMonth$Number[invMonth$ContactName == "Derbyshire Community Health Services NHS Foundation Trust"] <- "0008"
+invMonth$Number[invMonth$ContactName == "South Staffordshire and Shropshire Healthcare NHS Foundation  Trust"] <- "0009"
+invMonth$Number[invMonth$ContactName == "Hertfordshire"] <- "00010"
+invMonth$Number[invMonth$ContactName == "Berkshire"] <- "00012"
+invMonth$Number[invMonth$ContactName == "Bradford"] <- "00013"
+invMonth$Number[invMonth$ContactName == "Knowsley"] <- "00014"
+invMonth$Number[invMonth$ContactName == "Darlington"] <- "00015"
+invMonth$Number[invMonth$ContactName == "Leicester City"] <- "00016"
+invMonth$Number[invMonth$ContactName == "Rutland"] <- "00017"
+invMonth$Number[invMonth$ContactName == "Leicestershire"] <- "00018"
+invMonth$Number[invMonth$ContactName == "Derby City"] <- "00019"
+invMonth$Number[invMonth$ContactName == "North Staffordshire"] <- "00020"
+invMonth$Number[invMonth$ContactName == "Gateshead"] <- "00021"
+invMonth$Number[invMonth$ContactName == "Cheshire East"] <- "00022"
+invMonth$Number[invMonth$ContactName == "Halton"] <- "00023"
+invMonth$Number[invMonth$ContactName == "Warrington"] <- "00024"
+invMonth$Number[invMonth$ContactName == "Northern Ireland"] <- "00025"
+invMonth$Number[invMonth$ContactName == "UKHSA"] <- "00026"
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
+invMonth$Number[invMonth$ContactName == ""] <- ""
 
-
-
-
-
+# create InvoiceNumber as concatenate of 'Invoice' and 'Number'
+invMonth$InvoiceNumber <- paste(invMonth$Invoice, invMonth$Number, sep="")
