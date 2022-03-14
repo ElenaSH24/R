@@ -147,7 +147,7 @@ colnames(invMonth_1)[1] <- "ContactName"
 colnames(invMonth_1)[2] <- "Description"
 colnames(invMonth_1)[3] <- "Quantity"
 
-
+# order data frist by Area (=ContractName) and then by the invoicing category (=Description)
 invMonth_1 <- invMonth_1[order(invMonth_1$ContactName,invMonth_1$Description),]
 
 # remove dataframe rows based on zero values in one column
