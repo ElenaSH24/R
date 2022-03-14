@@ -53,32 +53,44 @@ EC1 <- rename(EC1, Default.LA = Region)
 
 # stack all data sets one of top of each other
 DataStack <- rbind(Orders1, Treatments1,ContCOC1,ContPOP1,EC1)
-table(DataStack$Type)
 
 DataStackFettle <- DataStack[(DataStack$Default.LA == "Fettle"),]
-# remove SH24 number!
-DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="/Users/ElenaArdines1/Documents/Reports/2.Ad-hoc-reports/2022.02.21.DataStack_Fettle.csv", row.names=F, sep=",")
+
 
 # metrics
 nrow(DataStackFettle) #number of orders from all Fettle products
-table(DataStackFettle$Type) #number of orders per product
-
+#number of orders per product
+Fettle.OrdersCreated <- as.data.frame(table(DataStackFettle$Type))
+colnames(Fettle.OrdersCreated)[1] <- "Product"
+colnames(Fettle.OrdersCreated)[2] <- "Orders created"  
+  
 # number of unique users per Fettle product
 Fettle.Unique <- aggregate(x = DataStackFettle$Customer.ID, # Specify data column
                         by = list(DataStackFettle$Type), # Specify group indicator
                         FUN = function(x) length(unique(x))) #Desired function
-names(Fettle.Unique)
-print(Fettle.Unique)
-# DOESN'T WORK: add row with total of the columns. (1:6) in brackets: number of columns of data frame i.e.from column 1 to column 5
-###Fettle.Unique1 <- as.data.frame(Fettle.Unique)
-###Fettle.Unique1["Total Orders from unique users",(1:4)] <- colSums(Fettle.Unique1[,1:4], na.rm=TRUE)
-###colSums (Fettle.Unique1, na.rm = FALSE, dims = 1)
-###colSums (x, na.rm = FALSE, dims = 1)
+
+colnames(Fettle.Unique)[1] <- "Product"
+colnames(Fettle.Unique)[2] <- "Count unique users"
+        # print the new data frame to paste into Excel for Fran
+        print(Fettle.Unique)
+
+# put both data frames together:
+Fettle.OrdersAndUnique = merge(x = Fettle.OrdersCreated, y = Fettle.Unique, by = "Product", all = TRUE)
+# print to copy and paste in Excel
+print(Fettle.OrdersAndUnique)
+
+
+
+
+
+# remove SH24 number!
+DataStackFettle$SH24.UID = NULL
+write.table (DataStackFettle, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.03.14.DataStack_Fettle.csv", row.names=F, sep=",")
+
 
 # Cross-product orders
 # Reshape the data frame
-################## CONTINUE FROM HERE 11.JAN.2022 ###############
+################## CONTINUE FROM HERE 14.MARCH.2022 ###############
 DataStackFettle.Wide <- DataStackFettle[,c('Customer.ID','Type')]
 
 DataStackFettle.Wide1 <- reshape(DataStackFettle.Wide, idvar = "Customer.ID", timevar = "Type", direction = "wide")
@@ -87,10 +99,8 @@ reshape(dat1, idvar = "name", timevar = "numbers", direction = "wide")
 COCandPOP$COC.POP[COCandPOP$Gender=="male" | GumcadQ$Genitals=="Penis"] <- 1 
 GumcadQ$Gender[GumcadQ$Gender=="male" | GumcadQ$Genitals=="Penis"] <- 1 
 
-
-
-
-
+# TRY THIS?: convert to data frame to get the frequency of ordering per user
+DataStackFettle_1 <- as.data.frame(table(DataStackFettle$Customer.ID,DataStackFettle$Type))
 
 # End Stack all data sets----
 
