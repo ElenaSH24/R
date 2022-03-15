@@ -43,7 +43,6 @@ invoicing$Created_Month <- format(as.Date(invoicing$order_created_at),"%Y-%m")
 invoicing$Processed_Month <- format(as.Date(invoicing$processed_at),"%Y-%m")
 
 table(invoicing$Processed_Month, invoicing$overall_type=='kits_sent')
-table(invoicing$Region, invoicing$overall_type ,invoicing$Processed_Month=='2022-02')
 
 # assign values to 'overall_type' that align with invoicing
 invoicing$overall_type[invoicing$overall_type == 'kits_sent'] <- 'Orders'
@@ -147,19 +146,21 @@ colnames(invMonth_1)[1] <- "ContactName"
 colnames(invMonth_1)[2] <- "Description"
 colnames(invMonth_1)[3] <- "Quantity"
 
-# order data frist by Area (=ContractName) and then by the invoicing category (=Description)
+# order data first by Area (=ContactName) and second by the invoicing category (=Description)
 invMonth_1 <- invMonth_1[order(invMonth_1$ContactName,invMonth_1$Description),]
+# some returns are blank, which shows in data.frame as 'Returns -'
+# assimilate those 'blank' categories to CT/GC (single site) - just cause there are only a few every month, and not sure how to allocate to their relevant category, 
+# they relate to categories not interpreted by the mapping table in the DB
+invMonth_1$Description[invMonth_1$Description == "Returns - "] <- "Returns - CT/GC (single site)"
 
 # remove dataframe rows based on zero values in one column
-invMonth_1 <- invMonth_1[invMonth_1$Quantity != 0, ]
+invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
 
-# some returns are blank, which shows in data.frame as 'Returns -'
-table(invMonth_1$Description, invMonth_1$Description == 'Returns -')
+
 
 
 # price data frames
-
-categories <- c('Orders - All STIs (dual site)',
+Description <- c('Orders - All STIs (dual site)',
                 'Orders - All STIs (single site)',
                 'Orders - All STIs (triple site)',
                 'Orders - CT/GC (dual site)',
@@ -222,20 +223,49 @@ categories <- c('Orders - All STIs (dual site)',
                 'Returns - Hep: 4 bloods & CT/GC (single site)',
                 'Returns - Hep: 4 bloods & CT/GC (triple site)')
 
-Discount <- 
+Fee1DiscountRM <- c(3.6,3.04,4.18,2.99,2.34,3.16,2.72,3.6,3.04,4.18,2.72,
+                    2.72,3.6,3.04,4.18,2.72,3.6,3.04,4.18,2.72,3.6,3.04,
+                    4.18,2.72,3.6,3.04,4.18,2.72,3.6,3.04,4.18,
+                    46.13,31.6,51.1,29.06,13.71,34.03,
+                    9.64,37.6,23.62,42.56,18.17,
+                    9.64,37.6,23.62,42.56,9.64,
+                    37.6,23.62,42.56,18.17,46.13,
+                    31.6,51.1,26.7,54.66,40.13,
+                    59.63,35.23,63.19,48.66,68.16)
+
+Fee2Standard <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,
+                  4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,6.54,5.52,
+                  7.60,4.94,5.52,6.54,7.60,4.94,5.52,6.54,7.60,66.60,38.48,
+                  72.82,37.22,19.16,55.28,16.62,54.19,33.85,61.41,22.82,13.52,
+                  54.19,33.85,61.41,16.62,54.19,
+                  33.85
+                  61.41
+                  22.82
+                  66.60
+                  38.48
+                  72.82
+                  33.54
+                  44.68
+                  72.80
+                  79.02
+                  39.74
+                  50.88
+                  79.00
+                  85.22
+)
 
 
 
-multiply_by_fee <- function(Quantity) {
-  temp_C <- (Quantity * )
-  return(temp_C)
-}
+# create data frame with prices per invoicing category
+fee1 <- data.frame(Description, Fee1DiscountRM)
 
+# break down the main invoicing data set as per the fee contracted in each area 
+InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$ContactName=="Bradford"),]
 
+# merge each price data set with its correspondent areas
+InvoicesFee1 = merge(x = InvFee1, y = fee1, by = "Description", all.x = TRUE)
+# order data first by Area (=ContactName) and second by the invoicing category (=Description)
+InvoicesFee1 <- InvoicesFee1[order(InvoicesFee1$ContactName,InvoicesFee1$Description),]
 
-fahrenheit_to_celsius <- function(temp_F) {
-  temp_C <- (temp_F - 32) * 5 / 9
-  return(temp_C)
-}
 
 
