@@ -11,11 +11,18 @@ Ctad <- orders[ ,c('SH24.UID','Lab.UID','Postcode','Default.LA',
 # Orders requested on the relevant quarter, without LabResults date OR orders that have a LabResults date within the quarter?!?!?!?
 
 # Select orders for relevant quarter
-Ctad1 <- Ctad [((Ctad$Created.at.month.year=="2021-07"| Ctad$Created.at.month.year=="2021-08"| Ctad$Created.at.month.year=="2021-09")
+Ctad1 <- Ctad [((Ctad$Created.at.month.year=="2021-10"| Ctad$Created.at.month.year=="2021-11"| Ctad$Created.at.month.year=="2021-12")
                            & (Ctad$Default.LA != "Fettle") & (Ctad$Default.LA != "Romania") 
                 & (Ctad$Default.LA != "Ireland - Cork") & (Ctad$Default.LA != "Ireland - Dublin") & (Ctad$Default.LA != "Ireland - Kerry")
-                & (Ctad$Default.LA != "Ireland - Kildare") & (Ctad$Default.LA != "Ireland - Wicklow")
+                & (Ctad$Default.LA != "Ireland - Kildare") & (Ctad$Default.LA != "Ireland - Wicklow") & (Ctad$Default.LA != "Ireland - Louth") 
+                & (Ctad$Default.LA != "Ireland - Cavan") & (Ctad$Default.LA != "Ireland - Meath") & (Ctad$Default.LA != "Ireland - Monaghan") 
+                & (Ctad$Default.LA != "Ireland - Offaly") & (Ctad$Default.LA != "Ireland - Galway") & (Ctad$Default.LA != "Ireland - Mayo") 
+                & (Ctad$Default.LA != "Ireland - Laois") & (Ctad$Default.LA != "Ireland - Roscommon") & (Ctad$Default.LA != "Ireland - Donegal") 
+                & (Ctad$Default.LA != "Ireland - Sligo") & (Ctad$Default.LA != "Ireland - Leitrim") & (Ctad$Default.LA != "Ireland - Limerick")
+                & (Ctad$Default.LA != "Ireland - Clare") & (Ctad$Default.LA != "Ireland - Tipperary") & (Ctad$Default.LA != "Ireland - Carlow") 
+                & (Ctad$Default.LA != "Ireland - Kilkenny")
                 & (Ctad$Lab.results.at.month.year != "")),]
+nrow(Ctad1)
 
 # Create variable Lab ID, with the Lab Codes sent by TDL and SPS
 Ctad1$Lab_ID <- 0
@@ -119,6 +126,7 @@ Ctad2$SpecimenType_4 <- ifelse(grepl("Oral|oral|Oral Swab|MSM", Ctad2$Test.regim
 Ctad2$CTResult_1 <- 0
 Ctad2$CTResult_1[Ctad2$Test.for.Chlamydia.Urine=='positive'] <- 1
 Ctad2$CTResult_1[Ctad2$Test.for.Chlamydia.Urine=='negative'] <- 2
+Ctad2$CTResult_1[Ctad2$Test.for.Chlamydia.Urine=='insufficient'] <- 4
 Ctad2$CTResult_1[Ctad2$Test.for.Chlamydia.Urine=='no_results' | Ctad2$Test.for.Chlamydia.Urine=='not_requested'
                | Ctad2$Test.for.Chlamydia.Urine=='missing'] <- "XX"
 table(Ctad2$CTResult_1)
@@ -176,5 +184,5 @@ Ctad3Long1 <- Ctad3Long1 [c("Lab_ID","Test_ID","Patient_ID","NHS_Number","NHS_Nu
          ,"Registered_GP_Code","Postcode_Testing_Service","Venue_code","Specimen_Type","Testing_Service_Type","NCSP_Clinic_Code","Specimen_Date","Receipt_date"
          ,"Date_Result_authorised","CT_Result")]
 
-write.table (Ctad3Long1, file="/Users/ElenaArdines1/Documents/Reports/NHS_Reports/CTAD/2021/YGMDR_Q3_2021.csv", row.names=F, sep=",")
+write.table (Ctad3Long1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\CTAD\\2021\\YGMDR_Q4_2021.csv", row.names=F, sep=",")
 
