@@ -1,18 +1,90 @@
 # producing Xero file
 
-invoicing = read.csv("20220303_Invoicing_AprToFeb.csv")
+invSTI = read.csv("20220303_Invoicing_AprToFeb.csv")
+invSTI <- invSTI[,c("overall_type","default_la","processed_at","invoice_category_billable")]
 
-names(invoicing)
-table(invoicing$Region)
+# convert character to date, first set the format the date is shown 
+invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
+# extract month from day date
+invSTI$Dispatched.MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
+# assign values to 'overall_type' that align with invoicing
+invSTI$overall_type[invSTI$overall_type == 'kits_sent'] <- 'Orders'
+invSTI$overall_type[invSTI$overall_type == 'kits_tested'] <- 'Returns'
+# concatenate values of both variables (type and category) to create the invoicing Description
+invSTI$Description <- paste(invSTI$overall_type, invSTI$invoice_category_billable, sep=" - ")
 
-# Create Region, to group freetesting, Ireland etc together
-invoicing$Service <- invoicing$default_la
-invoicing$Service[grepl("Freetesting -", invoicing$default_la)] <- "Freetesting"
-invoicing$Service[grepl("Ireland -", invoicing$default_la)] <- "Ireland"
-invoicing$Service[grepl("Northern Ireland ", invoicing$default_la)] <- "Northern Ireland"
-invoicing$Service[grepl("PrEP Trial -", invoicing$default_la)] <- "PrEP Trial"
+table(invSTI$Description, invSTI$overall_type=='Returns')
+# some returns are blank, showing in data.frame as 'Returns -'
+# assimilate those 'blank' categories to CT/GC (single site) - only a few every month, and not sure how to allocate to exact category, 
+# they relate to categories not interpreted by the mapping table in the DB
+invSTI$Description[invSTI$Description == "Returns - "] <- "Returns - CT/GC (single site)"
 
-table(invoicing$ContactName)
+# remove variables not needed anymore
+invSTI$processed_at = NULL
+invSTI$overall_type = NULL
+invSTI$invoice_category_billable = NULL
+
+
+# Include CT treatments. Read the file. Get needed columns
+invTreatments <- Treatments[ , c("Region","Dispatched.MonthYear")]
+# create variable Description to rbind with STI data frame
+invTreatments$Description <- "CT Treatments"
+# rename (new variable name = existing variable name) to have same names in all data frames----
+invTreatments <- rename(invTreatments, default_la = Region)
+
+
+# Include contraception
+invCOC <- ContCOC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
+invPOP <- ContPOP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
+invEC <- ECNow[ , c("region","dispatched_year_month","Drug")]
+invInjectable <- Injectable[ , c("region","Injectable.months.prescribed","Dispatched.Month.Year")]
+invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year")]
+invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
+
+names(invPatch)
+
+
+# concatenate values to create 'Description'
+invCOC$Description <- paste("COC ",invCOC$Months.prescribed,"mth ",invCOC$Drug)
+invPOP$Description <- paste("POP ",invPOP$Months.prescribed,"mth ",invPOP$Drug)
+invEC$Description <- paste("EC ",invEC$Drug)
+invInjectable$Description <- paste('Sayana Press 104mg / 0.65ml ',invInjectable$Injectable.months.prescribed)
+invPatch$Description <- paste('Evra Patch ',invInjectable$Patch.months.prescribed)
+
+
+
+
+
+
+
+
+# rename (new variable name = existing variable name) to have same names in all data frames----
+invCOC <- rename(invCOC, default_la = Region)
+invCOC <- rename(invCOC, Dispatched.MonthYear = Dispatched.at.month.year)
+invPOP <- rename(invPOP, default_la = Region)
+invPOP <- rename(invPOP, Dispatched.MonthYear = Dispatched.at.month.year)
+invEC <- rename(invEC, default_la = region)
+invEC <- rename(invEC, Dispatched.MonthYear = dispatched_year_month)
+invInjectable <- rename(invInjectable,default_la = region)
+# remove variables not needed 
+invCOC$Months.prescribed = NULL
+invCOC$Drug = NULL
+invPOP$Months.prescribed = NULL
+invPOP$Drug = NULL
+invEC$Drug = NULL
+invInjectable$Injectable.months.prescribed = NULL
+
+
+# Stack data sets one on top of the other ----
+invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC)
+
+
+        # Create variable to group freetesting, Ireland etc together
+        invoicing$Service <- invoicing$default_la
+        invoicing$Service[grepl("Freetesting -", invoicing$default_la)] <- "Freetesting"
+        invoicing$Service[grepl("Ireland -", invoicing$default_la)] <- "Ireland"
+        invoicing$Service[grepl("Northern Ireland ", invoicing$default_la)] <- "Northern Ireland"
+        invoicing$Service[grepl("PrEP Trial -", invoicing$default_la)] <- "PrEP Trial"
 
 # Create ContactName, to name regions as per invoicing requirements
 invoicing$ContactName <- invoicing$Service
@@ -31,41 +103,16 @@ invoicing$ContactName[invoicing$default_la == "Southend-on-Sea"] <- "Southend"
 invoicing$ContactName[invoicing$default_la == "Staffordshire"] <- "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
 invoicing$ContactName[invoicing$default_la == "Stoke-on-Trent"] <- "Stoke on Trent"
 
-class(invoicing$order_created_at)
-class(invoicing$processed_at)
-
-table(invoicing$ContactName)
-
-# convert character to date, first set the format the date is shown 
-invoicing$order_created_at <- as.Date(invoicing$order_created_at,"%Y-%m-%d")
-invoicing$processed_at <- as.Date(invoicing$processed_at,"%Y-%m-%d")
-
-# extract month from day date
-invoicing$Created_Month <- format(as.Date(invoicing$order_created_at),"%Y-%m")
-invoicing$Processed_Month <- format(as.Date(invoicing$processed_at),"%Y-%m")
-
 table(invoicing$Processed_Month, invoicing$overall_type=='kits_sent')
 
-# assign values to 'overall_type' that align with invoicing
-invoicing$overall_type[invoicing$overall_type == 'kits_sent'] <- 'Orders'
-invoicing$overall_type[invoicing$overall_type == 'kits_tested'] <- 'Returns'
-# concatenate values of both variables (type and category) to create the invoicing Description
-invoicing$Description <- paste(invoicing$overall_type, invoicing$invoice_category_billable, sep=" - ")
-
-table(invoicing$Description, invoicing$overall_type=='Orders')
-# some returns are blank, which shows in data.frame as 'Returns -'
-# assimilate those 'blank' categories to CT/GC (single site) - just cause there are only a few every month, and not sure how to allocate to their relevant category, 
-# they relate to categories not interpreted by the mapping table in the DB
-invoicing$Description[invoicing$Description == "Returns - "] <- "Returns - CT/GC (single site)"
 
 # extract data for the relevant month, and columns needed for invoicing
 x <- '2022-02'
 invMonth <- invoicing[(invoicing$Processed_Month == x),c("ContactName","Processed_Month",'Description')]
 
 
-# Include CT treatments. Read the file. Get needed columns
-names(Treatments)
-invTreatments <- Treatments[Treatments$Dispatched.MonthYear == x, c("Region","Dispatched.MonthYear","drug_name")]
+
+
 
 
 
@@ -352,7 +399,7 @@ InvoicesFee3 = merge(x = InvFee3, y = fee3, by = "Description", all.x = TRUE)
 
 
 # rename variables in the data frames that include prices. Variables have to be called the same to be able to stack data frames
-#rename(new variable name = existing variable name) ----
+#rename(new variable name = existing variable name)
 InvoicesFee1 <- rename(InvoicesFee1, Unit.Price = Fee1DiscountRM)
 InvoicesFee2 <- rename(InvoicesFee2, Unit.Price = Fee2Standard)
 InvoicesFee3 <- rename(InvoicesFee3, Unit.Price = Fee3Discount)
