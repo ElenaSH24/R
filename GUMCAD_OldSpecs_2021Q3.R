@@ -24,7 +24,7 @@ Gumcad <- orders[ ,c('SH24.UID','Customer.ID','Postcode','LSOA.name','Default.LA
 #GumcadQNotified <- Gumcad [((Gumcad$Notified.at.month.year=="2020-04"| Gumcad$Notified.at.month.year=="2020-05"| Gumcad$Notified.at.month.year=="2020-06")
 #          & (Gumcad$Site != "Fettle Hub") & (Gumcad$Site != "ARAS Bucuresti") & (Gumcad$Notified.at.month.year != "N/A")),]
 
-GumcadQ <- Gumcad [((Gumcad$Lab.results.at.month.year=="2021-07"| Gumcad$Lab.results.at.month.year=="2021-08"| Gumcad$Lab.results.at.month.year=="2021-09")
+GumcadQ <- Gumcad [((Gumcad$Lab.results.at.month.year=="2021-10"| Gumcad$Lab.results.at.month.year=="2021-11"| Gumcad$Lab.results.at.month.year=="2021-12")
            & (Gumcad$Default.LA != "Fettle") & (Gumcad$Default.LA != "Romania") 
            & (Gumcad$Default.LA != "Ireland - Cork") & (Gumcad$Default.LA != "Ireland - Dublin") & (Gumcad$Default.LA != "Ireland - Kerry")
            & (Gumcad$Default.LA != "Ireland - Kildare") & (Gumcad$Default.LA != "Ireland - Wicklow")
@@ -47,7 +47,10 @@ table(GumcadQ$Gender, useNA = "always")
 
 # Sexual orientation
 table(GumcadQ$Sexual.preference,GumcadQ$Gender)
+GumcadQ <- rename(GumcadQ, Gender_Identity = Gender.Identity)
 table(GumcadQ$Sexual.preference,GumcadQ$Gender_Identity)
+
+
 
 GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="women"] <- 1
 GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="men"] <- 2
@@ -267,7 +270,7 @@ GumcadQMergeLong <- GumcadMergeTreatm[,grep("^episode|clinic|Patient|Gender_Iden
                                             ignore.case = T)]
 
 GumcadQMergeLong1 <- melt (GumcadQMergeLong,id.vars = c("ClinicID","PatientID","Gender_Identity","Age","Sex_Ori",
-                                                        "Ethnicity","Country_Birth","LA","LSOA","FirstAttendance","AttendanceDate"),
+                                                        "Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate"),
                           measure.vars = c("Episode_Activity_1","Episode_Activity_2","Episode_Activity_3","Episode_Activity_4","Episode_Activity_5","Episode_Activity_6",
                                            "Episode_Activity_7","Episode_Activity_8","Episode_Activity_9","Episode_Activity_10","Episode_Activity_11","Episode_Activity_12",
                                            "Episode_Activity_13","Episode_Activity_14","Episode_Activity_15","Episode_Activity_16"),
@@ -282,9 +285,9 @@ table(GumcadQMergeLong1$Episode_Activity, useNA = "always")
 
 
 # order columns
-GumcadQMergeLong1 <- GumcadQMergeLong1 [c("ClinicID","PatientID","Episode_Activity","Gender_Identity","Age","Sex_Ori","Ethnicity","Country_Birth","LA","LSOA","FirstAttendance","AttendanceDate")]
+GumcadQMergeLong1 <- GumcadQMergeLong1 [c("ClinicID","PatientID","Episode_Activity","Gender_Identity","Age","Sex_Ori","Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate")]
 # export outcome
-write.table (GumcadQMergeLong1, file="/Users/ElenaArdines1/Documents/Reports/NHS_Reports/GUMCAD/YGMDR_Q3_2021.csv", row.names=F, sep=",")
+write.table (GumcadQMergeLong1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\GUMCAD\\YGMDR_Q4_2021.csv", row.names=F, sep=",")
 
 
 ### DERBYSHIRE GUMCAD REPORT----
