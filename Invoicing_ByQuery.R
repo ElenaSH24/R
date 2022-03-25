@@ -45,16 +45,16 @@ names(invPatch)
 
 
 # concatenate values to create 'Description'
-invCOC$Description <- paste("COC ",invCOC$Months.prescribed,"mth ",invCOC$Drug)
-invPOP$Description <- paste("POP ",invPOP$Months.prescribed,"mth ",invPOP$Drug)
-invEC$Description <- paste("EC ",invEC$Drug)
-invInjectable$Description <- paste('Sayana Press 104mg / 0.65ml ',invInjectable$Injectable.months.prescribed)
-invPatch$Description <- paste('Evra Patch ',invInjectable$Patch.months.prescribed)
+invCOC$Description <- paste("COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
+invPOP$Description <- paste("POP",invPOP$Months.prescribed,"mth",invPOP$Drug)
+invEC$Description <- paste("EC",invEC$Drug)
+invInjectable$Description <- paste('Sayana Press 104mg / 0.65ml',invInjectable$Injectable.months.prescribed,"mth")
+invPatch$Description <- paste('Evra Patch',invInjectable$Patch.months.prescribed,"mth")
+invRing$Description <- paste('Nuva Ring',invInjectable$Patch.months.prescribed,"mth")
 
-
-
-
-
+# Check that prescriptions no dispatched don't have a 'months.prescribed'
+table(invCOC$Description, invCOC$Dispatched.at.month.year != "")
+table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
 
 
 
@@ -66,6 +66,14 @@ invPOP <- rename(invPOP, Dispatched.MonthYear = Dispatched.at.month.year)
 invEC <- rename(invEC, default_la = region)
 invEC <- rename(invEC, Dispatched.MonthYear = dispatched_year_month)
 invInjectable <- rename(invInjectable,default_la = region)
+invInjectable <- rename(invInjectable,Dispatched.MonthYear = Dispatched.MonthYear)
+invPatch <- rename(invPatch,default_la = region)
+invPatch <- rename(invPatch,Dispatched.MonthYear = Dispatched.MonthYear)
+invRing <- rename(invRing,default_la = region)
+invRing <- rename(invRing,Dispatched.MonthYear = Dispatched.MonthYear)
+
+
+
 # remove variables not needed 
 invCOC$Months.prescribed = NULL
 invCOC$Drug = NULL
@@ -73,10 +81,15 @@ invPOP$Months.prescribed = NULL
 invPOP$Drug = NULL
 invEC$Drug = NULL
 invInjectable$Injectable.months.prescribed = NULL
+invPatch$Patch.months.prescribed = NULL
+invRing$Ring.months.prescribed = NULL
+
+
+names(invRing)
 
 
 # Stack data sets one on top of the other ----
-invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC)
+invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing)
 
 
         # Create variable to group freetesting, Ireland etc together
