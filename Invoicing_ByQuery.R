@@ -66,12 +66,13 @@ invPOP <- rename(invPOP, Dispatched.MonthYear = Dispatched.at.month.year)
 invEC <- rename(invEC, default_la = region)
 invEC <- rename(invEC, Dispatched.MonthYear = dispatched_year_month)
 invInjectable <- rename(invInjectable,default_la = region)
-invInjectable <- rename(invInjectable,Dispatched.MonthYear = Dispatched.MonthYear)
+invInjectable <- rename(invInjectable,Dispatched.MonthYear = Dispatched.Month.Year)
 invPatch <- rename(invPatch,default_la = region)
-invPatch <- rename(invPatch,Dispatched.MonthYear = Dispatched.MonthYear)
+invPatch <- rename(invPatch,Dispatched.MonthYear = Dispatched.Month.Year)
 invRing <- rename(invRing,default_la = region)
-invRing <- rename(invRing,Dispatched.MonthYear = Dispatched.MonthYear)
+invRing <- rename(invRing,Dispatched.MonthYear = Dispatched.Month.Year)
 
+names(invPatch)
 
 
 # remove variables not needed 
@@ -123,7 +124,7 @@ table(invoicing$Processed_Month, invoicing$overall_type=='kits_sent')
 x <- '2022-02'
 invMonth <- invoicing[(invoicing$Processed_Month == x),c("ContactName","Processed_Month",'Description')]
 
-
+names(invoicing)
 
 
 
@@ -372,7 +373,8 @@ Fee3Discount <- c(3.60,3.04,4.18,2.99,2.34,3.16,2.72,3.60,3.04,4.18,2.72,
 
 
 
-Fee4DiscountRM5 <- c()
+Fee4DiscountRM5 <- c(3.42,2.89,3.97,2.84,2.22,3.00,2.58	3.42	2.89	3.97	2.58	2.58	3.42	2.89	3.97	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	43.88	30.08	48.60	27.66	13.08	32.38	9.21	35.78	22.49	40.49	17.32	9.21	35.78	22.49	40.49	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00	0.00
+)
 
 Fee5Freetesting
 
@@ -429,6 +431,6 @@ InvoicesStack <- InvoicesStack [c("ContactName","InvoiceNumber","Reference","Inv
 InvoicesStack <- InvoicesStack[order(InvoicesStack$ContactName,InvoicesStack$Description),]
 
 
-
-
+# create blank variables
+InvoicesStack$Total <- ""
 
