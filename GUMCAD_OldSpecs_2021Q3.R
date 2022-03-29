@@ -8,8 +8,8 @@ library(reshape2)
 
 # GUMCAD data spec: file:///C:/Users/Elena%20Ardines/Documents/Reports/NHS%20Reports/GUMCAD/GUMCAD_Data_Specification_and_Technical_Guidance.pdf
 
-Gumcad <- orders[ ,c('SH24.UID','Customer.ID','Postcode','LSOA.name','Default.LA','LA.of.residence','Site',
-          'Age','Gender','Genitals','Gender.Identity','Sexual.preference','Ethnicity',"Reason.for.visit",
+Gumcad <- orders[ ,c('SH24.UID','Customer.ID','LSOA.name','Default.LA','LA.of.residence','Site',
+          'Age','Gender','Genitals','Gender.Identity','Sexual.preference','Ethnicity',
           "Created.at",'Created.at.month.year',"Notified.at","Notified.at.month.year","Lab.results.at","Lab.results.at.month.year",
           'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C','Test.for.Hiv','Test.for.Syphilis.EIA',"Test.for.Syphilis.RPR",'Test.for.Chlamydia.Urine',
           'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
@@ -17,13 +17,6 @@ Gumcad <- orders[ ,c('SH24.UID','Customer.ID','Postcode','LSOA.name','Default.LA
 
 
 # Data frame with the months we need for the relevant submission, and exclude FETTLE
-# Orders requested on the relevant quarter, without Notified date
-# GumcadQ <- Gumcad [((Gumcad$Created.at.month.year=="2020-01"| Gumcad$Created.at.month.year=="2020-02"| Gumcad$Created.at.month.year=="2020-03")
-#          & (Gumcad$Site != "Fettle Hub") & (Gumcad$Site != "ARAS Bucuresti") & (Gumcad$Notified.at.month.year != "N/A")),]
-
-#GumcadQNotified <- Gumcad [((Gumcad$Notified.at.month.year=="2020-04"| Gumcad$Notified.at.month.year=="2020-05"| Gumcad$Notified.at.month.year=="2020-06")
-#          & (Gumcad$Site != "Fettle Hub") & (Gumcad$Site != "ARAS Bucuresti") & (Gumcad$Notified.at.month.year != "N/A")),]
-
 GumcadQ <- Gumcad [((Gumcad$Lab.results.at.month.year=="2021-10"| Gumcad$Lab.results.at.month.year=="2021-11"| Gumcad$Lab.results.at.month.year=="2021-12")
            & (Gumcad$Default.LA != "Fettle") & (Gumcad$Default.LA != "Romania") 
            & (Gumcad$Default.LA != "Ireland - Cork") & (Gumcad$Default.LA != "Ireland - Dublin") & (Gumcad$Default.LA != "Ireland - Kerry")
@@ -35,30 +28,35 @@ GumcadQ$ClinicID <- "YGMDR"
 # PatientID: rename(new variable name = existing variable name) ----
 GumcadQ <- rename(GumcadQ, PatientID = SH24.UID)
 
-# Gender: 1 Male(including trans man), 2 Female(including trans woman), 3 Non-binary, 4 Other, Z Not Stated, X Not Known
-GumcadQ$Gender[GumcadQ$Gender=="male" | GumcadQ$Genitals=="Penis"] <- 1     
-GumcadQ$Gender[GumcadQ$Gender=="female" | GumcadQ$Genitals=="Vagina"] <- 2
-GumcadQ$Gender[GumcadQ$Gender=="non_binary"] <- 3
+names(GumcadQ)
 
-table(GumcadQ$Gender,GumcadQ$Genitals, useNA = "always")
-table(GumcadQ$Gender, useNA = "always")
+
+# create intermediate gender variable: 1 Male(including trans man), 2 Female(inc trans woman), 3 Non-binary, 4 Other, Z Not Stated, X Not Known
+GumcadQ$Gend <- 0
+GumcadQ$Gend[GumcadQ$Gender=="male" | GumcadQ$Gender.Identity=="Male" | GumcadQ$Genitals=="Penis"] <- 1     
+GumcadQ$Gend[GumcadQ$Gender=="female" | GumcadQ$Gender.Identity=="Female" | GumcadQ$Genitals=="Vagina"] <- 2
+GumcadQ$Gend[GumcadQ$Gender=="non_binary" | GumcadQ$Gender.Identity=="Non binary" ] <- 3
+table(GumcadQ$Gend, useNA = "always")
+# remove original variables
+GumcadQ$Gender =NULL 
+GumcadQ$Gender.Identity =NULL
+GumcadQ$Genitals =NULL
+GumcadQ <- rename(GumcadQ, Gender = Gend) # rename intermediate variable
+
 
 # Age: we have age in admin
 
 # Sexual orientation
 table(GumcadQ$Sexual.preference,GumcadQ$Gender)
-GumcadQ <- rename(GumcadQ, Gender_Identity = Gender.Identity)
-table(GumcadQ$Sexual.preference,GumcadQ$Gender_Identity)
+######## REMOVE?! GumcadQ <- rename(GumcadQ, Gender = Gender.Identity)
 
-
-
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="women"] <- 1
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="men"] <- 2
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="both"] <- 3
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="2" & GumcadQ$Sexual.preference=="men"] <- 1
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="2" & GumcadQ$Sexual.preference=="women"] <- 2
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="2" & GumcadQ$Sexual.preference=="both"] <- 3
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="3"] <- 4
+GumcadQ$Sex_Ori [GumcadQ$Gender=="1" & GumcadQ$Sexual.preference=="women"] <- 1
+GumcadQ$Sex_Ori [GumcadQ$Gender=="1" & GumcadQ$Sexual.preference=="men"] <- 2
+GumcadQ$Sex_Ori [GumcadQ$Gender=="1" & GumcadQ$Sexual.preference=="both"] <- 3
+GumcadQ$Sex_Ori [GumcadQ$Gender=="2" & GumcadQ$Sexual.preference=="men"] <- 1
+GumcadQ$Sex_Ori [GumcadQ$Gender=="2" & GumcadQ$Sexual.preference=="women"] <- 2
+GumcadQ$Sex_Ori [GumcadQ$Gender=="2" & GumcadQ$Sexual.preference=="both"] <- 3
+GumcadQ$Sex_Ori [GumcadQ$Gender=="3"] <- 4
 
 # Create tables with totals to check that 'Sex_Ori' is correctly calculated
 table(GumcadQ$Sex_Ori, GumcadQ$Gender, useNA = "always")
@@ -264,12 +262,12 @@ table(GumcadMergeTreatm$Episode_Activity_16)
 #End CT Treatments----
 
 # 'Melt' (install package RESHAPE2) from wide to long, so all of those new variables called Episode_Activity 1, 2, 3, etc 'melt' into one column. 
-GumcadQMergeLong <- GumcadMergeTreatm[,grep("^episode|clinic|Patient|Gender_Identity|Age|Sex|Ethnicity|Country|LA|LSOA|attendance|Site|residence|Created.at.month.year",
+GumcadQMergeLong <- GumcadMergeTreatm[,grep("^episode|clinic|Patient|Gender|Age|Sex|Ethnicity|Country|LA|LSOA|attendance|Site|residence|Created.at.month.year",
                                             colnames(GumcadMergeTreatm),
                                             perl = T,value = T,
                                             ignore.case = T)]
 
-GumcadQMergeLong1 <- melt (GumcadQMergeLong,id.vars = c("ClinicID","PatientID","Gender_Identity","Age","Sex_Ori",
+GumcadQMergeLong1 <- melt (GumcadQMergeLong,id.vars = c("ClinicID","PatientID","Gender","Age","Sex_Ori",
                                                         "Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate"),
                           measure.vars = c("Episode_Activity_1","Episode_Activity_2","Episode_Activity_3","Episode_Activity_4","Episode_Activity_5","Episode_Activity_6",
                                            "Episode_Activity_7","Episode_Activity_8","Episode_Activity_9","Episode_Activity_10","Episode_Activity_11","Episode_Activity_12",
@@ -282,13 +280,13 @@ GumcadQMergeLong1 <- melt (GumcadQMergeLong,id.vars = c("ClinicID","PatientID","
 GumcadQMergeLong1 <- GumcadQMergeLong1[(GumcadQMergeLong1$Episode_Activity!=""),]
 GumcadQMergeLong1 <- GumcadQMergeLong1[(GumcadQMergeLong1$Episode_Activity!="0"),]
 table(GumcadQMergeLong1$Episode_Activity, useNA = "always")
+table(GumcadQMergeLong1$Sex_Ori, useNA = "always")
 
 
 # order columns
-GumcadQMergeLong1 <- GumcadQMergeLong1 [c("ClinicID","PatientID","Episode_Activity","Gender_Identity","Age","Sex_Ori","Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate")]
+GumcadQMergeLong1 <- GumcadQMergeLong1 [c("ClinicID","PatientID","Episode_Activity","Gender","Age","Sex_Ori","Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate")]
 # export outcome
 write.table (GumcadQMergeLong1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\GUMCAD\\YGMDR_Q4_2021.csv", row.names=F, sep=",")
-
 
 ### DERBYSHIRE GUMCAD REPORT----
 GumcadDerbyshire <- melt (GumcadQMergeLong,id.vars = c("PatientID","Gender_Identity","Age","Sex_Ori","Ethnicity",
