@@ -15,7 +15,7 @@ invSTI$Description <- paste(invSTI$overall_type, invSTI$invoice_category_billabl
 
 table(invSTI$Description, invSTI$overall_type=='Returns')
 # some returns are blank, showing in data.frame as 'Returns -'
-# assimilate those 'blank' categories to CT/GC (single site) - only a few every month, and not sure how to allocate to exact category, 
+# assimilate those 'blank' categories to CT/GC (single site) - only a few PER month, and not sure how to allocate to exact category - DISCUSS WITH TEAM 
 # they relate to categories not interpreted by the mapping table in the DB
 invSTI$Description[invSTI$Description == "Returns - "] <- "Returns - CT/GC (single site)"
 
@@ -44,7 +44,8 @@ invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
 names(invPatch)
 
 
-# concatenate values to create 'Description'
+# 
+te values to create 'Description'
 invCOC$Description <- paste("COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
 invPOP$Description <- paste("POP",invPOP$Months.prescribed,"mth",invPOP$Drug)
 invEC$Description <- paste("EC",invEC$Drug)
