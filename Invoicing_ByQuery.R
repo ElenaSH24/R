@@ -70,12 +70,13 @@ invPOP <- rename(invPOP, Dispatched.MonthYear = Dispatched.at.month.year)
 invEC <- rename(invEC, default_la = region)
 invEC <- rename(invEC, Dispatched.MonthYear = dispatched_year_month)
 invInjectable <- rename(invInjectable,default_la = region)
-invInjectable <- rename(invInjectable,Dispatched.MonthYear = Dispatched.MonthYear)
+invInjectable <- rename(invInjectable,Dispatched.MonthYear = Dispatched.Month.Year)
 invPatch <- rename(invPatch,default_la = region)
-invPatch <- rename(invPatch,Dispatched.MonthYear = Dispatched.MonthYear)
+invPatch <- rename(invPatch,Dispatched.MonthYear = Dispatched.Month.Year)
 invRing <- rename(invRing,default_la = region)
-invRing <- rename(invRing,Dispatched.MonthYear = Dispatched.MonthYear)
+invRing <- rename(invRing,Dispatched.MonthYear = Dispatched.Month.Year)
 
+names(invPatch)
 
 
 # remove variables not needed 
@@ -127,7 +128,7 @@ table(invoicing$Processed_Month, invoicing$overall_type=='kits_sent')
 x <- '2022-02'
 invMonth <- invoicing[(invoicing$Processed_Month == x),c("ContactName","Processed_Month",'Description')]
 
-
+names(invoicing)
 
 
 
@@ -374,7 +375,6 @@ Fee3Discount <- c(3.60,3.04,4.18,2.99,2.34,3.16,2.72,3.60,3.04,4.18,2.72,
                   0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                   0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
 
-
 Fee4DiscountRM5 <- c(3.42,2.89,3.97,2.84,2.22,3.00,2.58,3.42,2.89,3.97,2.58,2.58,
                      3.42,2.89,3.97,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
@@ -412,7 +412,6 @@ eSRH5 <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52
            0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
            0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
            0.00,0.00,0.00,0.00,0.00,0.00,34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
-
 
 
 # create data frame with prices per invoicing category
@@ -463,6 +462,6 @@ InvoicesStack <- InvoicesStack [c("ContactName","InvoiceNumber","Reference","Inv
 InvoicesStack <- InvoicesStack[order(InvoicesStack$ContactName,InvoicesStack$Description),]
 
 
-
-
+# create blank variables
+InvoicesStack$Total <- ""
 
