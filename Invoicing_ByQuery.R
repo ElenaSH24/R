@@ -1,6 +1,6 @@
 # producing Xero file
 
-invSTI = read.csv("20220303_Invoicing_AprToFeb.csv")
+invSTI = read.csv("20220404_Invoicing_AprToMar.csv")
 invSTI <- invSTI[,c("overall_type","default_la","processed_at","invoice_category_billable")]
 
 # convert character to date, first set the format the date is shown 
