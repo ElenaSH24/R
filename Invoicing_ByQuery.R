@@ -1,15 +1,24 @@
 # producing Xero file
+# v1: reporting month
 
-###dplry package 
-
-
-invSTI = read.csv("20220303_Invoicing_AprToFeb.csv")
-invSTI <- invSTI[,c("overall_type","default_la","processed_at","invoice_category_billable")]
+invSTI = read.csv("20220404_Invoicing_AprToMar.csv")
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
 # extract month from day date
 invSTI$Dispatched.MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
+
+# summarise month results
+v1 <- '2022-03'
+STImonth <- invSTI[(invSTI$Dispatched.MonthYear == v1) , ]
+
+table(STImonth$overall_type, STImonth$repeat_kit)
+table(STImonth$overall_type)
+
+
+# extract the columns we need for invoicing
+invSTI <- invSTI[,c("overall_type","default_la","processed_at","invoice_category_billable")]
+
 # assign values to 'overall_type' that align with invoicing
 invSTI$overall_type[invSTI$overall_type == 'kits_sent'] <- 'Orders'
 invSTI$overall_type[invSTI$overall_type == 'kits_tested'] <- 'Returns'
@@ -18,7 +27,7 @@ invSTI$Description <- paste(invSTI$overall_type, invSTI$invoice_category_billabl
 
 table(invSTI$Description, invSTI$overall_type=='Returns')
 # some returns are blank, showing in data.frame as 'Returns -'
-# assimilate those 'blank' categories to CT/GC (single site) - only a few every month, and not sure how to allocate to exact category, 
+# assimilate those 'blank' categories to CT/GC (single site) - only a few PER month, and not sure how to allocate to exact category - DISCUSS WITH TEAM 
 # they relate to categories not interpreted by the mapping table in the DB
 invSTI$Description[invSTI$Description == "Returns - "] <- "Returns - CT/GC (single site)"
 
@@ -46,7 +55,6 @@ invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
 
 names(invPatch)
 
-###dplry package 
 
 # concatenate values to create 'Description'
 invCOC$Description <- paste("COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
@@ -375,6 +383,8 @@ Fee3Discount <- c(3.60,3.04,4.18,2.99,2.34,3.16,2.72,3.60,3.04,4.18,2.72,
                   0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                   0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
 
+
+
 Fee4DiscountRM5 <- c(3.42,2.89,3.97,2.84,2.22,3.00,2.58,3.42,2.89,3.97,2.58,2.58,
                      3.42,2.89,3.97,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
@@ -384,7 +394,6 @@ Fee4DiscountRM5 <- c(3.42,2.89,3.97,2.84,2.22,3.00,2.58,3.42,2.89,3.97,2.58,2.58
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
-
 Fee5Freetesting <- c(0.00,0.00,0.00,0.00,0.00,0.00,2.72,0.00,0.00,0.00,2.72,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
@@ -394,7 +403,6 @@ Fee5Freetesting <- c(0.00,0.00,0.00,0.00,0.00,0.00,2.72,0.00,0.00,0.00,2.72,0.00
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
-
 eSRH <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52,7.60,
           4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,5.52,6.54,7.60,4.94,5.52,
           6.54,7.60,46.45,30.33,49.26,37.07,19.01,46.13,16.47,39.04,33.70,46.26,
@@ -403,7 +411,6 @@ eSRH <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52,
           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
           0.00,0.00,0.00,0.00,0.00,34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
-
 eSRH5 <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52,
            7.60,4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,5.52,6.54,7.60,4.94,
            5.52,6.54,7.60,46.45,30.33,49.26,37.07,19.01,46.13,16.47,39.04,33.70,
@@ -418,10 +425,7 @@ eSRH5 <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52
 fee1 <- data.frame(Description, Fee1DiscountRM)
 fee2 <- data.frame(Description, Fee2Standard)
 fee3 <- data.frame(Description, Fee3Discount)
-fee4 <- data.frame(Description, Fee4DiscountRM5)
-fee5 <- data.frame(Description, Fee5Freetesting)
-fee6 <- data.frame(Description, eSRH)
-fee7 <- data.frame(Description, eSRH5)
+
 
 
 # break down the main invoicing data set as per the fee contracted in each area 
