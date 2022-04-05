@@ -50,7 +50,8 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
                  DF[,varname5]=="Northern Ireland Northern PCT" |
                  DF[,varname5]=="Northern Ireland South Eastern PCT" |
                  DF[,varname5]=="Northern Ireland Southern PCT" |
-                 DF[,varname5]=="Northern Ireland Western PCT"] <- "Northern Ireland"
+                 DF[,varname5]=="Northern Ireland Western PCT" |
+                 DF[,varname5]=="Northern Ireland Offline: Southern"] <- "Northern Ireland"
   
   DF[,varname][DF[,varname5]=="Ireland - Dublin" |  DF[,varname5]=="Ireland - Cork" |
                  DF[,varname5]=="Ireland - Kerry" | DF[,varname5]=="Ireland - Wicklow" | 
@@ -107,6 +108,7 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
   DF[,varname][DF[,varname5]=="Thurrock"] <- "Thurrock"
   DF[,varname][DF[,varname5]=="Wirral"] <- "Wirral"
   DF[,varname][DF[,varname5]=="Greater Manchester"] <- "Greater Manchester"
+  DF[,varname][DF[,varname5]=="Rotherham"] <- "Rotherham"
   
   DF[,varname] <- as.factor(DF[,varname])  #change class back to factor
   DF[,varname] #prints out variable 
@@ -128,6 +130,7 @@ recodeContraception <- function(DF,varname,varname2){
   
   DF[,varname][DF[,varname2]=="Bradford"] <- "Bradford"
   DF[,varname][(DF[,varname2]=="Blackburn with Darwen")] <- "Blackburn"
+  DF[,varname][(DF[,varname2]=="Bury")] <- "Bury"
   DF[,varname][DF[,varname2]=="Cheshire East"] <- "Cheshire East"
   DF[,varname][DF[,varname2]=="Cornwall and Isles of Scilly PCT"] <- "Cornwall"
   DF[,varname][DF[,varname2]=="County Durham"] <- "County Durham"
