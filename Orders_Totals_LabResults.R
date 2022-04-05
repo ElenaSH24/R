@@ -24,9 +24,9 @@ OrdersMonth$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
 OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
-table(OrdersMonth$Dispatched.at.month.year=="2022-02", useNA = "always")
-table(OrdersMonth$Lab.results.at.month.year=="2022-02")
-table(OrdersMonth$Area, OrdersMonth$Dispatched.at.month.year=="2022-02", useNA = "always")
+table(OrdersMonth$Dispatched.at.month.year=="2022-03", useNA = "always")
+table(OrdersMonth$Lab.results.at.month.year=="2022-03")
+table(OrdersMonth$Area, OrdersMonth$Dispatched.at.month.year=="2022-03", useNA = "always")
 
 #TOT Turnaround Time: 'Lab.results.at' minus 'Lab.receipt.at'----
 # convert dates from 'factor' to 'date' to calculate TOT, and then to 'character' to group
@@ -63,12 +63,12 @@ OrdersMonth$TOT.Bands.SPS[OrdersMonth$TOT>3 & OrdersMonth$Lab=="SPS"] <- "TOT.Mo
 #End TOT----
 
 #ORDERS----
-KitsDispatched <- OrdersMonth[(OrdersMonth$Dispatched.at.month.year=="2022-02" & OrdersMonth$Area!="MTV event"),]
-table (KitsDispatched$Dispatched.at.month.year=="2022-02", useNA = "always")
+KitsDispatched <- OrdersMonth[(OrdersMonth$Dispatched.at.month.year=="2022-03" & OrdersMonth$Area!="MTV event"),]
+table (KitsDispatched$Dispatched.at.month.year=="2022-03", useNA = "always")
 
 #RETURNS: change methodology in June 2020 from returns based on 'Notified' date to based on 'LabResults' date----
-KitsReturned <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year=="2022-02" & OrdersMonth$Area!="MTV event"),]
-table (KitsReturned$Lab.results.at.month.year=="2022-02", useNA = "always")
+KitsReturned <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year=="2022-03" & OrdersMonth$Area!="MTV event"),]
+table (KitsReturned$Lab.results.at.month.year=="2022-03", useNA = "always")
 
 # find out those orders with no Area, if any (there shouldn't be any!)
 Zero <- KitsDispatched[(KitsDispatched$Area==0),]
@@ -159,35 +159,35 @@ Summary1 <- rename(Summary1, Returned.Tests = Returns.x)
 
 # TO INPUT IN SUMMARY MANUALLY: TOT per Lab, based on 'LabResults' (change of methodology in June 2020, from 'LabReceipt' to 'LabResults') and for TDL and SPS separately----
 #Calculate overall TOT for current and previous month
-OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-01" 
+OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOTPrev$TOT.Bands)
 prop.table(table(OverallTOTPrev$TOT.Bands))*100
 
 
-OverallTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
+OverallTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOT$TOT.Bands)
 prop.table(table(OverallTOT$TOT.Bands))*100
 
 #TDL 
-TOT.TDL <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
+TOT.TDL <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="TDL"),]
 table(TOT.TDL$TOT.Bands)
 prop.table(table(TOT.TDL$TOT.Bands))*100
 
 #SPS
-TOT.SPS <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
+TOT.SPS <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="SPS"),]
 table(TOT.SPS$TOT.Bands)
 prop.table(table(TOT.SPS$TOT.Bands))*100
 
 #Medlab
-TOT.Medlab <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
+TOT.Medlab <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
                         & OrdersMonth$Area != "London"
                         & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="Medlab"),]
 table(TOT.Medlab$TOT.Bands)
@@ -196,7 +196,7 @@ prop.table(table(TOT.Medlab$TOT.Bands))*100
 
 
 #Create data set for relevant month, excluding London, and with no '0'category in TOT.Bands (which is the category relating to NA dates)
-OrdersMonthTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
+OrdersMonthTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
                                & OrdersMonth$Area != "London"
                                & OrdersMonth$TOT.Bands != "0"),]
 
@@ -342,14 +342,15 @@ TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, 
 TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
 TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
 
-table(TreatmentsMerge$Dispatched_MonthYear=="2022-02")
-table(TreatmentsMerge$Area, TreatmentsMerge$Dispatched_MonthYear=="2022-02")
+v1 <- "2022-03"
+table(TreatmentsMerge$Dispatched_MonthYear == v1)
+table(TreatmentsMerge$Area, TreatmentsMerge$Dispatched_MonthYear == v1)
 
 #Export as table to Clinical Reports, as a summary of all CT treatments since the start of the service in all areas (inc London!)
-write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.02.CT.Treatments.csv", row.names=F, sep=",")
+write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.03.CT.Treatments.csv", row.names=F, sep=",")
 
 #Prepare CT treatments to add to rest of summary: select data for relevant month
-TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched_MonthYear == "2022-02" & !is.na(TreatmentsMerge$Dispatched_MonthYear)),]
+TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched_MonthYear == v1 & !is.na(TreatmentsMerge$Dispatched_MonthYear)),]
 NumberTreatments <- as.data.frame(table(TreatmentsMonth$Area))
 #Name the columns
 colnames(NumberTreatments)[1] <- "Area"
@@ -535,9 +536,9 @@ Summary7 = merge(x = Summary6, y = DemogRates, by = "Area", all = TRUE)
 
 #SAFEGUARDING----
 #Create safeguarding data sets for young people and adults
-table(OrdersMonth$Created.at.month.year=="2022-02")
+table(OrdersMonth$Created.at.month.year == v1)
 
-SafeguardingYP <- OrdersMonth [(OrdersMonth$Age<18 & OrdersMonth$Created.at.month.year=="2022-02"),]
+SafeguardingYP <- OrdersMonth [(OrdersMonth$Age<18 & OrdersMonth$Created.at.month.year == v1),]
 
 #create new variable (columns) flags that - first - equal the safeguarding columns and - then - assign 1 or 0 to those safeguarding flags
 SafeguardingYP$Flag_SA <- SafeguardingYP$Sexually.assaulted.risk.assessment
@@ -598,7 +599,7 @@ SafegYP = merge(x = SafeguardingYPFlags, y = SafeguardingYPUsers,  by = "Area", 
 SafegYP[is.na(SafegYP)] <- 0
 
 # subset ADULT FLAGS
-SafeguardAdults <- OrdersMonth [(OrdersMonth$Age>17 & OrdersMonth$Created.at.month.year=="2022-02"),]
+SafeguardAdults <- OrdersMonth [(OrdersMonth$Age>17 & OrdersMonth$Created.at.month.year == v1),]
 
 #In ADULTS there's only one safeguarding flag
 SafeguardAdults$Flag <- SafeguardAdults$Sexually.assaulted.risk.assessment
@@ -637,18 +638,18 @@ ContPOP$Area <- recodeContraception(DF= ContPOP,varname="Area",varname2="Region"
 Injectable$Area <- recodeContraception(DF= Injectable,varname="Area",varname2="region")
 Patch$Area <- recodeContraception(DF= Patch,varname="Area",varname2="region")
 Ring$Area <- recodeContraception(DF= Ring,varname="Area",varname2="region")
-table(ContCOC$Dispatched.at.month.year=="2022-02")
-table(ContPOP$Dispatched.at.month.year=="2022-02")
-table(Injectable$Dispatched.Month.Year=="2022-02")
-table(Patch$Dispatched.Month.Year=="2022-02")
-table(Ring$Dispatched.Month.Year=="2022-02")
+table(ContCOC$Dispatched.at.month.year == v1)
+table(ContPOP$Dispatched.at.month.year == v1)
+table(Injectable$Dispatched.Month.Year == v1)
+table(Patch$Dispatched.Month.Year == v1)
+table(Ring$Dispatched.Month.Year == v1)
 
 # subset for relevant month
-ContCOCMonth <- ContCOC [(ContCOC$Dispatched.at.month.year=="2022-02"),]
-ContPOPMonth <- ContPOP [(ContPOP$Dispatched.at.month.year=="2022-02"),]
-InjectableMonth <- Injectable [(Injectable$Dispatched.Month.Year=="2022-02"),]
-PatchMonth <- Patch [(Patch$Dispatched.Month.Year=="2022-02"),]
-RingMonth <- Ring [(Ring$Dispatched.Month.Year=="2022-02"),]
+ContCOCMonth <- ContCOC [(ContCOC$Dispatched.at.month.year == v1),]
+ContPOPMonth <- ContPOP [(ContPOP$Dispatched.at.month.year == v1),]
+InjectableMonth <- Injectable [(Injectable$Dispatched.Month.Year == v1),]
+PatchMonth <- Patch [(Patch$Dispatched.Month.Year == v1),]
+RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
 
 # and convert into a data frame
 ContCOCMonth1 = as.data.frame(table(ContCOCMonth$Area), useNA = "always")
@@ -674,29 +675,40 @@ Contraception4 = merge(x = Contraception3, y = RingMonth, by = "Area", all = TRU
 
 Summary9 = merge(x = Summary8, y = Contraception4, by = "Area", all = TRUE)
 
-## Emergency Contraception - create Area. csv are exported from DataGrip for the relevant month----
-ECFuture$Area <- 0
-ECFuture$Area[ECFuture$region=="Fettle"] <- "Fettle"
-ECFuture$Area <- 0
-#rename 'region'
-ECFuture <- rename(ECFuture, Region = region)
-#run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
-ECFuture$Area <- recodeContraception(DF= ECFuture,varname="Area",varname2="Region")
+## Emergency Contraception - create Area. csv are exported from DataGrip----
+# Check that EC Future is only distributed in Fettle
+table(ECFuture$Region)
+# No need to recode the Area, just rename 'region' to name all variables the same in different datasets
+ECFuture <- rename(ECFuture, Area = Region)
+names(ECFuture)
 
+     # REMOVE: run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
+     # REMOVE: ECFuture$Area <- recodeContraception(DF= ECFuture,varname="Area",varname2="Region")
+
+# create 'Area' variable for recoding
 ECNow$Area <- 0
-#rename 'region'
-ECNow <- rename(ECNow, Region = region)
+
+      # REMOVE: rename 'region'
+      # REMOVE: ECNow <- rename(ECNow, Region = region)
+
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
 ECNow$Area <- recodeContraception(DF= ECNow,varname="Area",varname2="Region")
+table(ECNow$Region, ECNow$Area)
 
-
+# subset for relevant month
+ECFutureMonth <- ECFuture [(ECFuture$Dispatched.at.month.year == v1),]
+ECNowMonth <- ECNow [(ECNow$Dispatched.at.month.year == v1),]
+table(ECFutureMonth$Dispatched.at.month.year)
 
 # subset per drug 
-ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','Drug')]
-ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','Drug')]
-ECNowLevonelle <- ECNow [(ECNow$Drug=="Levonelle"),c('Area','Drug')]
-ECNowEllaone <- ECNow [(ECNow$Drug=="EllaOne"),c('Area','Drug')]
-ECNowLevonor <- ECNow [(ECNow$Drug=="Levonorgestrel 1.5mg"),c('Area','Drug')]
+ECFutureLevonelle <- ECFutureMonth [(ECFutureMonth$Drug=="Levonelle"),c('Area','Drug')]
+ECFutureEllaone <- ECFutureMonth [(ECFutureMonth$Drug=="EllaOne"),c('Area','Drug')]
+ECNowLevonelle <- ECNowMonth [(ECNowMonth$Drug=="Levonelle"),c('Area','Drug')]
+ECNowEllaone <- ECNowMonth [(ECNowMonth$Drug=="EllaOne"),c('Area','Drug')]
+ECNowLevonor <- ECNowMonth [(ECNowMonth$Drug=="Levonorgestrel 1.5mg"),c('Area','Drug')]
+
+
+
 
 # convert into data frame
 ECFutureLevonelle = as.data.frame(table(ECFutureLevonelle$Area), useNA = "always")
@@ -729,15 +741,11 @@ ECEllaOne[is.na(ECEllaOne)] <- "0" #give NAs value 0 for + below to work
 ECEllaOne$EC.EllaOne.x <- as.integer(ECEllaOne$EC.EllaOne.x)
 ECEllaOne$EC.EllaOne <- ECEllaOne$EC.EllaOne.x + ECEllaOne$EC.EllaOne.y
 
-
-# # Also possible to sum with 'rowSums' 
-# # ECLevonelle$EC.Levonelle <- rowSums(ECLevonelle[,-1])
 #remove columns we don't need 
 ECLevonelle$EC.Levonelle.x = NULL
 ECLevonelle$EC.Levonelle.y = NULL
 ECEllaOne$EC.EllaOne.x = NULL
 ECEllaOne$EC.EllaOne.y = NULL
-
 
 #put together all the different datasets, first Levonelle and EllaOne, and then with Levonor
 EC = merge(x = ECEllaOne, y = ECLevonelle, by = 'Area', all = TRUE)
@@ -770,7 +778,7 @@ colnames(PhotoConsult1)[1] <- "Area"
 colnames(PhotoConsult1)[2] <- "Photo.Diagnosis.Consultations"
 
 PhotoTreatm1 <- PhotoTreatm
-PhotoTreatm1 <- PhotoTreatm [(PhotoTreatm$dispatched_month_year=="2022-02"),]
+PhotoTreatm1 <- PhotoTreatm [(PhotoTreatm$dispatched_month_year==""),]
 # CAN'T USE WITHOUT A 'COUNT' COLUMN - group by 'Area' with 'aggregate' function. You can preserve column names this way:
 # PhotoTreatm1 <- aggregate(PhotoTreatm1["PD.Treatments"], by=PhotoTreatm1["Area"], sum)
 # convert into a data frame
