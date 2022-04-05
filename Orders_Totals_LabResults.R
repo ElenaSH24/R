@@ -24,9 +24,13 @@ OrdersMonth$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
 OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
-table(OrdersMonth$Dispatched.at.month.year=="2022-03", useNA = "always")
-table(OrdersMonth$Lab.results.at.month.year=="2022-03")
-table(OrdersMonth$Area, OrdersMonth$Dispatched.at.month.year=="2022-03", useNA = "always")
+# create variable with reporting month
+v1 <- "2022-03"
+
+
+table(OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
+table(OrdersMonth$Lab.results.at.month.year == v1)
+table(OrdersMonth$Area, OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
 
 #TOT Turnaround Time: 'Lab.results.at' minus 'Lab.receipt.at'----
 # convert dates from 'factor' to 'date' to calculate TOT, and then to 'character' to group
@@ -63,12 +67,12 @@ OrdersMonth$TOT.Bands.SPS[OrdersMonth$TOT>3 & OrdersMonth$Lab=="SPS"] <- "TOT.Mo
 #End TOT----
 
 #ORDERS----
-KitsDispatched <- OrdersMonth[(OrdersMonth$Dispatched.at.month.year=="2022-03" & OrdersMonth$Area!="MTV event"),]
-table (KitsDispatched$Dispatched.at.month.year=="2022-03", useNA = "always")
+KitsDispatched <- OrdersMonth[(OrdersMonth$Dispatched.at.month.year == v1 & OrdersMonth$Area!="MTV event"),]
+table (KitsDispatched$Dispatched.at.month.year == v1, useNA = "always")
 
 #RETURNS: change methodology in June 2020 from returns based on 'Notified' date to based on 'LabResults' date----
-KitsReturned <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year=="2022-03" & OrdersMonth$Area!="MTV event"),]
-table (KitsReturned$Lab.results.at.month.year=="2022-03", useNA = "always")
+KitsReturned <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 & OrdersMonth$Area!="MTV event"),]
+table (KitsReturned$Lab.results.at.month.year == v1, useNA = "always")
 
 # find out those orders with no Area, if any (there shouldn't be any!)
 Zero <- KitsDispatched[(KitsDispatched$Area==0),]
@@ -166,28 +170,28 @@ table(OverallTOTPrev$TOT.Bands)
 prop.table(table(OverallTOTPrev$TOT.Bands))*100
 
 
-OverallTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
+OverallTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOT$TOT.Bands)
 prop.table(table(OverallTOT$TOT.Bands))*100
 
 #TDL 
-TOT.TDL <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
+TOT.TDL <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="TDL"),]
 table(TOT.TDL$TOT.Bands)
 prop.table(table(TOT.TDL$TOT.Bands))*100
 
 #SPS
-TOT.SPS <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
+TOT.SPS <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="SPS"),]
 table(TOT.SPS$TOT.Bands)
 prop.table(table(TOT.SPS$TOT.Bands))*100
 
 #Medlab
-TOT.Medlab <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
+TOT.Medlab <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
                         & OrdersMonth$Area != "London"
                         & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="Medlab"),]
 table(TOT.Medlab$TOT.Bands)
@@ -196,7 +200,7 @@ prop.table(table(TOT.Medlab$TOT.Bands))*100
 
 
 #Create data set for relevant month, excluding London, and with no '0'category in TOT.Bands (which is the category relating to NA dates)
-OrdersMonthTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
+OrdersMonthTOT <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
                                & OrdersMonth$Area != "London"
                                & OrdersMonth$TOT.Bands != "0"),]
 
@@ -342,7 +346,7 @@ TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, 
 TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
 TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
 
-v1 <- "2022-03"
+
 table(TreatmentsMerge$Dispatched_MonthYear == v1)
 table(TreatmentsMerge$Area, TreatmentsMerge$Dispatched_MonthYear == v1)
 
@@ -680,7 +684,6 @@ Summary9 = merge(x = Summary8, y = Contraception4, by = "Area", all = TRUE)
 table(ECFuture$Region)
 # No need to recode the Area, just rename 'region' to name all variables the same in different datasets
 ECFuture <- rename(ECFuture, Area = Region)
-names(ECFuture)
 
      # REMOVE: run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
      # REMOVE: ECFuture$Area <- recodeContraception(DF= ECFuture,varname="Area",varname2="Region")
@@ -693,7 +696,6 @@ ECNow$Area <- 0
 
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
 ECNow$Area <- recodeContraception(DF= ECNow,varname="Area",varname2="Region")
-table(ECNow$Region, ECNow$Area)
 
 # subset for relevant month
 ECFutureMonth <- ECFuture [(ECFuture$Dispatched.at.month.year == v1),]
@@ -706,9 +708,6 @@ ECFutureEllaone <- ECFutureMonth [(ECFutureMonth$Drug=="EllaOne"),c('Area','Drug
 ECNowLevonelle <- ECNowMonth [(ECNowMonth$Drug=="Levonelle"),c('Area','Drug')]
 ECNowEllaone <- ECNowMonth [(ECNowMonth$Drug=="EllaOne"),c('Area','Drug')]
 ECNowLevonor <- ECNowMonth [(ECNowMonth$Drug=="Levonorgestrel 1.5mg"),c('Area','Drug')]
-
-
-
 
 # convert into data frame
 ECFutureLevonelle = as.data.frame(table(ECFutureLevonelle$Area), useNA = "always")
@@ -819,7 +818,7 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_02\\SummaryPerformance.2022.02.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_03\\SummaryPerformance.2022.03.csv", col.names = F, row.names=T, sep=",")
 
 
 
