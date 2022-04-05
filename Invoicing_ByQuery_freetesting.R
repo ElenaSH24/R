@@ -1,6 +1,8 @@
 # producing Xero quarterly file for freetesting activity
 # read generic invoicing file (same we use for SH:24 invoicing)
-invoicing = read.csv("20220303_Invoicing_AprToFeb.csv")
+invoicing = read.csv("20220404_Invoicing_AprToMar.csv")
+
+
 # extract freetesting activity, and the variables needed for invoicing
 invFre <- invoicing[grep('Freetesting -', invoicing$default_la)
                      ,c("overall_type","default_la","processed_at","invoice_category_billable")]
