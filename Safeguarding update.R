@@ -1,12 +1,13 @@
 #Clean the environment
 rm(list = ls())
 
-# set working directory and import file, recode new variable 'Area'  
+# set working directory and import file, recode new variable 'Area'
+     
 # create dataframe from the original file
 safeguarding <- orders
 
 # import outcome of url query with the url links to admin on the sh24 number
-links = read.csv("20220310_urls_safeguarding.csv")
+links = read.csv("20220406_urls_safeguarding.csv")
 
 #Create Area variable and set to 0
 safeguarding$Area <- 0
@@ -20,7 +21,7 @@ SelectedColumns <- safeguarding[,(c("SH24.UID","Customer.ID","Created.at","Creat
                   "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C"))]
 
 #'table' gives a table with the selected variable and the number of occurrences
-table(SelectedColumns$Dispatched.at.month.year=="2022-02")
+table(SelectedColumns$Dispatched.at.month.year=="2022-03")
 
 
 #Create subsets (data frames) for the two safeguarding reports:
@@ -32,7 +33,8 @@ str(SelectedColumns$Age)
 #create a subset with people under 18 ***CHANGE MONTH*** ----
 #There's a comma at the end of the command because we are selecting certain rows but all the columns.
 YoungPeople <- SelectedColumns [(SelectedColumns$Age<18 
-                            & SelectedColumns$Created.at.month.year=="2022-02"),]
+                            & SelectedColumns$Created.at.month.year=="2022-03"),]
+install.packages("dplyr")
 
 links <- rename(links, SH24.UID = sh24_uid)
                                     
@@ -119,7 +121,7 @@ YoungPeopleFlagsOrdered <- YoungPeopleFlags [c("Created.at","Dispatched.at","Not
 
 #create subset for Adults ***CHANGE MONTH***
 Adults <- SelectedColumns [(SelectedColumns$Age>17 
-                           & SelectedColumns$Created.at.month.year=="2022-01"),]
+                           & SelectedColumns$Created.at.month.year=="2022-03"),]
 
 Adults <- merge(x = Adults, links[,c("SH24.UID","admin_url")], by = 'SH24.UID', all.x = TRUE)
 
