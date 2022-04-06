@@ -644,11 +644,65 @@ ggplot(Dispatched, aes(x = processed_month_year, fill = service)) + geom_bar()
 ggplot(Dispatched) + geom_bar(mapping = aes(x = testing_service))
 
 table(Dispatched$service,Dispatched$processed_month_year)
-
-Dispatched2021 <- [(Dispatched$)]
-
-
 # END Invoicing with testing service----
+
+
+
+# Georgia request 2022.04.06 ----
+# contraception and STI data 
+# data only for orders created Feb and March 2022
+STI <- orders
+class(STI$Created.at)
+STI$Created.at <- as.Date(STI$Created.at, format = "%Y-%m-%d")
+STI <- STI[(STI$Created.at > "2022-01-31" & STI$Created.at < "2022-04-01"),]
+# check data is only for Feb, Mar
+table(STI$Created.at.month.year)
+# remove uids
+names(STI)
+STI$id = NULL
+STI$Lab.UID = NULL
+STI$SH24.UID = NULL
+STI$Feedback.token = NULL
+STI$Customer.ID = NULL
+
+COC <- ContCOC
+class(COC$Created.at)
+COC$Created.at <- as.Date(COC$Created.at, format = "%Y-%m-%d")
+COC <- COC[(COC$Created.at > "2022-01-31" & COC$Created.at < "2022-04-01"),]
+table(COC$Created.at.month.year)
+names(COC)
+COC$Feedback.token = NULL
+COC$SH.24.UID = NULL
+COC$ID = NULL
+COC$Customer.ID = NULL
+
+
+POP <- ContPOP
+class(POP$Created.at)
+POP$Created.at <- as.Date(POP$Created.at, format = "%Y-%m-%d")
+POP <- POP[(POP$Created.at > "2022-01-31" & POP$Created.at < "2022-04-01"),]
+table(POP$Created.at.month.year)
+names(POP)
+POP$Feedback.token = NULL
+POP$SH.24.UID = NULL
+POP$ID = NULL
+POP$Customer.ID = NULL
+
+
+EC <- ECNow
+class(EC$Created.at)
+EC$Created.at <- as.Date(EC$Created.at, format = "%Y-%m-%d")
+EC <- EC[(EC$Created.at > "2022-01-31" & EC$Created.at < "2022-04-01"),]
+table(EC$Created.at.month.year)
+
+
+
+write.table (STI, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_STI_Feb_Mar.csv", row.names=F, sep=",")
+
+
+
+
+# END Georgia request 2022.04.06
 
 
 
