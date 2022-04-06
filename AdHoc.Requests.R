@@ -647,7 +647,6 @@ table(Dispatched$service,Dispatched$processed_month_year)
 # END Invoicing with testing service----
 
 
-
 # Georgia request 2022.04.06 ----
 # contraception and STI data 
 # data only for orders created Feb and March 2022
@@ -676,7 +675,6 @@ COC$SH.24.UID = NULL
 COC$ID = NULL
 COC$Customer.ID = NULL
 
-
 POP <- ContPOP
 class(POP$Created.at)
 POP$Created.at <- as.Date(POP$Created.at, format = "%Y-%m-%d")
@@ -688,18 +686,21 @@ POP$SH.24.UID = NULL
 POP$ID = NULL
 POP$Customer.ID = NULL
 
-
 EC <- ECNow
 class(EC$Created.at)
 EC$Created.at <- as.Date(EC$Created.at, format = "%Y-%m-%d")
 EC <- EC[(EC$Created.at > "2022-01-31" & EC$Created.at < "2022-04-01"),]
 table(EC$Created.at.month.year)
+names(EC)
+EC$customer_id = NULL
+EC$sh24_uid = NULL
 
 
 
-write.table (STI, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_STI_Feb_Mar.csv", row.names=F, sep=",")
-
-
+write.table (STI, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_STI_Feb_Mar.csv", row.names=F, sep=",")
+write.table (COC, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_COC_Feb_Mar.csv", row.names=F, sep=",")
+write.table (POP, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_POP_Feb_Mar.csv", row.names=F, sep=",")
+write.table (EC, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_EC_Feb_Mar.csv", row.names=F, sep=",")
 
 
 # END Georgia request 2022.04.06
