@@ -17,7 +17,7 @@ table(STImonth$overall_type)
 
 
 # extract the columns we need for invoicing
-invSTI <- invSTI[,c("overall_type","default_la","processed_at","invoice_category_billable")]
+invSTI <- invSTI[,c("overall_type","default_la","Dispatched.MonthYear","invoice_category_billable")]
 
 # assign values to 'overall_type' that align with invoicing
 invSTI$overall_type[invSTI$overall_type == 'kits_sent'] <- 'Orders'
@@ -32,7 +32,6 @@ table(invSTI$Description, invSTI$overall_type=='Returns')
 invSTI$Description[invSTI$Description == "Returns - "] <- "Returns - CT/GC (single site)"
 
 # remove variables not needed anymore
-invSTI$processed_at = NULL
 invSTI$overall_type = NULL
 invSTI$invoice_category_billable = NULL
 
@@ -48,13 +47,10 @@ invTreatments <- rename(invTreatments, default_la = Region)
 # Include contraception
 invCOC <- ContCOC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
 invPOP <- ContPOP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
-invEC <- ECNow[ , c("region","dispatched_year_month","Drug")]
+invEC <- ECNow[ , c("Region","Dispatched.at.month.year","Drug")]
 invInjectable <- Injectable[ , c("region","Injectable.months.prescribed","Dispatched.Month.Year")]
 invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year")]
 invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
-
-names(invPatch)
-
 
 # concatenate values to create 'Description'
 invCOC$Description <- paste("COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
@@ -64,28 +60,17 @@ invInjectable$Description <- paste('Sayana Press 104mg / 0.65ml',invInjectable$I
 invPatch$Description <- paste('Evra Patch',invInjectable$Patch.months.prescribed,"mth")
 invRing$Description <- paste('Nuva Ring',invInjectable$Patch.months.prescribed,"mth")
 
-# Check that prescriptions no dispatched don't have a 'months.prescribed'
-table(invCOC$Description, invCOC$Dispatched.at.month.year != "")
-table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
-
-
+              # REMOVE?: # Check that prescriptions no dispatched don't have a 'months.prescribed'
+              # table(invCOC$Description, invCOC$Dispatched.at.month.year != "")
+              # table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
 
 # rename (new variable name = existing variable name) to have same names in all data frames----
-invCOC <- rename(invCOC, default_la = Region)
-invCOC <- rename(invCOC, Dispatched.MonthYear = Dispatched.at.month.year)
-invPOP <- rename(invPOP, default_la = Region)
-invPOP <- rename(invPOP, Dispatched.MonthYear = Dispatched.at.month.year)
-invEC <- rename(invEC, default_la = region)
-invEC <- rename(invEC, Dispatched.MonthYear = dispatched_year_month)
-invInjectable <- rename(invInjectable,default_la = region)
-invInjectable <- rename(invInjectable,Dispatched.MonthYear = Dispatched.Month.Year)
-invPatch <- rename(invPatch,default_la = region)
-invPatch <- rename(invPatch,Dispatched.MonthYear = Dispatched.Month.Year)
-invRing <- rename(invRing,default_la = region)
-invRing <- rename(invRing,Dispatched.MonthYear = Dispatched.Month.Year)
-
-names(invPatch)
-
+invCOC <- rename(invCOC, default_la = Region, Dispatched.MonthYear = Dispatched.at.month.year)
+invPOP <- rename(invPOP, default_la = Region, Dispatched.MonthYear = Dispatched.at.month.year)
+invEC <- rename(invEC, default_la = Region, Dispatched.MonthYear = Dispatched.at.month.year)
+invInjectable <- rename(invInjectable, default_la = region, Dispatched.MonthYear = Dispatched.Month.Year)
+invPatch <- rename(invPatch, default_la = region, Dispatched.MonthYear = Dispatched.Month.Year)
+invRing <- rename(invRing, default_la = region, Dispatched.MonthYear = Dispatched.Month.Year)
 
 # remove variables not needed 
 invCOC$Months.prescribed = NULL
@@ -97,15 +82,10 @@ invInjectable$Injectable.months.prescribed = NULL
 invPatch$Patch.months.prescribed = NULL
 invRing$Ring.months.prescribed = NULL
 
-
-names(invRing)
-
-
 # Stack data sets one on top of the other ----
 invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing)
 
-
-        # Create variable to group freetesting, Ireland etc together
+# Create variable to group freetesting, Ireland etc together
         invoicing$Service <- invoicing$default_la
         invoicing$Service[grepl("Freetesting -", invoicing$default_la)] <- "Freetesting"
         invoicing$Service[grepl("Ireland -", invoicing$default_la)] <- "Ireland"
@@ -129,25 +109,12 @@ invoicing$ContactName[invoicing$default_la == "Southend-on-Sea"] <- "Southend"
 invoicing$ContactName[invoicing$default_la == "Staffordshire"] <- "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
 invoicing$ContactName[invoicing$default_la == "Stoke-on-Trent"] <- "Stoke on Trent"
 
-table(invoicing$Processed_Month, invoicing$overall_type=='kits_sent')
-
-
-# extract data for the relevant month, and columns needed for invoicing
-x <- '2022-02'
-invMonth <- invoicing[(invoicing$Processed_Month == x),c("ContactName","Processed_Month",'Description')]
-
+table(invoicing$ContactName, useNA = "always")
 names(invoicing)
 
 
-
-
-
-
-
-
-
-
-
+# extract data for the relevant month, and columns needed for invoicing: use variable v1 defined above
+invMonth <- invoicing[(invoicing$Dispatched.MonthYear == v1),c("ContactName","Dispatched.MonthYear",'Description')]
 
 # convert to data.frame to get the count of the number of tests
 invMonth_1 = as.data.frame(table (invMonth$ContactName,invMonth$Description))
@@ -383,49 +350,59 @@ Fee3Discount <- c(3.60,3.04,4.18,2.99,2.34,3.16,2.72,3.60,3.04,4.18,2.72,
                   0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                   0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
 
+Fee4DiscountRM5 <- c( 3.42, 2.89, 3.97, 2.84, 2.22, 3.00,2.58, 3.42, 2.89, 3.97, 2.58,2.58, 3.42, 2.89, 3.97,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     43.88,30.08,48.60,27.66,13.08,32.38,9.21,35.78,22.49,40.49,17.32,9.21,35.78,22.49,40.49,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
 
+Fee5Freetesting <- c(0.00,0.00,0.00,0.00,0.00,0.00,2.72,0.00,0.00,0.00, 2.72,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,9.64,0.00,0.00,0.00,18.18,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,
+                     0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
 
-Fee4DiscountRM5 <- c(3.42,2.89,3.97,2.84,2.22,3.00,2.58,3.42,2.89,3.97,2.58,2.58,
-                     3.42,2.89,3.97,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     43.88,30.08,48.60,27.66,13.08,32.38,9.21,35.78,22.49,40.49,
-                     17.32,9.21,35.78,22.49,40.49,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
-Fee5Freetesting <- c(0.00,0.00,0.00,0.00,0.00,0.00,2.72,0.00,0.00,0.00,2.72,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,9.64,0.00,0.00,0.00,18.18,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
-eSRH <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52,7.60,
-          4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,5.52,6.54,7.60,4.94,5.52,
-          6.54,7.60,46.45,30.33,49.26,37.07,19.01,46.13,16.47,39.04,33.70,46.26,
-          20.67,13.37,39.04,33.70,46.26,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-          0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-          0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-          0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-          0.00,0.00,0.00,0.00,0.00,34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
-eSRH5 <- c(6.54,5.52,7.60,5.44,4.25,5.85,4.94,6.54,5.52,7.60,4.94,4.94,6.54,5.52,
-           7.60,4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,5.52,6.54,7.60,4.94,
-           5.52,6.54,7.60,46.45,30.33,49.26,37.07,19.01,46.13,16.47,39.04,33.70,
-           46.26,20.67,13.37,39.04,33.70,46.26,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-           0.00,0.00,0.00,0.00,0.00,0.00,34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
+eSRH <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4.94, 4.94, 6.54, 5.52, 7.60,4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,5.52,6.54,7.60,4.94,5.52,6.54,7.60,
+          46.45,30.33,49.26,37.07,19.01,46.13,16.47,39.04,33.70,46.26,20.67,13.37,39.04,33.70,46.26,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+          0.00,
+          0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+          0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+          0.00,0.00,0.00,0.00,
+          0.00,0.00,0.00,
+          0.00,0.00,0.00,0.00,0.00,0.00,
+          0.00,0.00,
+          34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
+
+eSRH5 <- c( 6.21, 5.24, 7.22, 5.17, 4.04, 5.56, 4.69, 6.21, 5.24, 7.22, 4.69, 4.69, 6.21, 5.24, 7.22,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+           44.13,28.81,46.80,35.22,18.06,43.82,15.65,37.09,32.02,43.95,19.64,12.70,37.09,32.02,43.95,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+           0.00,
+           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+           0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+           0.00,0.00,0.00,0.00,
+           0.00,0.00,0.00,
+           0.00,0.00,0.00,0.00,0.00,0.00,
+           0.00,0.00,
+           34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
 
 # create data frame with prices per invoicing category
 fee1 <- data.frame(Description, Fee1DiscountRM)
 fee2 <- data.frame(Description, Fee2Standard)
 fee3 <- data.frame(Description, Fee3Discount)
-
+fee4 <- data.frame(Description, Fee4DiscountRM5)
+fee5 <- data.frame(Description, Fee5Freetesting)
+fee6 <- data.frame(Description, eSRH)
+fee7 <- data.frame(Description, eSRH5)
 
 
 # break down the main invoicing data set as per the fee contracted in each area 
