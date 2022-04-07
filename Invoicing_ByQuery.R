@@ -1,7 +1,7 @@
 # producing Xero file
 # v1: reporting month
 
-invSTI = read.csv("20220404_Invoicing_AprToMar.csv")
+invSTI = read.csv("20220405_Invoicing_AprToMar.csv")
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -11,9 +11,9 @@ invSTI$Dispatched.MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
 # summarise month results
 v1 <- '2022-03'
 STImonth <- invSTI[(invSTI$Dispatched.MonthYear == v1) , ]
-
 table(STImonth$overall_type, STImonth$repeat_kit)
 table(STImonth$overall_type)
+
 
 
 # extract the columns we need for invoicing
@@ -81,6 +81,17 @@ invEC$Drug = NULL
 invInjectable$Injectable.months.prescribed = NULL
 invPatch$Patch.months.prescribed = NULL
 invRing$Ring.months.prescribed = NULL
+
+names(invSTI)
+names(invCOC)
+names(invPOP)
+names(invEC)
+names(invInjectable)
+names(invPatch)
+names(invTreatments)
+
+
+
 
 # Stack data sets one on top of the other ----
 invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing)
