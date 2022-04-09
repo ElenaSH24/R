@@ -1,7 +1,13 @@
 # producing Xero file
-# v1: reporting month
 
-invSTI = read.csv("20220405_Invoicing_AprToMar.csv")
+# set date variables 
+v1 <- '2022-03'               #v1: reporting month
+v2 <- '01.03.2022-31.03.2022' #v2: activity period being invoiced
+v3 <- "28/02/2022"            #v3: InvoiceDate
+v4 <- "31/03/2022"            #v4: DueDate
+  
+
+invSTI = read.csv("20220405_InvoicingApril_March.csv")
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -9,11 +15,9 @@ invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
 invSTI$Dispatched.MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
 
 # summarise month results
-v1 <- '2022-03'
 STImonth <- invSTI[(invSTI$Dispatched.MonthYear == v1) , ]
 table(STImonth$overall_type, STImonth$repeat_kit)
 table(STImonth$overall_type)
-
 
 
 # extract the columns we need for invoicing
@@ -34,14 +38,16 @@ invSTI$Description[invSTI$Description == "Returns - "] <- "Returns - CT/GC (sing
 # remove variables not needed anymore
 invSTI$overall_type = NULL
 invSTI$invoice_category_billable = NULL
+# rename (new variable name = existing variable name) to have same names in all data frames----
+invSTI <- rename(invSTI, MonthYear = Dispatched.MonthYear)
 
 
 # Include CT treatments. Read the file. Get needed columns
 invTreatments <- Treatments[ , c("Region","Dispatched.MonthYear")]
 # create variable Description to rbind with STI data frame
 invTreatments$Description <- "CT Treatments"
-# rename (new variable name = existing variable name) to have same names in all data frames----
-invTreatments <- rename(invTreatments, default_la = Region)
+# rename (new variable name = existing variable name) to have same names in all data frames
+invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatched.MonthYear)
 
 
 # Include contraception
@@ -53,24 +59,24 @@ invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year
 invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
 
 # concatenate values to create 'Description'
-invCOC$Description <- paste("COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
-invPOP$Description <- paste("POP",invPOP$Months.prescribed,"mth",invPOP$Drug)
-invEC$Description <- paste("EC",invEC$Drug)
-invInjectable$Description <- paste('Sayana Press 104mg / 0.65ml',invInjectable$Injectable.months.prescribed,"mth")
-invPatch$Description <- paste('Evra Patch',invInjectable$Patch.months.prescribed,"mth")
-invRing$Description <- paste('Nuva Ring',invInjectable$Patch.months.prescribed,"mth")
+invCOC$Description <- paste("Contraception COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
+invPOP$Description <- paste("Contraception POP",invPOP$Months.prescribed,"mth",invPOP$Drug)
+invEC$Description <- paste("Contraception EC",invEC$Drug)
+invInjectable$Description <- paste('Contraception Sayana Press 104mg / 0.65ml',invInjectable$Injectable.months.prescribed,"mth")
+invPatch$Description <- paste('Contraception Evra Patch',invPatch$Patch.months.prescribed,"mth")
+invRing$Description <- paste('Contraception Nuva Ring',invRing$Ring.months.prescribed,"mth")
 
               # REMOVE?: # Check that prescriptions no dispatched don't have a 'months.prescribed'
               # table(invCOC$Description, invCOC$Dispatched.at.month.year != "")
               # table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
 
 # rename (new variable name = existing variable name) to have same names in all data frames----
-invCOC <- rename(invCOC, default_la = Region, Dispatched.MonthYear = Dispatched.at.month.year)
-invPOP <- rename(invPOP, default_la = Region, Dispatched.MonthYear = Dispatched.at.month.year)
-invEC <- rename(invEC, default_la = Region, Dispatched.MonthYear = Dispatched.at.month.year)
-invInjectable <- rename(invInjectable, default_la = region, Dispatched.MonthYear = Dispatched.Month.Year)
-invPatch <- rename(invPatch, default_la = region, Dispatched.MonthYear = Dispatched.Month.Year)
-invRing <- rename(invRing, default_la = region, Dispatched.MonthYear = Dispatched.Month.Year)
+invCOC <- rename(invCOC, default_la = Region, MonthYear = Dispatched.at.month.year)
+invPOP <- rename(invPOP, default_la = Region, MonthYear = Dispatched.at.month.year)
+invEC <- rename(invEC, default_la = Region, MonthYear = Dispatched.at.month.year)
+invInjectable <- rename(invInjectable, default_la = region, MonthYear = Dispatched.Month.Year)
+invPatch <- rename(invPatch, default_la = region, MonthYear = Dispatched.Month.Year)
+invRing <- rename(invRing, default_la = region, MonthYear = Dispatched.Month.Year)
 
 # remove variables not needed 
 invCOC$Months.prescribed = NULL
@@ -82,6 +88,29 @@ invInjectable$Injectable.months.prescribed = NULL
 invPatch$Patch.months.prescribed = NULL
 invRing$Ring.months.prescribed = NULL
 
+# Count of RPR kits
+# kits dispatched that include Syphilis RPR in reporting month = v1----
+RPR.Dispatched <- orders[(orders$Dispatched.at.month.year == v1), c("Default.LA","Test.regime","Dispatched.at.month.year") ]
+RPR.Dispatched <- RPR.Dispatched[grep('RPR',RPR.Dispatched$Test.regime),]
+table (RPR.Dispatched$Default.LA, useNA = "always")
+# Kits returned that include Syphilis RPR
+RPR.Returned <- orders[(orders$Lab.results.at.month.year == v1), c("Default.LA","Test.regime","Lab.results.at.month.year") ]
+RPR.Returned <- RPR.Returned[grep('RPR',RPR.Returned$Test.regime),]
+table (RPR.Returned$Default.LA, useNA = "always")
+
+# add column with description
+RPR.Dispatched$Description <- "RPR Syphilis tests dispatched"
+RPR.Returned$Description <- "RPR Syphilis tests processed"
+
+# remove columns not needed any more
+RPR.Dispatched$Test.regime = NULL
+RPR.Returned$Test.regime = NULL
+
+# rename (new variable name = existing variable name) to have same names in all data frames----
+RPR.Dispatched <- rename(RPR.Dispatched, default_la = Default.LA, MonthYear = Dispatched.at.month.year)
+RPR.Returned <- rename(RPR.Returned, default_la = Default.LA, MonthYear = Lab.results.at.month.year)
+# END count of Syphilis RPR----
+
 names(invSTI)
 names(invCOC)
 names(invPOP)
@@ -89,12 +118,12 @@ names(invEC)
 names(invInjectable)
 names(invPatch)
 names(invTreatments)
-
-
+names(RPR.Dispatched)
+names(RPR.Returned)
 
 
 # Stack data sets one on top of the other ----
-invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing)
+invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Dispatched,RPR.Returned)
 
 # Create variable to group freetesting, Ireland etc together
         invoicing$Service <- invoicing$default_la
@@ -121,11 +150,9 @@ invoicing$ContactName[invoicing$default_la == "Staffordshire"] <- "South Staffor
 invoicing$ContactName[invoicing$default_la == "Stoke-on-Trent"] <- "Stoke on Trent"
 
 table(invoicing$ContactName, useNA = "always")
-names(invoicing)
-
 
 # extract data for the relevant month, and columns needed for invoicing: use variable v1 defined above
-invMonth <- invoicing[(invoicing$Dispatched.MonthYear == v1),c("ContactName","Dispatched.MonthYear",'Description')]
+invMonth <- invoicing[(invoicing$MonthYear == v1),c("ContactName","MonthYear",'Description')]
 
 # convert to data.frame to get the count of the number of tests
 invMonth_1 = as.data.frame(table (invMonth$ContactName,invMonth$Description))
@@ -181,42 +208,49 @@ invMonth_1$Number[invMonth_1$ContactName == "Teesside"] <- "00042"
 invMonth_1$Number[invMonth_1$ContactName == "Thurrock"] <- "00043"
 invMonth_1$Number[invMonth_1$ContactName == "Wirral"] <- "0056"
 
-
 # create InvoiceNumber as concatenate of 'Invoice' and 'Number'
-invMonth_1$InvoiceNumber <- paste(invMonth_1$Invoice,x,invMonth_1$Number, sep=" ")
+invMonth_1$InvoiceNumber <- paste(invMonth_1$Invoice, v1, invMonth_1$Number, sep=" ")
 
-# some Trusts have a Purchase Order
-invMonth_1$PO <- ""
-invMonth_1$PO[invMonth_1$ContactName == "Berkshire"] <- "PO 40157114"
-invMonth_1$PO[invMonth_1$ContactName == "County Durham and Darlington NHS Foundation Trust"] <- "PO RXP0003834180"
-invMonth_1$PO[invMonth_1$ContactName == "Bradford"] <- "PO L024942"
-invMonth_1$PO[invMonth_1$ContactName == "Cheshire East"] <- "PO RQ6N400039417"
-invMonth_1$PO[invMonth_1$ContactName == "Gateshead"] <- "PO RLNN400008230"
-invMonth_1$PO[invMonth_1$ContactName == "Halton"] <- "PO RQ6N400039417"
-invMonth_1$PO[invMonth_1$ContactName == "Hertfordshire"] <- "PO 000037852"
-invMonth_1$PO[invMonth_1$ContactName == "Kirklees"] <- "PO L024941"
-invMonth_1$PO[invMonth_1$ContactName == "Knowsley"] <- "PO RQ6N400039417"
-invMonth_1$PO[invMonth_1$ContactName == "Leicester City"] <- "PO SS139020"
-invMonth_1$PO[invMonth_1$ContactName == "Leicestershire"] <- "PO SS139020"
-invMonth_1$PO[invMonth_1$ContactName == "North Staffordshire"] <- "PO SS139114"
-invMonth_1$PO[invMonth_1$ContactName == "Nottingham City Council"] <- "PO NCC7156225"
-invMonth_1$PO[invMonth_1$ContactName == "UKHSA PrEP Trial"] <- "PO 6695926"
-invMonth_1$PO[invMonth_1$ContactName == "Rutland"] <- "PO SS139020"
-invMonth_1$PO[invMonth_1$ContactName == "Shropshire"] <- "PO SS105992"
-invMonth_1$PO[invMonth_1$ContactName == "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"] <- "PO SS124036"
-invMonth_1$PO[invMonth_1$ContactName == "Stoke on Trent"] <- "PO SS139114"
-invMonth_1$PO[invMonth_1$ContactName == "Telford and Wrekin"] <- "PO SS80163"
-invMonth_1$PO[invMonth_1$ContactName == "Warrington"] <- "PO RQ6N400039417"
+# remove columns no needed anymore
+invMonth_1$Invoice = NULL
+invMonth_1$Number = NULL
+
+
+# REMOVE AS TARAN INCLUDES THE PO IN EACH INVOICE - DISCUSS WITH BLAKE
+#some Trusts have a Purchase Order
+# invMonth_1$PO <- ""
+# invMonth_1$PO[invMonth_1$ContactName == "Berkshire"] <- "PO 40157114"
+# invMonth_1$PO[invMonth_1$ContactName == "County Durham and Darlington NHS Foundation Trust"] <- "PO RXP0003834180"
+# invMonth_1$PO[invMonth_1$ContactName == "Bradford"] <- "PO L024942"
+# invMonth_1$PO[invMonth_1$ContactName == "Cheshire East"] <- "PO RQ6N400039417"
+# invMonth_1$PO[invMonth_1$ContactName == "Gateshead"] <- "PO RLNN400008230"
+# invMonth_1$PO[invMonth_1$ContactName == "Halton"] <- "PO RQ6N400039417"
+# invMonth_1$PO[invMonth_1$ContactName == "Hertfordshire"] <- "PO 000037852"
+# invMonth_1$PO[invMonth_1$ContactName == "Kirklees"] <- "PO L024941"
+# invMonth_1$PO[invMonth_1$ContactName == "Knowsley"] <- "PO RQ6N400039417"
+# invMonth_1$PO[invMonth_1$ContactName == "Leicester City"] <- "PO SS139020"
+# invMonth_1$PO[invMonth_1$ContactName == "Leicestershire"] <- "PO SS139020"
+# invMonth_1$PO[invMonth_1$ContactName == "North Staffordshire"] <- "PO SS139114"
+# invMonth_1$PO[invMonth_1$ContactName == "Nottingham City Council"] <- "PO NCC7156225"
+# invMonth_1$PO[invMonth_1$ContactName == "UKHSA PrEP Trial"] <- "PO 6695926"
+# invMonth_1$PO[invMonth_1$ContactName == "Rutland"] <- "PO SS139020"
+# invMonth_1$PO[invMonth_1$ContactName == "Shropshire"] <- "PO SS105992"
+# invMonth_1$PO[invMonth_1$ContactName == "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"] <- "PO SS124036"
+# invMonth_1$PO[invMonth_1$ContactName == "Stoke on Trent"] <- "PO SS139114"
+# invMonth_1$PO[invMonth_1$ContactName == "Telford and Wrekin"] <- "PO SS80163"
+# invMonth_1$PO[invMonth_1$ContactName == "Warrington"] <- "PO RQ6N400039417"
 
 # create reference. Use 'Region' instead of 'ContactName' as a better reference to our records
-invMonth_1$Reference <- paste("SH:24 ",invMonth_1$ContactName, " activity 01.02.2022-28.02.2022", invMonth_1$PO)
+invMonth_1$Reference <- paste("SH:24 ",invMonth_1$ContactName, "activity", v2)
 # invoice dates----
-invMonth_1$InvoiceDate <- "28/02/2022"
-invMonth_1$DueDate <- "31/03/2022"
+invMonth_1$InvoiceDate <- v3
+invMonth_1$DueDate <- v4
 
         
 # remove dataframe rows based on zero values in one column
 invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
+# export to check figures 
+write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_03\\test_invoicing_March.csv", row.names=F, sep=",")
 
 
 # create price data frames
@@ -228,101 +262,81 @@ Description <- c('Orders - All STIs (dual site)','Orders - All STIs (single site
                 'Orders - Syphilis',
                 'Orders - Syphilis & CT/GC (dual site)','Orders - Syphilis & CT/GC (single site)','Orders - Syphilis & CT/GC (triple site)',
                 'Orders - Hep: 1 blood',
-                'Orders - Hep: 1 blood & CT/GC (dual site)',
-                'Orders - Hep: 1 blood & CT/GC (single site)',
-                'Orders - Hep: 1 blood & CT/GC (triple site)',
+                'Orders - Hep: 1 blood & CT/GC (dual site)','Orders - Hep: 1 blood & CT/GC (single site)','Orders - Hep: 1 blood & CT/GC (triple site)',
                 'Orders - Hep: 2 bloods',
-                'Orders - Hep: 2 bloods & CT/GC (dual site)',
-                'Orders - Hep: 2 bloods & CT/GC (single site)',
-                'Orders - Hep: 2 bloods & CT/GC (triple site)',
+                'Orders - Hep: 2 bloods & CT/GC (dual site)','Orders - Hep: 2 bloods & CT/GC (single site)','Orders - Hep: 2 bloods & CT/GC (triple site)',
                 'Orders - Hep: 3 bloods',
-                'Orders - Hep: 3 bloods & CT/GC (dual site)',
-                'Orders - Hep: 3 bloods & CT/GC (single site)',
-                'Orders - Hep: 3 bloods & CT/GC (triple site)',
+                'Orders - Hep: 3 bloods & CT/GC (dual site)','Orders - Hep: 3 bloods & CT/GC (single site)','Orders - Hep: 3 bloods & CT/GC (triple site)',
                 'Orders - Hep: 4 bloods',
                 'Orders - Hep: 4 bloods & CT/GC (dual site)',
                 'Orders - Hep: 4 bloods & CT/GC (single site)',
                 'Orders - Hep: 4 bloods & CT/GC (triple site)',
-                'Returns - All STIs (dual site)',
-                'Returns - All STIs (single site)',
-                'Returns - All STIs (triple site)',
-                'Returns - CT/GC (dual site)',
-                'Returns - CT/GC (single site)',
-                'Returns - CT/GC (triple site)',
+                'Returns - All STIs (dual site)','Returns - All STIs (single site)','Returns - All STIs (triple site)',
+                'Returns - CT/GC (dual site)','Returns - CT/GC (single site)','Returns - CT/GC (triple site)',
                 'Returns - HIV',
-                'Returns - HIV & CT/GC (dual site)',
-                'Returns - HIV & CT/GC (single site)',
-                'Returns - HIV & CT/GC (triple site)',
+                'Returns - HIV & CT/GC (dual site)','Returns - HIV & CT/GC (single site)','Returns - HIV & CT/GC (triple site)',
                 'Returns - HIV & Syphilis',
                 'Returns - Syphilis',
-                'Returns - Syphilis & CT/GC (dual site)',
-                'Returns - Syphilis & CT/GC (single site)',
-                'Returns - Syphilis & CT/GC (triple site)',
+                'Returns - Syphilis & CT/GC (dual site)','Returns - Syphilis & CT/GC (single site)','Returns - Syphilis & CT/GC (triple site)',
                 'Returns - Hep: 1 blood',
-                'Returns - Hep: 1 blood & CT/GC (dual site)',
-                'Returns - Hep: 1 blood & CT/GC (single site)',
-                'Returns - Hep: 1 blood & CT/GC (triple site)',
+                'Returns - Hep: 1 blood & CT/GC (dual site)','Returns - Hep: 1 blood & CT/GC (single site)','Returns - Hep: 1 blood & CT/GC (triple site)',
                 'Returns - Hep: 2 bloods',
-                'Returns - Hep: 2 bloods & CT/GC (dual site)',
-                'Returns - Hep: 2 bloods & CT/GC (single site)',
-                'Returns - Hep: 2 bloods & CT/GC (triple site)',
+                'Returns - Hep: 2 bloods & CT/GC (dual site)','Returns - Hep: 2 bloods & CT/GC (single site)','Returns - Hep: 2 bloods & CT/GC (triple site)',
                 'Returns - Hep: 3 bloods',
-                'Returns - Hep: 3 bloods & CT/GC (dual site)',
-              'Returns - Hep: 3 bloods & CT/GC (single site)',
-              'Returns - Hep: 3 bloods & CT/GC (triple site)',
-               'Returns - Hep: 4 bloods',
+                'Returns - Hep: 3 bloods & CT/GC (dual site)','Returns - Hep: 3 bloods & CT/GC (single site)','Returns - Hep: 3 bloods & CT/GC (triple site)',
+                'Returns - Hep: 4 bloods',
                 'Returns - Hep: 4 bloods & CT/GC (dual site)',
                 'Returns - Hep: 4 bloods & CT/GC (single site)',
                 'Returns - Hep: 4 bloods & CT/GC (triple site)',
-              'CT.Treatments',
-              'COC.3mth Levonorgestrel/Ethinylestradiol',
-              'COC.3mth Desogestrel / Ethinyloestradiol 20',
-              'COC.3mth Desogestrel / Ethinyloestradiol 30',
-              'COC.3mth Gestodene / Ethinyloestradiol',
-              'COC.3mth Norgestimate / Ethinyloestradiol',
-              'COC.6mth Levonorgestrel/Ethinylestradiol',
-              'COC.6mth Desogestrel / Ethinyloestradiol 20',
-              'COC.6mth Desogestrel / Ethinyloestradiol 30',
-              'COC.6mth Gestodene / Ethinyloestradiol',
-              'COC.6mth Norgestimate / Ethinyloestradiol',
-              'COC.12mth Levonorgestrel/Ethinylestradiol',
-              'COC.12mth Desogestrel / Ethinyloestradiol 20',
-              'COC.12mth Desogestrel / Ethinyloestradiol 30',
-              'COC.12mth Gestodene / Ethinyloestradiol',
-              'COC.12mth Norgestimate / Ethinyloestradiol',
-              'POP.3mth Desogestrel',
-              'POP.3mth Levonorgestrel',
-              'POP.3mth Noriday',
-              'POP.6mth Desogestrel',
-              'POP.6mth Levonorgestrel',
-              'POP.6mth Noriday',
-              'POP.12mth Desogestrel',
-              'POP.12mth Levonorgestrel',
-              'POP.12mth Noriday',
-              'POP bolt-on Desogestrel 3 months',
-              'Bolt-on condoms',
-              'Bolt-on lube',
-              'Bolt-on pregnancy test',
-              'EC.EllaOne',
-              'EC.Levonelle',
-              'EC.Levonor',
+              'CT Treatments',
+              'Contraception COC 3 mth Levonorgestrel/Ethinylestradiol',
+              'Contraception COC 3 mth Desogestrel / Ethinyloestradiol 20',
+              'Contraception COC 3 mth Desogestrel / Ethinyloestradiol 30',
+              'Contraception COC 3 mth Gestodene / Ethinyloestradiol',
+              'Contraception COC 3 mth Norgestimate / Ethinyloestradiol',
+              'Contraception COC 6 mth Levonorgestrel/Ethinylestradiol',
+              'Contraception COC 6 mth Desogestrel / Ethinyloestradiol 20',
+              'Contraception COC 6 mth Desogestrel / Ethinyloestradiol 30',
+              'Contraception COC 6 mth Gestodene / Ethinyloestradiol',
+              'Contraception COC 6 mth Norgestimate / Ethinyloestradiol',
+              'Contraception COC 12 mth Levonorgestrel/Ethinylestradiol',
+              'Contraception COC 12 mth Desogestrel / Ethinyloestradiol 20',
+              'Contraception COC 12 mth Desogestrel / Ethinyloestradiol 30',
+              'Contraception COC 12 mth Gestodene / Ethinyloestradiol',
+              'Contraception COC 12 mth Norgestimate / Ethinyloestradiol',
+              'Contraception POP 3 mth Desogestrel',
+              'Contraception POP 3 mth Levonorgestrel',
+              'Contraception POP 3 mth Noriday',
+              'Contraception POP 6 mth Desogestrel',
+              'Contraception POP 6 mth Levonorgestrel',
+              'Contraception POP 6 mth Noriday',
+              'Contraception POP 12 mth Desogestrel',
+              'Contraception POP 12 mth Levonorgestrel',
+              'Contraception POP 12 mth Noriday',
+              'Contraception POP bolt-on Desogestrel 3 months',
+              'Bolt on condoms',
+              'Bolt on lube',
+              'Bolt on pregnancy test',
+              'Contraception EC EllaOne',
+              'Contraception EC Levonelle',
+              'Contraception EC Levonorgestrel 1.5mg',
               'Photo.Diagnosis.Consultations',
               'Photo.Treatments (3005) imiquimod',
               'Photo.Treatments (3006) podophyllotoxin',
               'Photo.Treatments (3007) aciclovir_episodic 800mg',
               'Photo.Treatments (3008) aciclovir_suppressive 400mg',
               'Photo.Treatments (3030) condyline',
-              'RPR Syphilis dispatched',
-              'RPR Syphilis returned',
-              'Nuva Ring 3 month',
-              'Nuva Ring 6 month',
-              'Nuva Ring 12 month',
-              'Evra Patch 3 month',
-              'Evra Patch 6 month',
-              'Evra Patch 12 month',
-              'Sayana Press 104mg / 0.65ml 3 month',
-              'Sayana Press 104mg / 0.65ml 6 month',
-              'Sayana Press 104mg / 0.65ml 12 month')
+              'RPR Syphilis tests dispatched',
+              'RPR Syphilis tests processed',
+              'Contraception Nuva Ring 3 mth',
+              'Contraception Nuva Ring 6 mth',
+              'Contraception Nuva Ring 12 mth',
+              'Contraception Evra Patch 3 mth',
+              'Contraception Evra Patch 6 mth',
+              'Contraception Evra Patch 12 mth',
+              'Contraception Sayana Press 104mg / 0.65ml 3 mth',
+              'Contraception Sayana Press 104mg / 0.65ml 6 mth',
+              'Contraception Sayana Press 104mg / 0.65ml 12 mth')
 
 Fee1DiscountRM <-c(3.60,3.04,4.18,2.99,2.34,3.16,2.72,3.60,3.04,4.18,2.72,2.72,3.60,3.04,4.18, 	
                    2.72,3.60,3.04,4.18,2.72,3.60,3.04,4.18,2.72,3.60,3.04,4.18,2.72,3.60,3.04,4.18,
@@ -405,6 +419,16 @@ eSRH5 <- c( 6.21, 5.24, 7.22, 5.17, 4.04, 5.56, 4.69, 6.21, 5.24, 7.22, 4.69, 4.
            0.00,0.00,
            34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
+FeeZero <- c( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+            0.00,
+            0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+            0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
+            0.00,0.00,0.00,0.00,
+            0.00,0.00,0.00,
+            0.00,0.00,0.00,0.00,0.00,0.00,
+            0.00,0.00,
+            0,0,0,0,0,0,0,0,0)
 
 # create data frame with prices per invoicing category
 fee1 <- data.frame(Description, Fee1DiscountRM)
@@ -414,6 +438,7 @@ fee4 <- data.frame(Description, Fee4DiscountRM5)
 fee5 <- data.frame(Description, Fee5Freetesting)
 fee6 <- data.frame(Description, eSRH)
 fee7 <- data.frame(Description, eSRH5)
+fee0 <- data.frame(Description, FeeZero)
 
 
 # break down the main invoicing data set as per the fee contracted in each area 
@@ -422,38 +447,119 @@ InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$Contact
                         | invMonth_2$ContactName=="County Durham and Darlington NHS Foundation Trust" | invMonth_2$ContactName=="Darlington"
                         | invMonth_2$ContactName=="Derby City" | invMonth_2$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
                         | invMonth_2$ContactName=="Dorset" | invMonth_2$ContactName=="Halton"
-                        | invMonth_2$ContactName=="Kirklees" | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"),]
+                        | invMonth_2$ContactName=="Kirklees" | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
+                        | invMonth_2$ContactName=="Nottingham City Council" | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
+                        | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside" 
+                        | invMonth_2$ContactName=="Hertfordshire"),]
 
-InvFee2 <- invMonth_2 [(invMonth_2$ContactName=="Gateshead" | invMonth_2$ContactName=="Glasgow" | invMonth_2$ContactName=="London Northwest Healthcare"),]
+InvFee2 <- invMonth_2 [(invMonth_2$ContactName=="Gateshead" | invMonth_2$ContactName=="Glasgow" 
+                        | invMonth_2$ContactName=="London Northwest Healthcare" | invMonth_2$ContactName=="South Tyneside" 
+                        | invMonth_2$ContactName=="Sunderland" | invMonth_2$ContactName=="Worcestershire"
+                        | invMonth_2$ContactName=="Northern Ireland") , ]
 
 InvFee3 <- invMonth_2 [(invMonth_2$ContactName=="Berkshire"),]
 
+InvFee4 <- invMonth_2 [(invMonth_2$ContactName=="Leicester City" | invMonth_2$ContactName=="Leicestershire"
+                        | invMonth_2$ContactName=="North Staffordshire" | invMonth_2$ContactName=="Rutland"
+                        | invMonth_2$ContactName=="Shropshire" | invMonth_2$ContactName=="South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
+                        | invMonth_2$ContactName=="Stoke on Trent" | invMonth_2$ContactName=="Telford and Wrekin") ,]
 
+InvFee5 <- invMonth_2 [(invMonth_2$ContactName=="Freetesting"),]
+
+InvFee6 <- invMonth_2 [(invMonth_2$ContactName=="Buckinghamshire"),]
+
+InvFee7 <- invMonth_2 [(invMonth_2$ContactName=="Essex" | invMonth_2$ContactName=="Thurrock" | invMonth_2$ContactName=="Wirral"),]
+# some areas not invoiced. Count them anyway to check whole picture
+InvFeeZero <- invMonth_2 [(invMonth_2$ContactName=="Ireland") | (invMonth_2$ContactName=="Romania") | (invMonth_2$ContactName=="Fettle")
+                        | (invMonth_2$ContactName == "Medway"),]
+
+# check that sum of the invoices grouped equals total of invoicing in file invMonth_2:
+nrow(InvFee1)
+nrow(InvFee2)
+nrow(InvFee3)
+nrow(InvFee4)
+nrow(InvFee5)
+nrow(InvFee6)
+nrow(InvFee7)
+nrow(InvFeeZero)
 
 # merge each price data set with its correspondent areas
 InvoicesFee1 = merge(x = InvFee1, y = fee1, by = "Description", all.x = TRUE)
 InvoicesFee2 = merge(x = InvFee2, y = fee2, by = "Description", all.x = TRUE)
 InvoicesFee3 = merge(x = InvFee3, y = fee3, by = "Description", all.x = TRUE)
+InvoicesFee4 = merge(x = InvFee4, y = fee4, by = "Description", all.x = TRUE)
+InvoicesFee5 = merge(x = InvFee5, y = fee5, by = "Description", all.x = TRUE)
+InvoicesFee6 = merge(x = InvFee6, y = fee6, by = "Description", all.x = TRUE)
+InvoicesFee7 = merge(x = InvFee7, y = fee7, by = "Description", all.x = TRUE)
+InvoicesFeeZero = merge(x = InvFeeZero, y = fee0, by = "Description", all.x = TRUE)
 
 
 # rename variables in the data frames that include prices. Variables have to be called the same to be able to stack data frames
 #rename(new variable name = existing variable name)
-InvoicesFee1 <- rename(InvoicesFee1, Unit.Price = Fee1DiscountRM)
-InvoicesFee2 <- rename(InvoicesFee2, Unit.Price = Fee2Standard)
-InvoicesFee3 <- rename(InvoicesFee3, Unit.Price = Fee3Discount)
+names(InvoicesFee1)
+names(InvoicesFee2)
+names(InvoicesFee3)
+names(InvoicesFee4)
+names(InvoicesFee5)
+names(InvoicesFee6)
+names(InvoicesFee7)
+names(InvoicesFeeZero)
 
-
+InvoicesFee1 <- rename(InvoicesFee1, UnitAmount = Fee1DiscountRM)
+InvoicesFee2 <- rename(InvoicesFee2, UnitAmount = Fee2Standard)
+InvoicesFee3 <- rename(InvoicesFee3, UnitAmount = Fee3Discount)
+InvoicesFee4 <- rename(InvoicesFee4, UnitAmount = Fee4DiscountRM5)
+InvoicesFee5 <- rename(InvoicesFee5, UnitAmount = Fee5Freetesting)
+InvoicesFee6 <- rename(InvoicesFee6, UnitAmount = eSRH)
+InvoicesFee7 <- rename(InvoicesFee7, UnitAmount = eSRH5)
+InvoicesFeeZero <- rename(InvoicesFeeZero, UnitAmount = FeeZero)
 
 # Stack data sets one on top of the other 
-InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee3)  
+InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee3, InvoicesFee4, InvoicesFee5, InvoicesFee6, InvoicesFee7, InvoicesFeeZero)  
 
+# create the rest of the variables needed for the Xero file
+InvoicesStack$EmailAddress <- ""
+InvoicesStack$POAddressLine1 <- ""
+InvoicesStack$POAddressLine2 <- ""
+InvoicesStack$POAddressLine3 <- ""
+InvoicesStack$POAddressLine4 <- ""
+InvoicesStack$POCity <- ""
+InvoicesStack$PORegion <- ""
+InvoicesStack$POPostalCode <- ""
+InvoicesStack$POCountry <- ""
+InvoicesStack$Total <- ""
+InvoicesStack$InventoryItemCode <- ""
+InvoicesStack$Discount <- ""
+InvoicesStack$AccountCode <- "200"
+InvoicesStack$AccountCode[grepl("Contraception", InvoicesStack$Description)] <- "206"
+table(InvoicesStack$AccountCode)
+InvoicesStack$TaxType <- "No VAT"
+InvoicesStack$TaxAmount <- ""
+InvoicesStack$TrackingName1 <- "Workstream"
+InvoicesStack$TrackingOption1 <- "Operations"
+InvoicesStack$TrackingName2 <- ""
+InvoicesStack$TrackingOption2 <- ""
+InvoicesStack$Currency <- "GBP"
+InvoicesStack$BrandingTheme <- "Standard SH24 (Accounts)"
+
+names(InvoicesStack)
 
 # select and order the columns we need
-InvoicesStack <- InvoicesStack [c("ContactName","InvoiceNumber","Reference","InvoiceDate","DueDate","Description","Quantity","Unit.Price")]
+InvoicesStack_Ordered <- InvoicesStack [c("ContactName","EmailAddress","POAddressLine1","POAddressLine2","POAddressLine3","POAddressLine4",
+                                          "POCity","PORegion","POPostalCode","POCountry",
+                                          "InvoiceNumber","Reference","InvoiceDate","DueDate","Total","InventoryItemCode","Description",
+                                          "Quantity","UnitAmount","Discount","AccountCode","TaxType","TaxAmount","TrackingName1","TrackingOption1",
+                                          "TrackingName2","TrackingOption2","Currency","BrandingTheme")]
 # order data first by Area (=ContactName) and second by the invoicing category (=Description)
-InvoicesStack <- InvoicesStack[order(InvoicesStack$ContactName,InvoicesStack$Description),]
+InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$ContactName),]
+
+# Replace <NA> in Unit.Amount with zero ----
+InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
+table(InvoicesStack_Ordered$UnitAmount)
 
 
-# create blank variables
-InvoicesStack$Total <- ""
+write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_03\\test_invoicing_March_4.csv", row.names=F, sep=",")
+
+
+
 
