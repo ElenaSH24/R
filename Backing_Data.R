@@ -14,7 +14,6 @@ setwd("~/Documents/Reports/0. Master for sharing")
 setwd("~/Documents/Reports/2. Ad-hoc reports/Feedback")
 
 orders = read.csv("20220404_sti_order_report.csv")
-inv = read.csv("Invoic_Test.csv")
 
 # REPEATS INVESTIGATION----
 orders = read.csv("20210706_Sti_IncludingRepeats.csv")
