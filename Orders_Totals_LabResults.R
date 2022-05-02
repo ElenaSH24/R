@@ -25,7 +25,7 @@ OrdersMonth$Area <- 0
 OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
 # set reporting month
-v1 <- '2022-03'
+v1 <- '2022-04'
 
 
 table(OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
@@ -163,7 +163,7 @@ Summary1 <- rename(Summary1, Returned.Tests = Returns.x)
 
 # TO INPUT IN SUMMARY MANUALLY: TOT per Lab, based on 'LabResults' (change of methodology in June 2020, from 'LabReceipt' to 'LabResults') and for TDL and SPS separately----
 #Calculate overall TOT for current and previous month
-OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-02" 
+OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
                            & OrdersMonth$Area != "London"
                            & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOTPrev$TOT.Bands)
@@ -350,7 +350,7 @@ table(TreatmentsMerge$Dispatched_MonthYear == v1)
 table(TreatmentsMerge$Area, TreatmentsMerge$Dispatched_MonthYear == v1)
 
 #Export as table to Clinical Reports, as a summary of all CT treatments since the start of the service in all areas (inc London!)
-write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.02.CT.Treatments.csv", row.names=F, sep=",")
+write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.04.CT.Treatments.csv", row.names=F, sep=",")
 
 #Prepare CT treatments to add to rest of summary: select data for relevant month
 TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched_MonthYear == v1 & !is.na(TreatmentsMerge$Dispatched_MonthYear)),]
@@ -647,6 +647,11 @@ table(Injectable$Dispatched.Month.Year == v1)
 table(Patch$Dispatched.Month.Year == v1)
 table(Ring$Dispatched.Month.Year == v1)
 
+# CHECK: find out POP prescriptions with no Area, if any (there shouldn't be any!)
+Zero <- ContPOP[(ContPOP$Area==0),]
+rm(Zero)
+
+
 # subset for relevant month
 ContCOCMonth <- ContCOC [(ContCOC$Dispatched.at.month.year ==  v1),]
 ContPOPMonth <- ContPOP [(ContPOP$Dispatched.at.month.year == v1),]
@@ -678,29 +683,31 @@ Contraception4 = merge(x = Contraception3, y = RingMonth, by = "Area", all = TRU
 
 Summary9 = merge(x = Summary8, y = Contraception4, by = "Area", all = TRUE)
 
-## Emergency Contraception - create Area. csv are exported from DataGrip for the relevant month----
-ECFuture$Area <- 0
-ECFuture$Area[ECFuture$region=="Fettle"] <- "Fettle"
-ECFuture$Area <- 0
-#rename 'region'
-ECFuture <- rename(ECFuture, Region = region)
+## Emergency Contraception ----
+# subset for relevant month
+ECFutureMonth <- ECFuture [(ECFuture$Dispatched.at.month.year ==  v1),]
+# create Area
+ECFutureMonth$Area <- 0
+####ECFutureMonth$Area[ECFutureMonth$region=="Fettle"] <- "Fettle"
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
-ECFuture$Area <- recodeContraception(DF= ECFuture,varname="Area",varname2="Region")
+ECFutureMonth$Area <- recodeContraception(DF= ECFutureMonth,varname="Area",varname2="Region")
 
-ECNow$Area <- 0
-#rename 'region'
-ECNow <- rename(ECNow, Region = region)
+ECNowMonth <- ECNow [(ECNow$Dispatched.at.month.year ==  v1),]
+# create Area
+ECNowMonth$Area <- 0
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
-ECNow$Area <- recodeContraception(DF= ECNow,varname="Area",varname2="Region")
-
+ECNowMonth$Area <- recodeContraception(DF= ECNowMonth,varname="Area",varname2="Region")
+# find out prescriptions with no Area, if any (there shouldn't be any!)
+Zero <- ECNowMonth[(ECNowMonth$Area==0),]
+rm(Zero)
 
 
 # subset per drug 
-ECFutureLevonelle <- ECFuture [(ECFuture$Drug=="Levonelle"),c('Area','Drug')]
-ECFutureEllaone <- ECFuture [(ECFuture$Drug=="EllaOne"),c('Area','Drug')]
-ECNowLevonelle <- ECNow [(ECNow$Drug=="Levonelle"),c('Area','Drug')]
-ECNowEllaone <- ECNow [(ECNow$Drug=="EllaOne"),c('Area','Drug')]
-ECNowLevonor <- ECNow [(ECNow$Drug=="Levonorgestrel 1.5mg"),c('Area','Drug')]
+ECFutureLevonelle <- ECFutureMonth [(ECFutureMonth$Drug=="Levonelle"),c('Area','Drug')]
+ECFutureEllaone <- ECFutureMonth [(ECFutureMonth$Drug=="EllaOne"),c('Area','Drug')]
+ECNowLevonelle <- ECNowMonth [(ECNowMonth$Drug=="Levonelle"),c('Area','Drug')]
+ECNowEllaone <- ECNowMonth [(ECNowMonth$Drug=="EllaOne"),c('Area','Drug')]
+ECNowLevonor <- ECNowMonth [(ECNowMonth$Drug=="Levonorgestrel 1.5mg"),c('Area','Drug')]
 
 # convert into data frame
 ECFutureLevonelle = as.data.frame(table(ECFutureLevonelle$Area), useNA = "always")
@@ -762,11 +769,19 @@ PhotoTreatm <- rename(PhotoTreatm, Region = name)
 #run recoding function (in Saskia Tab) and save output in Area; important to write your variable names in colons (but not the data frame name)
 PhotoConsult$Area <- recodeContraception(DF= PhotoConsult,varname="Area",varname2="Region")
 PhotoTreatm$Area <- recodeContraception(DF= PhotoTreatm,varname="Area",varname2="Region")
+# find out prescriptions with no Area, if any (there shouldn't be any!)
+Zero <- PhotoTreatm[(PhotoTreatm$Area==0),]
+rm(Zero)
 
+
+# subset for relevant month
 PhotoConsult1 <- PhotoConsult
-class(PhotoConsult1$diagnosed_at)
-PhotoConsult1$diagnosed_at <- as.Date(PhotoConsult1$diagnosed_at, format = "%Y-%m-%d")
-PhotoConsult1 <- PhotoConsult1[(PhotoConsult1$diagnosed_at >= "2022-02-01" & PhotoConsult1$diagnosed_at <= "2022-02-28"),]
+PhotoConsult1 <- PhotoConsult [(PhotoConsult$diagnosed_month_year ==  v1),]
+
+    #### DELETE: 02.05.2022
+    ####class(PhotoConsult1$diagnosed_at)
+    ####PhotoConsult1$diagnosed_at <- as.Date(PhotoConsult1$diagnosed_at, format = "%Y-%m-%d")
+    ####PhotoConsult1 <- PhotoConsult1[(PhotoConsult1$diagnosed_at >= "2022-02-01" & PhotoConsult1$diagnosed_at <= "2022-02-28"),]
 
 #convert to data.frame
 PhotoConsult1 = as.data.frame(table(PhotoConsult1$Area), useNA = "always")
@@ -774,7 +789,7 @@ colnames(PhotoConsult1)[1] <- "Area"
 colnames(PhotoConsult1)[2] <- "Photo.Diagnosis.Consultations"
 
 PhotoTreatm1 <- PhotoTreatm
-PhotoTreatm1 <- PhotoTreatm [(PhotoTreatm$dispatched_month_year=="2022-02"),]
+PhotoTreatm1 <- PhotoTreatm [(PhotoTreatm$dispatched_month_year== v1),]
 # CAN'T USE WITHOUT A 'COUNT' COLUMN - group by 'Area' with 'aggregate' function. You can preserve column names this way:
 # PhotoTreatm1 <- aggregate(PhotoTreatm1["PD.Treatments"], by=PhotoTreatm1["Area"], sum)
 # convert into a data frame
@@ -815,7 +830,7 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_02\\SummaryPerformance.2022.02.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_04\\SummaryPerformance.2022.02.csv", col.names = F, row.names=T, sep=",")
 
 
 
