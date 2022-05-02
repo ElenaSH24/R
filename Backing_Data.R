@@ -9,11 +9,11 @@ library(reshape2)
 # install openxlsx package: Read, Write and Edit XLSX File, no need to install Java.
 #library("openxlsx", lib.loc="~/R/win-library/4.0.4")
 
-setwd("/Users/ElenaArdinesTomas/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_03")
+setwd("/Users/ElenaArdinesTomas/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_04")
 setwd("~/Documents/Reports/0. Master for sharing")
 setwd("~/Documents/Reports/2. Ad-hoc reports/Feedback")
 
-orders = read.csv("20220404_sti_order_report.csv")
+orders = read.csv("20220502_sti_order_report.csv")
 
 # REPEATS INVESTIGATION----
 orders = read.csv("20210706_Sti_IncludingRepeats.csv")
@@ -26,16 +26,16 @@ table(orders1$test_kit_index,orders1$DispatchedMonthYr=="2021-06")
 
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
-Treatments = read.csv("20220404_CT_Treatments.csv")
-ContCOC = read.csv("20220404_COC.csv")
-ContPOP = read.csv("20220404_POP.csv")
-ECFuture = read.csv("20220404_ECFuture_disaggregat.csv")
-ECNow = read.csv("20220404_ECNow_disaggregated.csv")
-PhotoConsult = read.csv("20220404_PD_consultations.csv")
-PhotoTreatm = read.csv("20220404_PD_treatments.csv")
-Injectable = read.csv("20220404_Injectable.csv")
-Patch = read.csv("20220404_Patch.csv")  
-Ring = read.csv("20220404_Ring.csv")
+Treatments = read.csv("20220502_CT_Treatments.csv")
+ContCOC = read.csv("20220502_COC.csv")
+ContPOP = read.csv("20220502_POP.csv")
+ECFuture = read.csv("20220502_EC_Future_disaggregated.csv")
+ECNow = read.csv("20220502_EC_Now_disaggregated.csv")
+PhotoConsult = read.csv("20220502_PD_consultations.csv")
+PhotoTreatm = read.csv("20220502_PD_treatments.csv")
+Injectable = read.csv("20220502_Injectable.csv")
+Patch = read.csv("20220502_Patch.csv")  
+Ring = read.csv("20220502_Ring.csv")
 
 
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
