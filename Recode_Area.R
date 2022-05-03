@@ -108,7 +108,8 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
   DF[,varname][DF[,varname5]=="Thurrock"] <- "Thurrock"
   DF[,varname][DF[,varname5]=="Wirral"] <- "Wirral"
   DF[,varname][DF[,varname5]=="Greater Manchester"] <- "Greater Manchester"
-  DF[,varname][DF[,varname5]=="Stockport" | DF[,varname5]=="Tameside"] <- "Stockport & Tameside"
+  DF[,varname][DF[,varname5]=="Stockport"] <- "Stockport"
+  DF[,varname][DF[,varname5]=="Tameside"] <- "Tameside"
   DF[,varname][DF[,varname5]=="Rotherham"] <- "Rotherham"
   
   
