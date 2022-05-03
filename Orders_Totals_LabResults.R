@@ -338,22 +338,22 @@ Summary3 = merge(x = Summary2, y = DiagnosisReturns, by = "Area", all = TRUE)
 #CT TREATMENTS: Include 'Area', 'Site' and 'LA of residence' from 'orders' file. Like an Excel VLOOKUP, using merge()----
 TreatmentsMerge <- merge(OrdersMonth [, c('SH24.UID','Area', 'Site','LA.of.residence')], Treatments, by.x = 'SH24.UID', by.y = 'sh24_uid')
 
-#Include MonthYear dates: first convert date fields to date in d/m/y format to MonthYear
-TreatmentsMerge$Created_FormatDate <- as.Date(TreatmentsMerge$created_at, "%Y-%m-%d")
-TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, "%Y-%m-%d")
 
-#create MonthYear columns. class will be "character"
-TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
-TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
+    #### DELETE: 3.May.2022:
+    #Include MonthYear dates: first convert date fields to date in d/m/y format to MonthYear
+    #TreatmentsMerge$Created_FormatDate <- as.Date(TreatmentsMerge$created_at, "%Y-%m-%d")
+    #TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, "%Y-%m-%d")
 
-table(TreatmentsMerge$Dispatched_MonthYear == v1)
-table(TreatmentsMerge$Area, TreatmentsMerge$Dispatched_MonthYear == v1)
+    #create MonthYear columns. class will be "character"
+    #TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
+    #TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
 
 #Export as table to Clinical Reports, as a summary of all CT treatments since the start of the service in all areas (inc London!)
 write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.04.CT.Treatments.csv", row.names=F, sep=",")
 
 #Prepare CT treatments to add to rest of summary: select data for relevant month
-TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched_MonthYear == v1 & !is.na(TreatmentsMerge$Dispatched_MonthYear)),]
+# use Dispatched.month.year.signed_prescrip as it's the dispatched date in the signed_prescriptions table, that includes roll-backs
+TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched.month.year.signed_prescrip == v1 & !is.na(TreatmentsMerge$Dispatched.month.year.signed_prescrip)),]
 NumberTreatments <- as.data.frame(table(TreatmentsMonth$Area))
 #Name the columns
 colnames(NumberTreatments)[1] <- "Area"
@@ -641,8 +641,8 @@ ContPOP$Area <- recodeContraception(DF= ContPOP,varname="Area",varname2="Region"
 Injectable$Area <- recodeContraception(DF= Injectable,varname="Area",varname2="region")
 Patch$Area <- recodeContraception(DF= Patch,varname="Area",varname2="region")
 Ring$Area <- recodeContraception(DF= Ring,varname="Area",varname2="region")
-table(ContCOC$Dispatched.at.month.year == v1)
-table(ContPOP$Dispatched.at.month.year == v1)
+table(ContCOC$Dispatched.month.year.signed_prescrip == v1)
+table(ContPOP$Dispatched.month.year.signed_prescrip == v1)
 table(Injectable$Dispatched.Month.Year == v1)
 table(Patch$Dispatched.Month.Year == v1)
 table(Ring$Dispatched.Month.Year == v1)
@@ -653,8 +653,9 @@ rm(Zero)
 
 
 # subset for relevant month
-ContCOCMonth <- ContCOC [(ContCOC$Dispatched.at.month.year ==  v1),]
-ContPOPMonth <- ContPOP [(ContPOP$Dispatched.at.month.year == v1),]
+# use Dispatched.month.year.signed_prescrip for COC and POP as date is from signed_prescriptions table and includes roll-backs
+ContCOCMonth <- ContCOC [(ContCOC$Dispatched.month.year.signed_prescrip ==  v1),]
+ContPOPMonth <- ContPOP [(ContPOP$Dispatched.month.year.signed_prescrip == v1),]
 InjectableMonth <- Injectable [(Injectable$Dispatched.Month.Year == v1),]
 PatchMonth <- Patch [(Patch$Dispatched.Month.Year == v1),]
 RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
@@ -692,7 +693,8 @@ ECFutureMonth$Area <- 0
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
 ECFutureMonth$Area <- recodeContraception(DF= ECFutureMonth,varname="Area",varname2="Region")
 
-ECNowMonth <- ECNow [(ECNow$Dispatched.at.month.year ==  v1),]
+# use Dispatched.month.year.signed_prescrip 
+ECNowMonth <- ECNow [(ECNow$Dispatched.month.year.signed_prescrip ==  v1),]
 # create Area
 ECNowMonth$Area <- 0
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
@@ -830,7 +832,7 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_04\\SummaryPerformance.2022.04.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_04\\SummaryPerformance.2022.04_2.csv", col.names = F, row.names=T, sep=",")
 
 
 
