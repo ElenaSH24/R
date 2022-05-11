@@ -1,14 +1,14 @@
 # producing Xero file
 
 # read STI orders, CT treatment, contraception and photo diagnosis files from backing data
-invSTI = read.csv("20220405_InvoicingApril_March.csv")
-bolts = read.csv("20220404_EC_Now_boltons_Disaggregated.csv")
+invSTI = read.csv("20220510_invoicing.csv")
+bolts = read.csv("20220502_EC_Now_boltons_Disaggregated.csv")
 
 # set date variables 
-v1 <- '2022-03'               #v1: reporting month
-v2 <- '01.03.2022-31.03.2022' #v2: activity period being invoiced
-v3 <- "31/03/2022"            #v3: InvoiceDate
-v4 <- "30/04/2022"            #v4: DueDate
+v1 <- '2022-04'               #v1: reporting month
+v2 <- '01.04.2022-30.04.2022' #v2: activity period being invoiced
+v3 <- "30/04/2022"            #v3: InvoiceDate
+v4 <- "31/05/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -20,33 +20,37 @@ STImonth <- invSTI[(invSTI$Dispatched.MonthYear == v1) , ]
 table(STImonth$overall_type, STImonth$repeat_kit)
 table(STImonth$overall_type)
 
+
 # extract the columns we need for invoicing
 invSTI <- invSTI[,c("overall_type","default_la","Dispatched.MonthYear","invoice_category_billable","referred_from_token")]
 
 # assign values to 'overall_type' that align with invoicing
 invSTI$overall_type[invSTI$overall_type == 'kits_sent'] <- 'Orders'
 invSTI$overall_type[invSTI$overall_type == 'kits_tested'] <- 'Returns'
+table(invSTI$overall_type, invSTI$Dispatched.MonthYear == v1)
+
 # concatenate values of both variables (type and category) to create the invoicing Description
 invSTI$Description <- paste(invSTI$overall_type, invSTI$invoice_category_billable, sep=" - ")
 
 # some returns are blank, showing in data.frame as 'Returns -'
-# they relate to categories not interpreted by the mapping table in the DB
-# code blanks to be able to use them with grep later
+# they relate to lab_results not interpreted by the mapping table in the DB
+# code blanks to be able to identify them with grep later
 invSTI$Description[invSTI$invoice_category_billable == ""] <- "blank"
-table(invSTI$Description)
-# assimilate 'blank' categories to 'Returns - HIV' in Freetesting - use grep twice ----
-invSTI$Description[invSTI$Description == "blank" & (grepl('Freetesting -', invSTI$default_la) | grepl('PHE', invSTI$default_la))] <- "Returns - HIV"
-# assimilate 'blank' categories to CT/GC (single site) in all areas except Freetesting
-invSTI$Description[invSTI$Description == "blank" & !(grepl('Freetesting -', invSTI$default_la) | grepl('PHE', invSTI$default_la))] <- "Returns - CT/GC (single site)"
-# check that figures for the relevant month add up ok in freetesting / PHE
-table(invSTI$Description, grepl('Freetesting -', invSTI$default_la), invSTI$Dispatched.MonthYear==v1)
-table(invSTI$Description, grepl('PHE', invSTI$default_la), invSTI$Dispatched.MonthYear==v1)
+       # table(invSTI$Description)
+        # assimilate 'blank' categories to 'Returns - HIV' in Freetesting - use grep twice ----
+       # invSTI$Description[invSTI$Description == "blank" & (grepl('Freetesting -', invSTI$default_la) | grepl('PHE', invSTI$default_la))] <- "Returns - HIV"
+        # assimilate 'blank' categories to CT/GC (single site) in all areas except Freetesting
+       # invSTI$Description[invSTI$Description == "blank" & !(grepl('Freetesting -', invSTI$default_la) | grepl('PHE', invSTI$default_la))] <- "Returns - CT/GC (single site)"
+        # check that figures for the relevant month add up ok in freetesting / PHE
+       # table(invSTI$Description, grepl('Freetesting -', invSTI$default_la), invSTI$Dispatched.MonthYear==v1)
+       # table(invSTI$Description, grepl('PHE', invSTI$default_la), invSTI$Dispatched.MonthYear==v1)
 
+        
 # remove variables not needed anymore
 invSTI$overall_type = NULL
 invSTI$invoice_category_billable = NULL
 # rename (new variable name = existing variable name) to have same names in all data frames----
-invSTI <- rename(invSTI, MonthYear = Dispatched.MonthYear)
+invSTI  <- rename(invSTI, MonthYear = Dispatched.MonthYear)
 
 # account for Hertfordshire hertstestyourself Council, invoiced at a different fee than Hertfordshire
 # change name of default_LA
@@ -54,19 +58,28 @@ invSTI$default_la[invSTI$default_la == "Hertfordshire" & invSTI$referred_from_to
 # drop column not needed any more
 invSTI$referred_from_token = NULL
 
+# check 
+test1 <- invSTI[(invSTI$MonthYear == v1),]
+test1 <- test1[grep('Orders',test1$Description),]
+
+test2 <- invSTI[(invSTI$MonthYear == v1),]
+test2 <- test2[grep('Returns',test2$Description),]
+
 
 # Include CT treatments. Read the file. Get needed columns
-invTreatments <- Treatments[ , c("Region","Dispatched.MonthYear")]
+invTreatments <- Treatments[ , c("Region","Dispatched.month.year.signed_prescrip")]
+
 # create variable Description to rbind with STI data frame
 invTreatments$Description <- "CT Treatments"
 # rename (new variable name = existing variable name) to have same names in all data frames
-invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatched.MonthYear)
+invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
 
 
 # Include contraception
-invCOC <- ContCOC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
-invPOP <- ContPOP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
-invEC <- ECNow[ , c("Region","Dispatched.at.month.year","Drug")]
+names(ECNow)
+invCOC <- ContCOC[ , c("Dispatched.month.year.signed_prescrip","Months.prescribed","Drug","Region")]
+invPOP <- ContPOP[ , c("Dispatched.month.year.signed_prescrip","Months.prescribed","Drug","Region")]
+invEC <- ECNow[ , c("Region","Dispatched.month.year.signed_prescrip","Drug")]
 invInjectable <- Injectable[ , c("region","Injectable.months.prescribed","Dispatched.Month.Year")]
 invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year")]
 invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
@@ -84,9 +97,9 @@ invRing$Description <- paste('Contraception Nuva Ring',invRing$Ring.months.presc
               # table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
 
 # rename (new variable name = existing variable name) to have same names in all data frames----
-invCOC <- rename(invCOC, default_la = Region, MonthYear = Dispatched.at.month.year)
-invPOP <- rename(invPOP, default_la = Region, MonthYear = Dispatched.at.month.year)
-invEC <- rename(invEC, default_la = Region, MonthYear = Dispatched.at.month.year)
+invCOC <- rename(invCOC, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
+invPOP <- rename(invPOP, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
+invEC <- rename(invEC, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
 invInjectable <- rename(invInjectable, default_la = region, MonthYear = Dispatched.Month.Year)
 invPatch <- rename(invPatch, default_la = region, MonthYear = Dispatched.Month.Year)
 invRing <- rename(invRing, default_la = region, MonthYear = Dispatched.Month.Year)
@@ -191,6 +204,7 @@ invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPat
         invoicing$Service[grepl("Ireland -", invoicing$default_la)] <- "Ireland"
         invoicing$Service[grepl("Northern Ireland ", invoicing$default_la)] <- "Northern Ireland"
         invoicing$Service[grepl("PrEP Trial -", invoicing$default_la)] <- "PrEP Trial"
+        invoicing$Service[(invoicing$default_la == "Bury" | invoicing$default_la == "Rochdale" | invoicing$default_la == "Oldham" )] <- "Orbish"
 
 # Create ContactName, to name regions as per invoicing requirements
 invoicing$ContactName <- invoicing$Service
@@ -211,7 +225,18 @@ invoicing$ContactName[invoicing$default_la == "Southend-on-Sea"] <- "Southend"
 invoicing$ContactName[invoicing$default_la == "Staffordshire"] <- "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
 invoicing$ContactName[invoicing$default_la == "Stoke-on-Trent"] <- "Stoke on Trent"
 
+# check
+test3 <- invoicing[(invoicing$MonthYear == v1),]
+test3 <- test3[grep('Orders',test3$Description),]
+
+test4 <- invSTI[(invSTI$MonthYear == v1),]
+test4 <- test4[grep('Returns',test4$Description),]
+
+table(invoicing$MonthYear)
 table(invoicing$ContactName, useNA = "always")
+
+
+
 
 # extract data for the relevant month, and columns needed for invoicing: use variable v1 defined above
 invMonth <- invoicing[(invoicing$MonthYear == v1),c("ContactName","MonthYear",'Description')]
@@ -313,7 +338,7 @@ invMonth_1$DueDate <- v4
 # remove dataframe rows based on zero values in one column
 invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
 # export to check figures 
-write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_03\\test_invoicing_March_2.csv", row.names=F, sep=",")
+write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\Xero_Quantities_2022.April_v3.csv", row.names=F, sep=",")
 
 
 # create price data frames
@@ -510,7 +535,9 @@ InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$Contact
                         | invMonth_2$ContactName=="Kirklees" | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
                         | invMonth_2$ContactName=="Nottingham City Council" | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
                         | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside" 
-                        | invMonth_2$ContactName=="Hertfordshire"),]
+                        | invMonth_2$ContactName=="Hertfordshire" 
+                        | invMonth_2$ContactName=="Rotherham" | invMonth_2$ContactName=="Stockport" | invMonth_2$ContactName=="Tameside"
+                        | invMonth_2$ContactName=="Bury" | invMonth_2$ContactName=="Rochdale" | invMonth_2$ContactName=="Oldham"),]
 
 InvFee2 <- invMonth_2 [(invMonth_2$ContactName=="Gateshead" | invMonth_2$ContactName=="Glasgow" 
                         | invMonth_2$ContactName=="London Northwest Healthcare" | invMonth_2$ContactName=="South Tyneside" 
@@ -570,6 +597,9 @@ InvoicesFeeZero <- rename(InvoicesFeeZero, UnitAmount = FeeZero)
 
 # Stack data sets one on top of the other 
 InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee3, InvoicesFee4, InvoicesFee6, InvoicesFee7, InvoicesFeeZero)  
+write.table (InvoicesStack, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\20220510_Xero_Apr_v5.csv", row.names=F, sep=",")
+
+
 
 # create the rest of the variables needed for the Xero file
 InvoicesStack$EmailAddress <- ""
@@ -608,4 +638,4 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_03\\test_invoicing_March_9.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\20220510_Xero_Apr_v4.csv", row.names=F, sep=",")
