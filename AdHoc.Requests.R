@@ -701,9 +701,13 @@ write.table (STI, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc
 write.table (COC, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_COC_Feb_Mar.csv", row.names=F, sep=",")
 write.table (POP, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_POP_Feb_Mar.csv", row.names=F, sep=",")
 write.table (EC, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.04.06_Georgia_EC_Feb_Mar.csv", row.names=F, sep=",")
-
-
 # END Georgia request 2022.04.06
+
+
+# 2022.04.28 Graham messages oer customer (conversation)
+setwd("/Users/ElenaArdinesTomas/Documents/Reports/2.Ad-hoc-reports")
+mssg <- read.csv("20220428_MessagesPerConversation.csv")
+
 
 
 
