@@ -527,16 +527,15 @@ fee0 <- data.frame(Description, FeeZero)
 
 
 # break down the main invoicing data set as per the fee contracted in each area 
-InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$ContactName=="Bradford" | invMonth_2$ContactName=="Bromley"
+InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$ContactName=="Bromley"
                         | invMonth_2$ContactName=="Cheshire East" | invMonth_2$ContactName=="Cornwall and Isles of Scilly"
                         | invMonth_2$ContactName=="County Durham and Darlington NHS Foundation Trust" | invMonth_2$ContactName=="Darlington"
                         | invMonth_2$ContactName=="Derby City" | invMonth_2$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
                         | invMonth_2$ContactName=="Dorset" | invMonth_2$ContactName=="Halton"
-                        | invMonth_2$ContactName=="Kirklees" | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
+                        | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
                         | invMonth_2$ContactName=="Nottingham City Council" | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
                         | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside" 
                         | invMonth_2$ContactName=="Hertfordshire" 
-                        | invMonth_2$ContactName=="Rotherham" | invMonth_2$ContactName=="Stockport" | invMonth_2$ContactName=="Tameside"
                         | invMonth_2$ContactName=="Bury" | invMonth_2$ContactName=="Rochdale" | invMonth_2$ContactName=="Oldham"),]
 
 InvFee2 <- invMonth_2 [(invMonth_2$ContactName=="Gateshead" | invMonth_2$ContactName=="Glasgow" 
@@ -554,9 +553,11 @@ InvFee4 <- invMonth_2 [(invMonth_2$ContactName=="Leicester City" | invMonth_2$Co
 # freetesting done separately
 #InvFee5 <- invMonth_2 [(invMonth_2$ContactName=="Freetesting"),] 
 
-InvFee6 <- invMonth_2 [(invMonth_2$ContactName=="Buckinghamshire" | invMonth_2$ContactName=="Northern Ireland"),]
+InvFee6 <- invMonth_2 [(invMonth_2$ContactName=="Buckinghamshire" | invMonth_2$ContactName=="Northern Ireland"
+                        | invMonth_2$ContactName=="Rotherham" | invMonth_2$ContactName=="Stockport" | invMonth_2$ContactName=="Tameside"),]
 
-InvFee7 <- invMonth_2 [(invMonth_2$ContactName=="Essex" | invMonth_2$ContactName=="Thurrock" | invMonth_2$ContactName=="Wirral"),]
+InvFee7 <- invMonth_2 [(invMonth_2$ContactName=="Essex" | invMonth_2$ContactName=="Thurrock" | invMonth_2$ContactName=="Wirral"
+                        | invMonth_2$ContactName=="Bradford" | invMonth_2$ContactName=="Kirklees"),]
 
 # some areas not invoiced. Count them anyway to check whole picture
 InvFeeZero <- invMonth_2 [(invMonth_2$ContactName=="Ireland") | (invMonth_2$ContactName=="Romania") | (invMonth_2$ContactName=="Fettle")
