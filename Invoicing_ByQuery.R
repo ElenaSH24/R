@@ -65,21 +65,22 @@ test1 <- test1[grep('Orders',test1$Description),]
 test2 <- invSTI[(invSTI$MonthYear == v1),]
 test2 <- test2[grep('Returns',test2$Description),]
 
+names(Treatments)
 
 # Include CT treatments. Read the file. Get needed columns
-invTreatments <- Treatments[ , c("Region","Dispatched.month.year.signed_prescrip")]
+invTreatments <- Treatments[ , c("Region","Dispatched.MonthYear")]
 
 # create variable Description to rbind with STI data frame
 invTreatments$Description <- "CT Treatments"
 # rename (new variable name = existing variable name) to have same names in all data frames
-invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
+invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatched.MonthYear)
 
 
 # Include contraception
-names(ECNow)
-invCOC <- ContCOC[ , c("Dispatched.month.year.signed_prescrip","Months.prescribed","Drug","Region")]
-invPOP <- ContPOP[ , c("Dispatched.month.year.signed_prescrip","Months.prescribed","Drug","Region")]
-invEC <- ECNow[ , c("Region","Dispatched.month.year.signed_prescrip","Drug")]
+names(ContCOC)
+invCOC <- ContCOC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
+invPOP <- ContPOP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
+invEC <- ECNow[ , c("Region","Dispatched.at.month.year","Drug")]
 invInjectable <- Injectable[ , c("region","Injectable.months.prescribed","Dispatched.Month.Year")]
 invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year")]
 invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
@@ -97,9 +98,9 @@ invRing$Description <- paste('Contraception Nuva Ring',invRing$Ring.months.presc
               # table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
 
 # rename (new variable name = existing variable name) to have same names in all data frames----
-invCOC <- rename(invCOC, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
-invPOP <- rename(invPOP, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
-invEC <- rename(invEC, default_la = Region, MonthYear = Dispatched.month.year.signed_prescrip)
+invCOC <- rename(invCOC, default_la = Region, MonthYear = Dispatched.at.month.year)
+invPOP <- rename(invPOP, default_la = Region, MonthYear = Dispatched.at.month.year)
+invEC <- rename(invEC, default_la = Region, MonthYear = Dispatched.at.month.year)
 invInjectable <- rename(invInjectable, default_la = region, MonthYear = Dispatched.Month.Year)
 invPatch <- rename(invPatch, default_la = region, MonthYear = Dispatched.Month.Year)
 invRing <- rename(invRing, default_la = region, MonthYear = Dispatched.Month.Year)
@@ -198,6 +199,11 @@ names(invBolts)
 # Stack data sets one on top of the other ----
 invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Dispatched,RPR.Returned,invPDConsult,invPDTreatm,invBolts)
 
+# check
+testinvoicing <- as.data.frame(table(invoicing$Description, invoicing$MonthYear == v1))  
+write.table (testinvoicing, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\Xero_Quantities_2022.April_v9.csv", row.names=F, sep=",")
+
+
 # Create variable to group freetesting, Ireland etc together
         invoicing$Service <- invoicing$default_la
         invoicing$Service[grepl("Freetesting -", invoicing$default_la)] <- "Freetesting"
@@ -225,21 +231,15 @@ invoicing$ContactName[invoicing$default_la == "Southend-on-Sea"] <- "Southend"
 invoicing$ContactName[invoicing$default_la == "Staffordshire"] <- "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
 invoicing$ContactName[invoicing$default_la == "Stoke-on-Trent"] <- "Stoke on Trent"
 
-# check
-test3 <- invoicing[(invoicing$MonthYear == v1),]
-test3 <- test3[grep('Orders',test3$Description),]
-
-test4 <- invSTI[(invSTI$MonthYear == v1),]
-test4 <- test4[grep('Returns',test4$Description),]
-
-table(invoicing$MonthYear)
-table(invoicing$ContactName, useNA = "always")
-
-
 
 
 # extract data for the relevant month, and columns needed for invoicing: use variable v1 defined above
 invMonth <- invoicing[(invoicing$MonthYear == v1),c("ContactName","MonthYear",'Description')]
+
+# check
+test3 <- invMonth[grep('Orders',invMonth$Description),]
+test4 <- invMonth[grep('Returns',invMonth$Description),]
+
 
 # convert to data.frame to get the count of the number of tests
 invMonth_1 = as.data.frame(table (invMonth$ContactName,invMonth$Description))
@@ -247,6 +247,7 @@ invMonth_1 = as.data.frame(table (invMonth$ContactName,invMonth$Description))
 colnames(invMonth_1)[1] <- "ContactName"
 colnames(invMonth_1)[2] <- "Description"
 colnames(invMonth_1)[3] <- "Quantity"
+
 
 # create invoice number column----
 # first half of the invoice number is the month
@@ -295,6 +296,11 @@ invMonth_1$Number[invMonth_1$ContactName == "Southend"] <- "00041"
 invMonth_1$Number[invMonth_1$ContactName == "Teesside"] <- "00042"
 invMonth_1$Number[invMonth_1$ContactName == "Thurrock"] <- "00043"
 invMonth_1$Number[invMonth_1$ContactName == "Wirral"] <- "0056"
+invMonth_1$Number[invMonth_1$ContactName == "Rotherham"] <- "0057"
+invMonth_1$Number[invMonth_1$ContactName == "Stockport"] <- "0058"
+invMonth_1$Number[invMonth_1$ContactName == "Tameside"] <- "0059"
+invMonth_1$Number[invMonth_1$ContactName == "Orbish"] <- "0060"
+
 
 # create InvoiceNumber as concatenate of 'Invoice' and 'Number'
 invMonth_1$InvoiceNumber <- paste(invMonth_1$Invoice, v1, invMonth_1$Number, sep=" ")
@@ -520,7 +526,7 @@ fee1 <- data.frame(Description, Fee1DiscountRM)
 fee2 <- data.frame(Description, Fee2Standard)
 fee3 <- data.frame(Description, Fee3Discount)
 fee4 <- data.frame(Description, Fee4DiscountRM5)
-#fee5 <- data.frame(Description, Fee5Freetesting) # freetesting done separately
+fee5 <- data.frame(Description, Fee5Freetesting) # freetesting done separately
 fee6 <- data.frame(Description, eSRH)
 fee7 <- data.frame(Description, eSRH5)
 fee0 <- data.frame(Description, FeeZero)
@@ -534,7 +540,7 @@ InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$Contact
                         | invMonth_2$ContactName=="Dorset" | invMonth_2$ContactName=="Halton"
                         | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
                         | invMonth_2$ContactName=="Nottingham City Council" | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
-                        | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside" 
+                        | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside"  | invMonth_2$ContactName=="Orbish"
                         | invMonth_2$ContactName=="Hertfordshire" 
                         | invMonth_2$ContactName=="Bury" | invMonth_2$ContactName=="Rochdale" | invMonth_2$ContactName=="Oldham"),]
 
@@ -551,7 +557,7 @@ InvFee4 <- invMonth_2 [(invMonth_2$ContactName=="Leicester City" | invMonth_2$Co
                         | invMonth_2$ContactName=="Stoke on Trent" | invMonth_2$ContactName=="Telford and Wrekin") ,]
 
 # freetesting done separately
-#InvFee5 <- invMonth_2 [(invMonth_2$ContactName=="Freetesting"),] 
+InvFee5 <- invMonth_2 [(invMonth_2$ContactName=="Freetesting"),] 
 
 InvFee6 <- invMonth_2 [(invMonth_2$ContactName=="Buckinghamshire" | invMonth_2$ContactName=="Northern Ireland"
                         | invMonth_2$ContactName=="Rotherham" | invMonth_2$ContactName=="Stockport" | invMonth_2$ContactName=="Tameside"),]
@@ -639,4 +645,4 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\20220510_Xero_Apr_v4.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\20220512_Xero_Apr.csv", row.names=F, sep=",")
