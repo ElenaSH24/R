@@ -26,16 +26,25 @@ table(orders1$test_kit_index,orders1$DispatchedMonthYr=="2021-06")
 
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
+# 10th May 2022: files with signed_prescriptions
 Treatments = read.csv("20220503_CT_Treatments_signed.csv")
 ContCOC = read.csv("20220503_COC_signed.csv")
 ContPOP = read.csv("20220503_POP_signed.csv")
 ECFuture = read.csv("20220502_EC_Future_disaggregated.csv")
 ECNow = read.csv("20220503_ECNow_disaggregated_signed.csv")
+
+# 10th May 2022: files as usual
+Treatments = read.csv("20220502_CT_Treatments.csv")
+ContCOC = read.csv("20220502_COC.csv")
+ContPOP = read.csv("20220502_POP.csv")
+ECFuture = read.csv("20220502_EC_Future_disaggregated.csv")
+ECNow = read.csv("20220502_EC_Now_disaggregated.csv")
+
 PhotoConsult = read.csv("20220502_PD_consultations.csv")
 PhotoTreatm = read.csv("20220502_PD_treatments.csv")
-Injectable = read.csv("20220502_Injectable.csv")
-Patch = read.csv("20220502_Patch.csv")  
-Ring = read.csv("20220502_Ring.csv")
+Injectable = read.csv("20220511_Injectable.csv")
+Patch = read.csv("20220511_Patch.csv")  
+Ring = read.csv("20220511_Ring.csv")
 
 
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
@@ -59,12 +68,12 @@ FreetestFeedb <- read.csv("freetesting user feedback 2020.01.21..csv")
 
 # ANA HERB (PHE) PHE/freetesting backing data----
 freetesting <- orders[ ,c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
-         'Age','Gender',"Gender.at.birth",'Ethnicity','Sexual.preference','Unprotected.sex.in.last.5.days',
-         'Sexuality',"Sites.tested",'Test.regime','Clinic.visited','Clinic.visited.12','Attended.clinic',
-         "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
-         "Lab.results.at","Lab.results.at.month.year","PrEP.impact.trial.number","Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",'Syphilis','HIV',"Chlamydia","Gonorrhoea","Hep.B","Hep.C",
-         "Test.for.Chlamydia.Urine","Test.for.Chlamydia.Oral","Test.for.Chlamydia.Rectal","Test.for.Chlamydia.Vaginal",
-         "Test.for.Gonorrhoea.Urine","Test.for.Gonorrhoea.Oral","Test.for.Gonorrhoea.Rectal","Test.for.Gonorrhoea.Vaginal")]
+                          'Age','Gender',"Gender.at.birth",'Ethnicity','Sexual.preference','Unprotected.sex.in.last.5.days',
+                          'Sexuality',"Sites.tested",'Test.regime','Clinic.visited','Clinic.visited.12','Attended.clinic',
+                          "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
+                          "Lab.results.at","Lab.results.at.month.year","PrEP.impact.trial.number","Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",'Syphilis','HIV',"Chlamydia","Gonorrhoea","Hep.B","Hep.C",
+                          "Test.for.Chlamydia.Urine","Test.for.Chlamydia.Oral","Test.for.Chlamydia.Rectal","Test.for.Chlamydia.Vaginal",
+                          "Test.for.Gonorrhoea.Urine","Test.for.Gonorrhoea.Oral","Test.for.Gonorrhoea.Rectal","Test.for.Gonorrhoea.Vaginal")]
 
 # Subset using 'grep' and 'or' | (if 'Default LA' includes the string 'freetesting', or 'phe' or prep')
 freetesting1 <- freetesting[grep('Freetesting|PHE|PrEP', freetesting$Default.LA),]
@@ -75,14 +84,14 @@ freetesting2 <- rbind(freetesting1, freetesting11)
 # remove DUPLICATES, keep unique SH24 numbers
 freetesting.Unique = freetesting2[!duplicated(freetesting2$SH24.UID),]
 # include LSOA Code with 'merge' getting all the observations from the data set on the left (all.x = TRUE)
-          #### freetesting3 <- merge(freetesting.Unique, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
+#### freetesting3 <- merge(freetesting.Unique, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
 freetesting4 <- merge(freetesting.Unique, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
 #CHECK THIS: ABOUT ADDING REACTIVITY LEVELS
-        #split reactivity data frame in two, to get separate columns in the backing data - otherwise the SH24 number would show as duplicate
-        #reactivityHIV <- reactivity[(reactivity$test_klass=="Hiv::Blood"),]
-        #reactivityHIV.Unique = reactivityHIV[!duplicated(reactivityHIV$sh24_uid),] #get only unique SH24 uids
-        #reactivitySyph <- reactivity[(reactivity$test_klass=="Syphilis::Treponemal"),]
-        #freetesting5 <- merge(freetesting4, reactivityHIV.Unique[,c('result_value')], by.x = "SH24.UID", by.y = "sh24_uid", all.x = TRUE)
+#split reactivity data frame in two, to get separate columns in the backing data - otherwise the SH24 number would show as duplicate
+#reactivityHIV <- reactivity[(reactivity$test_klass=="Hiv::Blood"),]
+#reactivityHIV.Unique = reactivityHIV[!duplicated(reactivityHIV$sh24_uid),] #get only unique SH24 uids
+#reactivitySyph <- reactivity[(reactivity$test_klass=="Syphilis::Treponemal"),]
+#freetesting5 <- merge(freetesting4, reactivityHIV.Unique[,c('result_value')], by.x = "SH24.UID", by.y = "sh24_uid", all.x = TRUE)
 
 write.table (freetesting4, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\BackingData\\2022.04 freetesting.PHE.ImpactPrEP.csv", row.names=F, sep=",")
 
@@ -90,19 +99,19 @@ write.table (freetesting4, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\
 
 
 OrdersToWork <- orders[ ,c('SH24.UID','Customer.ID',"Feedback.token",'Reason.for.visit','Postcode','LSOA.name','Default.LA','LA.of.residence',
-                          'Site',"Distribution.center", "Distribution.method",
-            'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",'Sexual.preference',
-            'Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.5.days',
-            'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
-            'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
-            'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
-            "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
-            "Lab.results.at","Lab.results.at.month.year","Previously.diagnosed.with.HIV",
-            "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
-            "Previously.treated.for.Syphilis",
-            'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C','Test.for.Hiv','Test.for.Syphilis.EIA','Test.for.Chlamydia.Urine',
-            'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
-            'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal','Test.for.Hepatitis.B','Test.for.Hepatitis.C',"Test.for.Syphilis.RPR")]
+                           'Site',"Distribution.center", "Distribution.method",
+                           'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",'Sexual.preference',
+                           'Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.5.days',
+                           'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                           'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                           'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
+                           "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
+                           "Lab.results.at","Lab.results.at.month.year","Previously.diagnosed.with.HIV",
+                           "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                           "Previously.treated.for.Syphilis",
+                           'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C','Test.for.Hiv','Test.for.Syphilis.EIA','Test.for.Chlamydia.Urine',
+                           'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
+                           'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal','Test.for.Hepatitis.B','Test.for.Hepatitis.C',"Test.for.Syphilis.RPR")]
 # add this variable to keep historical structure -though this question isn't asked any longer
 OrdersToWork$Unprotected.sex.in.last.3.days <- ""
 ######### include from Marh: 
@@ -113,9 +122,9 @@ OrdersToWork$Area <- 0
 OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
 
-   #Bucks <- OrdersToWork[(OrdersToWork$Default.LA=='Buckinghamshire'),]
-   #table(Bucks$Created.at.month.year)
-   
+#Bucks <- OrdersToWork[(OrdersToWork$Default.LA=='Buckinghamshire'),]
+#table(Bucks$Created.at.month.year)
+
 # reporting month
 v1 <- '2022-04'
 
@@ -141,11 +150,11 @@ structure(OrdersFettle$Requested.time)
 
 OrdersFettleTime <- OrdersFettle
 OrdersFettleTime <- tribble(~timestamp,OrdersFettle$Requested.time)
-                            
+
 OrdersFettle$TimeGrouped <- 0
 OrdersFettle$TimeGrouped[OrdersFettle$Requested.time=="Beckenham Beacon Sexual Health Clinic"|
-                    OrdersToWork$Site=="Camberwell"|
-                    OrdersToWork$Site=="Waldron Health Centre"] <- "London"
+                           OrdersToWork$Site=="Camberwell"|
+                           OrdersToWork$Site=="Waldron Health Centre"] <- "London"
 #End FETTLE ORDERS##########################
 
 ############################################
@@ -183,18 +192,18 @@ OrdersToWork$AgeSplit = ifelse(OrdersToWork$Age>24,"25+","Under 25")
 table (OrdersToWork$AgeSplit)
 
 BackingMaximum <- OrdersToWork[,c('SH24.UID','Customer.ID','Reason.for.visit','Postcode','LSOA.name','Default.LA','LA.of.residence','Site',
-               'Age','AgeSplit','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
-               'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
-               'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
-               'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
-               'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
-               "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
-               "Lab.results.at","Lab.results.at.month.year","Previously.diagnosed.with.HIV",
-                "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
-                "Previously.treated.for.Syphilis",
-                'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C','Test.for.Hiv','Test.for.Syphilis.EIA','Test.for.Chlamydia.Urine',
-                'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
-                'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal','Test.for.Hepatitis.B','Test.for.Hepatitis.C',"Test.for.Syphilis.RPR")]
+                                  'Age','AgeSplit','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                                  'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
+                                  'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                                  'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                                  'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
+                                  "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
+                                  "Lab.results.at","Lab.results.at.month.year","Previously.diagnosed.with.HIV",
+                                  "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                                  "Previously.treated.for.Syphilis",
+                                  'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C','Test.for.Hiv','Test.for.Syphilis.EIA','Test.for.Chlamydia.Urine',
+                                  'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
+                                  'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal','Test.for.Hepatitis.B','Test.for.Hepatitis.C',"Test.for.Syphilis.RPR")]
 Data_Essex <- BackingMaximum [BackingMaximum$Site == "Essex Hub",]
 Data_Thurrock <- BackingMaximum [BackingMaximum$Default.LA == "Thurrock",]
 # End ESSEX and Thurrock----
@@ -202,15 +211,15 @@ Data_Thurrock <- BackingMaximum [BackingMaximum$Default.LA == "Thurrock",]
 # Areas needing the SH24.UID: LLR and Derby/shire----
 BackingMin_WithSH24 <- OrdersToWork[,c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
                                        "Distribution.center", "Distribution.method",
-                'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
-                'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
-                'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
-                'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
-                'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
-                "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
-                "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
-                "Previously.treated.for.Syphilis",
-                'Syphilis','HIV','Chlamydia','Gonorrhoea','Area',"Test.for.Syphilis.RPR")]
+                                       'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                                       'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
+                                       'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                                       'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                                       'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
+                                       "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
+                                       "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                                       "Previously.treated.for.Syphilis",
+                                       'Syphilis','HIV','Chlamydia','Gonorrhoea','Area',"Test.for.Syphilis.RPR")]
 
 # Include LSOA Code in DerbyshireDerby
 Data_DerbyshireDerby <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Derby" | BackingMin_WithSH24$Default.LA=="Derbyshire"),]
@@ -221,21 +230,21 @@ Data_DerbyshireDerby$Distribution.method = NULL
 
 # LLR file needs: 'Country of Birth' as 'unknown', SH24 number (instead of 'Customer.ID'), and fields with testing per site 
 BackingLLR.MPFT <- OrdersToWork[,c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
-               'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
-               'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
-               'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
-               'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
-                'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
-                "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
-                "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
-                "Previously.treated.for.Syphilis",
-                'Syphilis','HIV','Chlamydia','Gonorrhoea','Test.for.Chlamydia.Urine',
-                'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
-                'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal',"Test.for.Hepatitis.B","Test.for.Hepatitis.C","Test.for.Syphilis.RPR")]
+                                   'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                                   'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
+                                   'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                                   'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                                   'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
+                                   "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
+                                   "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                                   "Previously.treated.for.Syphilis",
+                                   'Syphilis','HIV','Chlamydia','Gonorrhoea','Test.for.Chlamydia.Urine',
+                                   'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
+                                   'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal',"Test.for.Hepatitis.B","Test.for.Hepatitis.C","Test.for.Syphilis.RPR")]
 
 Data_LLR.MPFT <- BackingLLR.MPFT [(BackingLLR.MPFT$Default.LA=="Leicester" | BackingLLR.MPFT$Default.LA=="Leicestershire" | BackingLLR.MPFT$Default.LA=="Rutland" |
-                   BackingLLR.MPFT$Default.LA=="Shropshire" | BackingLLR.MPFT$Default.LA=="Telford and Wrekin" | BackingLLR.MPFT$Default.LA=="Staffordshire" |
-                     BackingLLR.MPFT$Default.LA=="North Staffordshire" | BackingLLR.MPFT$Default.LA=="Stoke-on-Trent" ),]
+                                     BackingLLR.MPFT$Default.LA=="Shropshire" | BackingLLR.MPFT$Default.LA=="Telford and Wrekin" | BackingLLR.MPFT$Default.LA=="Staffordshire" |
+                                     BackingLLR.MPFT$Default.LA=="North Staffordshire" | BackingLLR.MPFT$Default.LA=="Stoke-on-Trent" ),]
 Data_LLR.MPFT$Country.of.Birth <- 'unknown'
 # Include LSOA Code in LLR
 Data_LLR.MPFT <- merge(Data_LLR.MPFT, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM")
@@ -244,18 +253,18 @@ Data_Dorset <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Dorset"),]
 
 # Bromley file needs 'Distribution Center' and 'Distribution Method' for offline kits
 BackingBromley <- OrdersToWork[,c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence'
-         ,"Distribution.center",'Site',
-         'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
-         'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
-         'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
-         'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
-         'Sexuality','Click.and.collect',"Distribution.method",'Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
-         "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
-         "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
-         "Previously.treated.for.Syphilis",
-         'Syphilis','HIV','Chlamydia','Gonorrhoea','Test.for.Chlamydia.Urine',
-         'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
-         'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal',"Test.for.Syphilis.RPR")]
+                                  ,"Distribution.center",'Site',
+                                  'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                                  'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.3.days','Unprotected.sex.in.last.5.days',
+                                  'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                                  'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                                  'Sexuality','Click.and.collect',"Distribution.method",'Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
+                                  "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
+                                  "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                                  "Previously.treated.for.Syphilis",
+                                  'Syphilis','HIV','Chlamydia','Gonorrhoea','Test.for.Chlamydia.Urine',
+                                  'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
+                                  'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal',"Test.for.Syphilis.RPR")]
 Data_Bromley <- BackingBromley [(BackingBromley$Default.LA=="Bromley"),]
 # END areas with SH24.UID----
 
@@ -280,10 +289,10 @@ BackingMin_noSH24 <- OrdersToWork[,c('Customer.ID','Reason.for.visit','LSOA.name
 
 Data_Berkshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="East Berkshire"),]
 Data_Buckinghamshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Buckinghamshire"),]
-  #Buckinghamshire data only from 1st Jan 2021
-  class(Data_Buckinghamshire$Created.at)
-  Data_Buckinghamshire$Created.at <- as.Date(Data_Buckinghamshire$Created.at, format = "%Y-%m-%d")
-  Data_Buckinghamshire <- Data_Buckinghamshire[(Data_Buckinghamshire$Created.at > "2020-12-31"),]
+#Buckinghamshire data only from 1st Jan 2021
+class(Data_Buckinghamshire$Created.at)
+Data_Buckinghamshire$Created.at <- as.Date(Data_Buckinghamshire$Created.at, format = "%Y-%m-%d")
+Data_Buckinghamshire <- Data_Buckinghamshire[(Data_Buckinghamshire$Created.at > "2020-12-31"),]
 
 Data_Cornwall <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Cornwall and Isles of Scilly PCT"
                                      | BackingMin_noSH24$Default.LA=="Southend-on-Sea"
@@ -291,16 +300,16 @@ Data_Cornwall <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Cornwall and
 Data_Hillingdon <- BackingMin_noSH24 [(BackingMin_noSH24$Site=="Hesa Primary Care Centre"),]
 #Data_Medway <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Medway"),]
 Data_NIreland <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Northern Ireland Belfast PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Northern PCT" |
-                 BackingMin_noSH24$Default.LA=="Northern Ireland South Eastern PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Southern PCT" |
-                 BackingMin_noSH24$Default.LA=="Northern Ireland Western PCT"),]
+                                       BackingMin_noSH24$Default.LA=="Northern Ireland South Eastern PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Southern PCT" |
+                                       BackingMin_noSH24$Default.LA=="Northern Ireland Western PCT"),]
 Data_Worces_Hereford <- BackingMin_noSH24 [(BackingMin_noSH24$Site=="Worcestershire Hub" | BackingMin_noSH24$Site=="iSH Hereford"),]
 # End REST OF AREAS----
 
 
 # RoyalLiverpool Justin----
 Data_RoyalLiverpool <-  BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Warrington" | BackingMin_WithSH24$Default.LA=="Halton" |
-               BackingMin_WithSH24$Default.LA=="Liverpool" | BackingMin_WithSH24$Default.LA=="Cheshire East" |
-               BackingMin_WithSH24$Default.LA=="Knowsley"),]
+                                                BackingMin_WithSH24$Default.LA=="Liverpool" | BackingMin_WithSH24$Default.LA=="Cheshire East" |
+                                                BackingMin_WithSH24$Default.LA=="Knowsley"),]
 
 Data_RoyalLiverpool <-  BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Liverpool"),]
 Data_RoyalLiverpool1 <- Data_RoyalLiverpool[(Data_RoyalLiverpool$Created.at > '2020-10-01'),]
@@ -315,13 +324,13 @@ write.table (Data_CheshireEast1, file="\\Users\\Elena Ardines\\Documents\\Report
 Data_Ireland <- orders [(orders$Default.LA=="Ireland - Dublin" | orders$Default.LA=="Ireland - Cork" 
                          | orders$Default.LA=="Ireland - Kerry" | orders$Default.LA=="Ireland - Kildare" 
                          | orders$Default.LA=="Ireland - Wicklow" | orders$Default.LA=="Ireland - Cavan" |
-                      orders$Default.LA=="Ireland - Louth" | orders$Default.LA=="Ireland - Meath" |
-                      orders$Default.LA=="Ireland - Monaghan" | orders$Default.LA=="Ireland - Offaly" |
-                      orders$Default.LA=="Ireland - Galway" | orders$Default.LA=="Ireland - Mayo" |
-                      orders$Default.LA=="Ireland - Laois" | orders$Default.LA=="Ireland - Roscommon" |
-                        orders$Default.LA=="Ireland - Donegal" | orders$Default.LA=="Ireland - Sligo" |
-                        orders$Default.LA=="Ireland - Leitrim" | orders$Default.LA=="Ireland - Limerick" |
-                        orders$Default.LA=="Ireland - Clare" | orders$Default.LA=="Ireland - Tipperary" ),]
+                           orders$Default.LA=="Ireland - Louth" | orders$Default.LA=="Ireland - Meath" |
+                           orders$Default.LA=="Ireland - Monaghan" | orders$Default.LA=="Ireland - Offaly" |
+                           orders$Default.LA=="Ireland - Galway" | orders$Default.LA=="Ireland - Mayo" |
+                           orders$Default.LA=="Ireland - Laois" | orders$Default.LA=="Ireland - Roscommon" |
+                           orders$Default.LA=="Ireland - Donegal" | orders$Default.LA=="Ireland - Sligo" |
+                           orders$Default.LA=="Ireland - Leitrim" | orders$Default.LA=="Ireland - Limerick" |
+                           orders$Default.LA=="Ireland - Clare" | orders$Default.LA=="Ireland - Tipperary" ),]
 
 #remove unwanted variables
 #Data_Ireland$SH24.UID = NULL
@@ -407,36 +416,36 @@ TreatmentsMerge <- merge(OrdersToWork [, c('SH24.UID','Area','Site','LSOA.name',
 table(TreatmentsMerge$Region)
 #CT treatment files  
 Treatment.Essex <- TreatmentsMerge [(TreatmentsMerge$Site=="Essex Hub"), 
-                  c("SH24.UID","customer_id",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
+                                    c("SH24.UID","customer_id",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
 
 Treatment.Thurrock <- TreatmentsMerge [(TreatmentsMerge$Region=="Thurrock"), 
-                  c("SH24.UID","customer_id",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
+                                       c("SH24.UID","customer_id",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
 
 Treatment.DerbyshireDerby <- TreatmentsMerge [(TreatmentsMerge$Site=="Wheatbridge Clinic" | TreatmentsMerge$Site=="London Road Community Hospital"), 
-                  c("SH24.UID",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
+                                              c("SH24.UID",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
 
 Treatment.LLR.MPFT <- TreatmentsMerge [(TreatmentsMerge$Area=="Rutland" | TreatmentsMerge$Area=="Leicester" | TreatmentsMerge$Area=="Leicestershire" |
-                  TreatmentsMerge$Area=="Shropshire" | TreatmentsMerge$Area=="Telford and Wrekin" | TreatmentsMerge$Area=="Staffordshire" | 
-                  TreatmentsMerge$Area=="North Staffordshire" | TreatmentsMerge$Area=="Stoke")
-                       , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
+                                          TreatmentsMerge$Area=="Shropshire" | TreatmentsMerge$Area=="Telford and Wrekin" | TreatmentsMerge$Area=="Staffordshire" | 
+                                          TreatmentsMerge$Area=="North Staffordshire" | TreatmentsMerge$Area=="Stoke")
+                                       , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
 # Include LSOA Code in LLR.MPFT
 Treatment.LLR.MPFT <- merge(Treatment.LLR.MPFT, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM")
 
 
 Treatment.Berkshire <- TreatmentsMerge [(TreatmentsMerge$Area=="East Berkshire")
-             , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
+                                        , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
 
 Treatment.NIreland <- TreatmentsMerge [(TreatmentsMerge$Area=="Northern Ireland")
-            , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
+                                       , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
 
 Treatment.Dorset <- TreatmentsMerge [(TreatmentsMerge$Area=="Dorset")
-            , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender'
-                ,'Sexual.preference.x','Ethnicity',"no_of_partners_last_6_months","no_of_contact_for_partners","no_of_partners_notified")]
+                                     , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender'
+                                         ,'Sexual.preference.x','Ethnicity',"no_of_partners_last_6_months","no_of_contact_for_partners","no_of_partners_notified")]
 
 Treatment.Bromley <- TreatmentsMerge [(TreatmentsMerge$Area=="Bromley")
-            , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",
-                'Age','Gender','Sexual.preference.x','Ethnicity',"no_of_partners_last_6_months",            
-                "no_of_contact_for_partners","no_of_partners_notified")]
+                                      , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",
+                                          'Age','Gender','Sexual.preference.x','Ethnicity',"no_of_partners_last_6_months",            
+                                          "no_of_contact_for_partners","no_of_partners_notified")]
 
 write.table (Treatment.Berkshire, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\BackingData\\2022 Month Berkshire Treatments.csv", row.names=F, sep=",")
 write.table (Treatment.Bromley, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\BackingData\\2022 Month Bromley Treatments.csv", row.names=F, sep=",")
@@ -449,9 +458,9 @@ write.table (Treatment.NIreland, file="\\Users\\ElenaArdinesTomas\\Documents\\Re
 
 #specific request
 Data_Durham <- BackingMin_noSH24[(BackingMin_noSH24$LA.of.residence=="County Durham" &
-                                 (BackingMin_noSH24$Created.at >"2017-12-31" & BackingMin_noSH24$Created.at <"2019-01-01")),]
+                                    (BackingMin_noSH24$Created.at >"2017-12-31" & BackingMin_noSH24$Created.at <"2019-01-01")),]
 Data_Darlington <- BackingMin_noSH24[(BackingMin_noSH24$LA.of.residence=="Darlington" &
-                                     (BackingMin_noSH24$Created.at >"2017-12-31" & BackingMin_noSH24$Created.at <"2019-01-01")),]
+                                        (BackingMin_noSH24$Created.at >"2017-12-31" & BackingMin_noSH24$Created.at <"2019-01-01")),]
 
 Data_DarlingtonDurham <- BackingMin_noSH24[(BackingMin_noSH24$Default.LA=="Darlington" | BackingMin_noSH24$Default.LA=="County Durham"),]
 Data_DarlingtonDurham$Customer.ID = NULL
@@ -469,7 +478,7 @@ Treatment.Durham.Darlington <- TreatmentsMerge [(TreatmentsMerge$Site=="Bishop A
 
 
 Treatment.Durham.Darlington <- TreatmentsMerge [(TreatmentsMerge$Area=="Darlington")
-                   , c('Site','LA.of.residence',"Created.at","Offered.at","Prescription.at","Dispatched.at","Customer.ID")]
+                                                , c('Site','LA.of.residence',"Created.at","Offered.at","Prescription.at","Dispatched.at","Customer.ID")]
 
 
 
@@ -479,19 +488,19 @@ write.table (Treatment.Durham.Darlington, file="\\Users\\Elena Ardines\\Document
 
 #CT treatment for Cheshire East 2021.05.10 Justin
 Treatment.CheshireEast <- TreatmentsMerge [(TreatmentsMerge$Area=="Cheshire East")
-                    , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
+                                           , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
 write.table (Treatment.CheshireEast, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2021\\2021 06\\Backing data\\2021.05.10 Treatment.CheshireEast.Justin.csv", row.names=F, sep=",")
 # END CT TREATMENTS----
 
 
 # Backing data CONTRACEPTION----
 COCToWork <- ContCOC[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                        ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
-                        "Taken.COC.before.","Ordered.COC.from.SH.24.before.","Ordered.OC.from.SH.24.before.","LSOA.name")]
+                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
+                         "Taken.COC.before.","Ordered.COC.from.SH.24.before.","Ordered.OC.from.SH.24.before.","LSOA.name")]
 
 POPToWork <- ContPOP[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                     ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
-                     "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before.","LSOA.name")]
+                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
+                         "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before.","LSOA.name")]
 
 
 
@@ -576,13 +585,13 @@ write.table (Data_Warwickshire, file="\\Users\\ElenaArdinesTomas\\Documents\\Rep
 
 # 2022.02.17 Blake Nottinghamshire
 Data_Notting <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Nottingham" | 
-                              BackingMin_noSH24$Default.LA=="Freetesting - Nottingham" |
-                              BackingMin_noSH24$Default.LA=="Freetesting - Nottinghamshire" ),]
+                                      BackingMin_noSH24$Default.LA=="Freetesting - Nottingham" |
+                                      BackingMin_noSH24$Default.LA=="Freetesting - Nottinghamshire" ),]
 
 class(Data_Notting$Created.at)
 Data_Notting$Created.at <- as.Date(Data_Notting$Created.at, format = "%Y-%m-%d")
 Data_Notting <- Data_Notting[(Data_Notting$Created.at >= "2021-10-01" & 
-                                                        Data_Notting$Created.at <= "2021-12-31"),]
+                                Data_Notting$Created.at <= "2021-12-31"),]
 Data_Notting$SplitAge <- 0
 Data_Notting$SplitAge = ifelse(Data_Notting$Age>24,"25+","Under 25")
 table(Data_Notting$SplitAge)
