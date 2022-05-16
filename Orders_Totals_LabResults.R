@@ -11,13 +11,13 @@ rm(list = ls())
 
 #create data frame with selected columns----
 OrdersMonth <- orders[,c('SH24.UID','Customer.ID','Reason.for.visit','LA.of.residence','Default.LA','Site','Age',
-          'Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
-          "Sexual.preference","Sexually.assaulted.risk.assessment","Unprotected.sex.in.last.5.days",
-          "Pressured.into.sex","Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
-          "Clinic.visited","Clinic.visited.12","Ethnicity","Sexuality","Click.and.collect","Referred.from","Sites.tested",'Test.regime',
-          "Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Lab.receipt.at.month.year",
-          "Notified.at","Notified.at.month.year","Lab.results.ongoing.at","Lab.results.ongoing.at.month.year","Lab.results.at","Lab.results.at.month.year",
-          "Syphilis","HIV","Chlamydia","Gonorrhoea",'Hep.B','Hep.C',"Test.for.Hiv","Test.for.Syphilis.RPR","Lab")]
+                         'Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                         "Sexual.preference","Sexually.assaulted.risk.assessment","Unprotected.sex.in.last.5.days",
+                         "Pressured.into.sex","Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
+                         "Clinic.visited","Clinic.visited.12","Ethnicity","Sexuality","Click.and.collect","Referred.from","Sites.tested",'Test.regime',
+                         "Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Lab.receipt.at.month.year",
+                         "Notified.at","Notified.at.month.year","Lab.results.ongoing.at","Lab.results.ongoing.at.month.year","Lab.results.at","Lab.results.at.month.year",
+                         "Syphilis","HIV","Chlamydia","Gonorrhoea",'Hep.B','Hep.C',"Test.for.Hiv","Test.for.Syphilis.RPR","Lab")]
 
 #Create Area variable and set to 0
 OrdersMonth$Area <- 0
@@ -30,7 +30,6 @@ v1 <- '2022-04'
 
 table(OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
 table(OrdersMonth$Lab.results.at.month.year == v1)
-table(OrdersMonth$Area, OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
 
 #TOT Turnaround Time: 'Lab.results.at' minus 'Lab.receipt.at'----
 # convert dates from 'factor' to 'date' to calculate TOT, and then to 'character' to group
@@ -164,8 +163,8 @@ Summary1 <- rename(Summary1, Returned.Tests = Returns.x)
 # TO INPUT IN SUMMARY MANUALLY: TOT per Lab, based on 'LabResults' (change of methodology in June 2020, from 'LabReceipt' to 'LabResults') and for TDL and SPS separately----
 #Calculate overall TOT for current and previous month
 OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
-                           & OrdersMonth$Area != "London"
-                           & OrdersMonth$TOT.Bands != "0"),]
+                               & OrdersMonth$Area != "London"
+                               & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOTPrev$TOT.Bands)
 prop.table(table(OverallTOTPrev$TOT.Bands))*100
 
@@ -178,22 +177,22 @@ prop.table(table(OverallTOT$TOT.Bands))*100
 
 #TDL 
 TOT.TDL <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
-                           & OrdersMonth$Area != "London"
-                           & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="TDL"),]
+                        & OrdersMonth$Area != "London"
+                        & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="TDL"),]
 table(TOT.TDL$TOT.Bands)
 prop.table(table(TOT.TDL$TOT.Bands))*100
 
 #SPS
 TOT.SPS <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
-                           & OrdersMonth$Area != "London"
-                           & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="SPS"),]
+                        & OrdersMonth$Area != "London"
+                        & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="SPS"),]
 table(TOT.SPS$TOT.Bands)
 prop.table(table(TOT.SPS$TOT.Bands))*100
 
 #Medlab
 TOT.Medlab <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == v1 
-                        & OrdersMonth$Area != "London"
-                        & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="Medlab"),]
+                           & OrdersMonth$Area != "London"
+                           & OrdersMonth$TOT.Bands != "0" & OrdersMonth$Lab=="Medlab"),]
 table(TOT.Medlab$TOT.Bands)
 prop.table(table(TOT.Medlab$TOT.Bands))*100
 # End TOT per Lab----
@@ -339,21 +338,22 @@ Summary3 = merge(x = Summary2, y = DiagnosisReturns, by = "Area", all = TRUE)
 TreatmentsMerge <- merge(OrdersMonth [, c('SH24.UID','Area', 'Site','LA.of.residence')], Treatments, by.x = 'SH24.UID', by.y = 'sh24_uid')
 
 
-    #### DELETE: 3.May.2022:
-    #Include MonthYear dates: first convert date fields to date in d/m/y format to MonthYear
-    #TreatmentsMerge$Created_FormatDate <- as.Date(TreatmentsMerge$created_at, "%Y-%m-%d")
-    #TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, "%Y-%m-%d")
+#### DELETE: 3.May.2022:
+#Include MonthYear dates: first convert date fields to date in d/m/y format to MonthYear
+#TreatmentsMerge$Created_FormatDate <- as.Date(TreatmentsMerge$created_at, "%Y-%m-%d")
+#TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, "%Y-%m-%d")
 
-    #create MonthYear columns. class will be "character"
-    #TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
-    #TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
+#create MonthYear columns. class will be "character"
+#TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
+#TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
 
 #Export as table to Clinical Reports, as a summary of all CT treatments since the start of the service in all areas (inc London!)
 write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.04.CT.Treatments.csv", row.names=F, sep=",")
 
+
 #Prepare CT treatments to add to rest of summary: select data for relevant month
-# use Dispatched.month.year.signed_prescrip as it's the dispatched date in the signed_prescriptions table, that includes roll-backs
-TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched.month.year.signed_prescrip == v1 & !is.na(TreatmentsMerge$Dispatched.month.year.signed_prescrip)),]
+# ckeck if using Dispatched.MonthYear or Dispatched.month.year.signed_prescrip as in the signed_prescriptions table, that includes roll-backs
+TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched.MonthYear == v1 & !is.na(TreatmentsMerge$Dispatched.MonthYear)),]
 NumberTreatments <- as.data.frame(table(TreatmentsMonth$Area))
 #Name the columns
 colnames(NumberTreatments)[1] <- "Area"
@@ -484,12 +484,12 @@ Summary6 = merge(x = Summary5, y = Metric3, by = "Area", all = TRUE)
 #Demographics----
 #BAME
 BAME <- KitsDispatched [(KitsDispatched$Ethnicity != 'white_english_welsh_scottish_northern_irish_british' &
-                      KitsDispatched$Ethnicity != 'other_white' &
-                      KitsDispatched$Ethnicity != 'irish' &
-                      KitsDispatched$Ethnicity != 'gypsy_or_irish_traveller' &
-                      KitsDispatched$Ethnicity != 'not_asked' &
-                      KitsDispatched$Ethnicity != 'not_known' &
-                      KitsDispatched$Ethnicity != 'prefer_not_to_say'),]
+                           KitsDispatched$Ethnicity != 'other_white' &
+                           KitsDispatched$Ethnicity != 'irish' &
+                           KitsDispatched$Ethnicity != 'gypsy_or_irish_traveller' &
+                           KitsDispatched$Ethnicity != 'not_asked' &
+                           KitsDispatched$Ethnicity != 'not_known' &
+                           KitsDispatched$Ethnicity != 'prefer_not_to_say'),]
 BAME = as.data.frame(table (BAME$Area))
 #name the columns
 colnames(BAME)[1] <- "Area"
@@ -511,7 +511,7 @@ colnames(Under25)[2] <- "Under.25"
 
 #MSM: REVIEW, IS IT CALCULATED WITH GENITALS FROM oCT 2020?
 MSM <- KitsDispatched [(KitsDispatched$Genitals=='Penis' 
-                     & (KitsDispatched$Sexual.preference=='men' | KitsDispatched$Sexual.preference=='both')),]
+                        & (KitsDispatched$Sexual.preference=='men' | KitsDispatched$Sexual.preference=='both')),]
 MSM = as.data.frame(table (MSM$Area))
 #name the columns
 colnames(MSM)[1] <- "Area"
@@ -571,11 +571,11 @@ table(SafeguardingYP$Any_Flag)
 
 #create a column that sums up flags
 SafeguardingYP$Sum.Flags <- rowSums(SafeguardingYP[,c("Flag_SA",
-                                                "Flag_PS",
-                                                "Flag_PAID",
-                                                "Flag_DD",
-                                                "Flag_DEP",
-                                                "Flag_PARTNER")])
+                                                      "Flag_PS",
+                                                      "Flag_PAID",
+                                                      "Flag_DD",
+                                                      "Flag_DEP",
+                                                      "Flag_PARTNER")])
 table(SafeguardingYP$Sum.Flags)
 
 
@@ -641,8 +641,8 @@ ContPOP$Area <- recodeContraception(DF= ContPOP,varname="Area",varname2="Region"
 Injectable$Area <- recodeContraception(DF= Injectable,varname="Area",varname2="region")
 Patch$Area <- recodeContraception(DF= Patch,varname="Area",varname2="region")
 Ring$Area <- recodeContraception(DF= Ring,varname="Area",varname2="region")
-table(ContCOC$Dispatched.month.year.signed_prescrip == v1)
-table(ContPOP$Dispatched.month.year.signed_prescrip == v1)
+table(ContCOC$Dispatched.at.month.year == v1)
+table(ContPOP$Dispatched.at.month.year == v1)
 table(Injectable$Dispatched.Month.Year == v1)
 table(Patch$Dispatched.Month.Year == v1)
 table(Ring$Dispatched.Month.Year == v1)
@@ -653,9 +653,9 @@ rm(Zero)
 
 
 # subset for relevant month
-# use Dispatched.month.year.signed_prescrip for COC and POP as date is from signed_prescriptions table and includes roll-backs
-ContCOCMonth <- ContCOC [(ContCOC$Dispatched.month.year.signed_prescrip ==  v1),]
-ContPOPMonth <- ContPOP [(ContPOP$Dispatched.month.year.signed_prescrip == v1),]
+# use Dispatched.MonthYear for COC and POP as date is from signed_prescriptions table and includes roll-backs
+ContCOCMonth <- ContCOC [(ContCOC$Dispatched.at.month.year ==  v1),]
+ContPOPMonth <- ContPOP [(ContPOP$Dispatched.at.month.year == v1),]
 InjectableMonth <- Injectable [(Injectable$Dispatched.Month.Year == v1),]
 PatchMonth <- Patch [(Patch$Dispatched.Month.Year == v1),]
 RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
@@ -693,8 +693,8 @@ ECFutureMonth$Area <- 0
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
 ECFutureMonth$Area <- recodeContraception(DF= ECFutureMonth,varname="Area",varname2="Region")
 
-# use Dispatched.month.year.signed_prescrip 
-ECNowMonth <- ECNow [(ECNow$Dispatched.month.year.signed_prescrip ==  v1),]
+# use Dispatched.MonthYear 
+ECNowMonth <- ECNow [(ECNow$Dispatched.at.month.year ==  v1),]
 # create Area
 ECNowMonth$Area <- 0
 #run Recode_Area function and save output in Area; important to write your variable names in colons (but not the data frame name)
@@ -780,10 +780,10 @@ rm(Zero)
 PhotoConsult1 <- PhotoConsult
 PhotoConsult1 <- PhotoConsult [(PhotoConsult$diagnosed_month_year ==  v1),]
 
-    #### DELETE: 02.05.2022
-    ####class(PhotoConsult1$diagnosed_at)
-    ####PhotoConsult1$diagnosed_at <- as.Date(PhotoConsult1$diagnosed_at, format = "%Y-%m-%d")
-    ####PhotoConsult1 <- PhotoConsult1[(PhotoConsult1$diagnosed_at >= "2022-02-01" & PhotoConsult1$diagnosed_at <= "2022-02-28"),]
+#### DELETE: 02.05.2022
+####class(PhotoConsult1$diagnosed_at)
+####PhotoConsult1$diagnosed_at <- as.Date(PhotoConsult1$diagnosed_at, format = "%Y-%m-%d")
+####PhotoConsult1 <- PhotoConsult1[(PhotoConsult1$diagnosed_at >= "2022-02-01" & PhotoConsult1$diagnosed_at <= "2022-02-28"),]
 
 #convert to data.frame
 PhotoConsult1 = as.data.frame(table(PhotoConsult1$Area), useNA = "always")
@@ -832,7 +832,7 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_04\\SummaryPerformance.2022.04_2.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_04\\SummaryPerformance.2022.04_AsUsual.csv", col.names = F, row.names=T, sep=",")
 
 
 
