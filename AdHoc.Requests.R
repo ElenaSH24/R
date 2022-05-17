@@ -708,21 +708,37 @@ write.table (EC, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-
 setwd("/Users/ElenaArdinesTomas/Documents/Reports/2.Ad-hoc-reports")
 mssg <- read.csv("20220428_MessagesPerConversation.csv")
 
-# 2022.05.messages Kate
-setwd("/Users/ElenaArdinesTomas/Documents/Reports/2.Ad-hoc-reports")
-m = read.csv("20220516_MessagesPerConversation.csv")
-m = read.csv("20220516_MessagesPerConversation_All.csv")
-names(m)
-table(m$type, m$automated)
-table(m$type,m$conversation_id)
+# 2022.05.17 Abi CT diagnosis and treatments period 15/7/21 to 14/1/22
+setwd("/Users/ElenaArdinesTomas/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_04")
+orders = read.csv("20220502_sti_order_report.csv")
+Treatments = read.csv("20220503_CT_Treatments_signed.csv")
 
-group_by(m, count) %>% summarize(m = mean(conversation_id))
-group_by(df, dive) %>% summarize(m = mean(speed))
+Abi <- orders
+# extract data for CT testing and tests that have been returned
+Abi <- Abi[(Abi$Chlamydia != 'not_requested' & Abi$Lab.results.at != ""), 
+           c("SH24.UID",'Default.LA','Age','Gender','Gender.at.birth','Genitals','Gender.identity.same.as.birth.sex','Gender.Identity',
+           'Sexual.preference','Sexuality','Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+           'Sites.tested','Created.at',"Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year",
+           "Lab.results.at","Lab.results.at.month.year","Chlamydia",
+           "Test.for.Chlamydia.Urine","Test.for.Chlamydia.Oral","Test.for.Chlamydia.Rectal","Test.for.Chlamydia.Vaginal")]
 
+# extract results for given period
+class(Abi$Lab.results.at)
+Abi$Lab.results.at <- as.Date(Abi$Lab.results.at, format = "%Y-%m-%d")
 
-# end messages Kate
+table(Abi$Lab.results.at.month.year)
+Abi <- Abi[(Abi$Lab.results.at >= "2021-07-15" & Abi$Lab.results.at <= "2022-01-14"),]
 
+# get CT treatments
+Abi_1 <- merge(Abi, Treatments[,c('sh24_uid',"dispatched_at")], by.x = "SH24.UID", by.y = "sh24_uid", all.x = TRUE)
+Abi_1 <- rename(Abi_1, Region = Default.LA)
+Abi_1 <- rename(Abi_1, Treatment_dispatched_at = dispatched_at)
+# remove UIDs
+Abi_1$SH24.UID = NULL
 
+table(Abi_1$Chlamydia)
+write.table(Abi_1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\\\PublicRegistrars\\20220517_Abi_CT_Diagnosis_Treatments.csv", row.names=F, sep=",")
+# end Abi CT
 
 
 
