@@ -3,7 +3,7 @@
 # Install 'reshape2' (for 'melt' function)
 install.packages("reshape2")
 library(reshape2)
-# If reshape2 isnt working any longer: function melt can be found in package data.table too
+# If reshape2 isn't working any longer: function melt can be found in package data.table too
 
 
 # GUMCAD data spec: file:///C:/Users/Elena%20Ardines/Documents/Reports/NHS%20Reports/GUMCAD/GUMCAD_Data_Specification_and_Technical_Guidance.pdf
@@ -17,18 +17,13 @@ Gumcad <- orders[ ,c('SH24.UID','Customer.ID','Postcode','LSOA.name','Default.LA
 
 
 # Data frame with the months we need for the relevant submission, and exclude FETTLE
-# Orders requested on the relevant quarter, without Notified date
-# GumcadQ <- Gumcad [((Gumcad$Created.at.month.year=="2020-01"| Gumcad$Created.at.month.year=="2020-02"| Gumcad$Created.at.month.year=="2020-03")
-#          & (Gumcad$Site != "Fettle Hub") & (Gumcad$Site != "ARAS Bucuresti") & (Gumcad$Notified.at.month.year != "N/A")),]
+# Orders requested on the relevant quarter, that have been returned to lab
 
-#GumcadQNotified <- Gumcad [((Gumcad$Notified.at.month.year=="2020-04"| Gumcad$Notified.at.month.year=="2020-05"| Gumcad$Notified.at.month.year=="2020-06")
-#          & (Gumcad$Site != "Fettle Hub") & (Gumcad$Site != "ARAS Bucuresti") & (Gumcad$Notified.at.month.year != "N/A")),]
+GumcadQ <- Gumcad [((Gumcad$Lab.results.at.month.year=="2022-01"| Gumcad$Lab.results.at.month.year=="2022-02"| Gumcad$Lab.results.at.month.year=="2022-03")
+                    & (Gumcad$Default.LA != "Fettle") & (Gumcad$Default.LA != "Romania") 
+                    & !(grepl('Ireland -', Gumcad$Default.LA))
+                    & (Gumcad$Lab.results.at.month.year != "N/A")),]
 
-GumcadQ <- Gumcad [((Gumcad$Lab.results.at.month.year=="2021-10"| Gumcad$Lab.results.at.month.year=="2021-11"| Gumcad$Lab.results.at.month.year=="2021-12")
-           & (Gumcad$Default.LA != "Fettle") & (Gumcad$Default.LA != "Romania") 
-           & (Gumcad$Default.LA != "Ireland - Cork") & (Gumcad$Default.LA != "Ireland - Dublin") & (Gumcad$Default.LA != "Ireland - Kerry")
-           & (Gumcad$Default.LA != "Ireland - Kildare") & (Gumcad$Default.LA != "Ireland - Wicklow")
-           & (Gumcad$Lab.results.at.month.year != "N/A")),]
 
 # ClinicID: create variables we don't have
 GumcadQ$ClinicID <- "YGMDR"    
@@ -47,18 +42,17 @@ table(GumcadQ$Gender, useNA = "always")
 
 # Sexual orientation
 table(GumcadQ$Sexual.preference,GumcadQ$Gender)
-GumcadQ <- rename(GumcadQ, Gender_Identity = Gender.Identity)
-table(GumcadQ$Sexual.preference,GumcadQ$Gender_Identity)
+#### GumcadQ <- rename(GumcadQ, Gender_Identity = Gender.Identity)
+#### table(GumcadQ$Sexual.preference,GumcadQ$Gender)
 
 
-
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="women"] <- 1
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="men"] <- 2
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="1" & GumcadQ$Sexual.preference=="both"] <- 3
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="2" & GumcadQ$Sexual.preference=="men"] <- 1
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="2" & GumcadQ$Sexual.preference=="women"] <- 2
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="2" & GumcadQ$Sexual.preference=="both"] <- 3
-GumcadQ$Sex_Ori [GumcadQ$Gender_Identity=="3"] <- 4
+GumcadQ$Sex_Ori [GumcadQ$Gender=="1" & GumcadQ$Sexual.preference=="women"] <- 1
+GumcadQ$Sex_Ori [GumcadQ$Gender=="1" & GumcadQ$Sexual.preference=="men"] <- 2
+GumcadQ$Sex_Ori [GumcadQ$Gender=="1" & GumcadQ$Sexual.preference=="both"] <- 3
+GumcadQ$Sex_Ori [GumcadQ$Gender=="2" & GumcadQ$Sexual.preference=="men"] <- 1
+GumcadQ$Sex_Ori [GumcadQ$Gender=="2" & GumcadQ$Sexual.preference=="women"] <- 2
+GumcadQ$Sex_Ori [GumcadQ$Gender=="2" & GumcadQ$Sexual.preference=="both"] <- 3
+GumcadQ$Sex_Ori [GumcadQ$Gender=="3"] <- 4
 
 # Create tables with totals to check that 'Sex_Ori' is correctly calculated
 table(GumcadQ$Sex_Ori, GumcadQ$Gender, useNA = "always")
@@ -108,6 +102,11 @@ GumcadQ$Country_Birth <- "XXX"
 
 # Data item 11 and 12: Vlookup LSOA and LA codes from LSOA name 
 GumcadQMerge <- merge(GumcadQ, LSOA[,c('LSOA11CD',"LAD19CD",'LSOA11NM')], by.x = 'LSOA.name', by.y = 'LSOA11NM', all.x = TRUE, all.y = FALSE)
+
+# Replace <NA> in LA and LSOA with blank ----
+GumcadQMerge$LSOA11CD[is.na(GumcadQMerge$LSOA11CD)] <- ""
+GumcadQMerge$LAD19CD[is.na(GumcadQMerge$LAD19CD)] <- ""
+
 
 # rename LA and LSOA (new variable name = existing variable name) ----
 GumcadQMerge <- rename(GumcadQMerge, LA = LAD19CD)
@@ -263,13 +262,14 @@ GumcadMergeTreatm$Episode_Activity_16 <- ifelse(GumcadMergeTreatm$dispatched_at=
 table(GumcadMergeTreatm$Episode_Activity_16)
 #End CT Treatments----
 
-# 'Melt' (install package RESHAPE2) from wide to long, so all of those new variables called Episode_Activity 1, 2, 3, etc 'melt' into one column. 
-GumcadQMergeLong <- GumcadMergeTreatm[,grep("^episode|clinic|Patient|Gender_Identity|Age|Sex|Ethnicity|Country|LA|LSOA|attendance|Site|residence|Created.at.month.year",
+
+GumcadQMergeLong <- GumcadMergeTreatm[,grep("^episode|clinic|Patient|Gender|Age|Sex|Ethnicity|Country|LA|LSOA|attendance|Site|residence|Created.at.month.year",
                                             colnames(GumcadMergeTreatm),
                                             perl = T,value = T,
                                             ignore.case = T)]
 
-GumcadQMergeLong1 <- melt (GumcadQMergeLong,id.vars = c("ClinicID","PatientID","Gender_Identity","Age","Sex_Ori",
+# 'Melt' (install package RESHAPE2) from wide to long, so all of those new variables called Episode_Activity 1, 2, 3, etc 'melt' into one column. 
+GumcadQMergeLong1 <- melt (GumcadQMergeLong,id.vars = c("ClinicID","PatientID","Gender","Age","Sex_Ori",
                                                         "Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate"),
                           measure.vars = c("Episode_Activity_1","Episode_Activity_2","Episode_Activity_3","Episode_Activity_4","Episode_Activity_5","Episode_Activity_6",
                                            "Episode_Activity_7","Episode_Activity_8","Episode_Activity_9","Episode_Activity_10","Episode_Activity_11","Episode_Activity_12",
@@ -285,19 +285,20 @@ table(GumcadQMergeLong1$Episode_Activity, useNA = "always")
 
 
 # order columns
-GumcadQMergeLong1 <- GumcadQMergeLong1 [c("ClinicID","PatientID","Episode_Activity","Gender_Identity","Age","Sex_Ori","Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate")]
+GumcadQMergeLong1 <- GumcadQMergeLong1 [c("ClinicID","PatientID","Episode_Activity","Gender","Age","Sex_Ori","Ethnicity","Country_Birth","LA","LSOA","First_Attendance","AttendanceDate")]
 # export outcome
-write.table (GumcadQMergeLong1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\GUMCAD\\YGMDR_Q4_2021.csv", row.names=F, sep=",")
+write.table (GumcadQMergeLong1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\GUMCAD\\YGMDR_Q1_2022_v3.csv", row.names=F, sep=",")
 
 
 ### DERBYSHIRE GUMCAD REPORT----
-GumcadDerbyshire <- melt (GumcadQMergeLong,id.vars = c("PatientID","Gender_Identity","Age","Sex_Ori","Ethnicity",
+GumcadDerbyshire <- melt (GumcadQMergeLong,id.vars = c("PatientID","Gender","Age","Sex_Ori","Ethnicity",
                                                         "LA","LSOA","AttendanceDate","LA.of.residence","Site","Created.at.month.year"),
                            measure.vars = c("Episode_Activity_1","Episode_Activity_2","Episode_Activity_3","Episode_Activity_4","Episode_Activity_5","Episode_Activity_6",
                                             "Episode_Activity_7","Episode_Activity_8","Episode_Activity_9","Episode_Activity_10","Episode_Activity_11","Episode_Activity_12",
                                             "Episode_Activity_13","Episode_Activity_14","Episode_Activity_15","Episode_Activity_16"),
                            variable.name = "Episode",
                            value.name = "Episode_Activity")
+
 # remove blanks and select
 GumcadDerbyshire1 <- GumcadDerbyshire[((GumcadDerbyshire$Episode_Activity!="") 
                                        & (GumcadDerbyshire$Site=="Wheatbridge Clinic")
