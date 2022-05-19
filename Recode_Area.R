@@ -50,7 +50,8 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
                  DF[,varname5]=="Northern Ireland Northern PCT" |
                  DF[,varname5]=="Northern Ireland South Eastern PCT" |
                  DF[,varname5]=="Northern Ireland Southern PCT" |
-                 DF[,varname5]=="Northern Ireland Western PCT"] <- "Northern Ireland"
+                 DF[,varname5]=="Northern Ireland Western PCT" | 
+                 DF[,varname5]=="Northern Ireland Offline: Southern"] <- "Northern Ireland"
   
   DF[,varname][DF[,varname5]=="Ireland - Dublin" |  DF[,varname5]=="Ireland - Cork" |
                  DF[,varname5]=="Ireland - Kerry" | DF[,varname5]=="Ireland - Wicklow" | 
@@ -62,8 +63,7 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
                  DF[,varname5]=="Ireland - Donegal" | DF[,varname5]=="Ireland - Sligo" |
                  DF[,varname5]=="Ireland - Leitrim" | DF[,varname5]=="Ireland - Limerick" |
                  DF[,varname5]=="Ireland - Clare" | DF[,varname5]=="Ireland - Tipperary" |
-                 DF[,varname5]=="Ireland - Carlow" | DF[,varname5]=="Ireland - Kilkenny" | 
-                 DF[,varname5]=="Northern Ireland Offline: Southern" 
+                 DF[,varname5]=="Ireland - Carlow" | DF[,varname5]=="Ireland - Kilkenny"  
                ] <- "Ireland"
 
   DF[,varname][DF[,varname5]=="Nottingham"] <- "Nottingham"
