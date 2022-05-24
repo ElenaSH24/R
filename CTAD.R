@@ -11,7 +11,7 @@ Ctad <- orders[ ,c('SH24.UID','Lab.UID','Postcode','Default.LA',
 # Orders requested on the relevant quarter, without LabResults date OR orders that have a LabResults date within the quarter?!?!?!?
 
 # Select orders for relevant quarter
-Ctad1 <- Ctad [((Ctad$Created.at.month.year=="2021-10"| Ctad$Created.at.month.year=="2021-11"| Ctad$Created.at.month.year=="2021-12")
+Ctad1 <- Ctad [((Ctad$Created.at.month.year=="2022-01"| Ctad$Created.at.month.year=="2022-02"| Ctad$Created.at.month.year=="2022-03")
                            & (Ctad$Default.LA != "Fettle") & (Ctad$Default.LA != "Romania") 
                 & (Ctad$Default.LA != "Ireland - Cork") & (Ctad$Default.LA != "Ireland - Dublin") & (Ctad$Default.LA != "Ireland - Kerry")
                 & (Ctad$Default.LA != "Ireland - Kildare") & (Ctad$Default.LA != "Ireland - Wicklow") & (Ctad$Default.LA != "Ireland - Louth") 
@@ -184,5 +184,5 @@ Ctad3Long1 <- Ctad3Long1 [c("Lab_ID","Test_ID","Patient_ID","NHS_Number","NHS_Nu
          ,"Registered_GP_Code","Postcode_Testing_Service","Venue_code","Specimen_Type","Testing_Service_Type","NCSP_Clinic_Code","Specimen_Date","Receipt_date"
          ,"Date_Result_authorised","CT_Result")]
 
-write.table (Ctad3Long1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\CTAD\\2021\\YGMDR_Q4_2021.csv", row.names=F, sep=",")
+write.table (Ctad3Long1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\NHS_Reports\\CTAD\\2022\\YGMDR_Q1_2022.csv", row.names=F, sep=",")
 
