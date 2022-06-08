@@ -25,7 +25,7 @@ OrdersMonth$Area <- 0
 OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
 # set reporting month
-v1 <- '2022-04'
+v1 <- '2022-05'
 
 
 table(OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
@@ -162,7 +162,7 @@ Summary1 <- rename(Summary1, Returned.Tests = Returns.x)
 
 # TO INPUT IN SUMMARY MANUALLY: TOT per Lab, based on 'LabResults' (change of methodology in June 2020, from 'LabReceipt' to 'LabResults') and for TDL and SPS separately----
 #Calculate overall TOT for current and previous month
-OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-03" 
+OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-04" 
                                & OrdersMonth$Area != "London"
                                & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOTPrev$TOT.Bands)
@@ -348,7 +348,7 @@ TreatmentsMerge <- merge(OrdersMonth [, c('SH24.UID','Area', 'Site','LA.of.resid
 #TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
 
 #Export as table to Clinical Reports, as a summary of all CT treatments since the start of the service in all areas (inc London!)
-write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.04.CT.Treatments.csv", row.names=F, sep=",")
+write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.05.CT.Treatments.csv", row.names=F, sep=",")
 
 
 #Prepare CT treatments to add to rest of summary: select data for relevant month
@@ -832,7 +832,7 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_04\\SummaryPerformance.2022.04_AsUsual.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Performance_Reports\\2022\\2022_05\\SummaryPerformance.2022.05_Orbish.csv", col.names = F, row.names=T, sep=",")
 
 
 
