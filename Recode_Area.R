@@ -21,7 +21,7 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
                & (DF[,varname5]=="Cheshire East")] <- "Cheshire East"
   
   DF[,varname][(DF[,varname5]=="Cornwall and Isles of Scilly PCT")] <- "Cornwall"
-  DF[,varname][DF[,varname3]=="County Durham"] <- "County Durham"
+  DF[,varname][DF[,varname5]=="County Durham"] <- "County Durham"
   #DF[,varname][DF[,varname2]=="Darlington GUM Clinic" & DF[,varname3]=="Darlington"] <- "Darlington"
   DF[,varname][(DF[,varname5]=="Darlington")] <- "Darlington"
   DF[,varname][DF[,varname2]=="London Road Community Hospital"] <- "Derby"
@@ -76,7 +76,7 @@ recodeArea <- function(DF,varname,varname2,varname3,varname4,varname5){
   DF[,varname][DF[,varname2]=="Cannock Chase Hospital"|DF[,varname2]=="Stafford Central Clinic"] <- "Staffordshire"
   DF[,varname][DF[,varname5]=="Stoke-on-Trent"] <- "Stoke"
   DF[,varname][DF[,varname5]=="Sunderland"] <- "Sunderland"
-  DF[,varname][DF[,varname3]=="Telford and Wrekin"] <- "Telford and Wrekin"
+  DF[,varname][DF[,varname5]=="Telford and Wrekin"] <- "Telford and Wrekin"
   DF[,varname][(DF[,varname5]=="Warrington")] <- "Warrington"
   DF[,varname][DF[,varname2]=="Worcestershire Hub"] <- "Worcestershire"
   DF[,varname][(DF[,varname5]=="Southend-on-Sea")] <- "Southend"
@@ -133,7 +133,6 @@ recodeContraception <- function(DF,varname,varname2){
   
   DF[,varname][DF[,varname2]=="Bradford"] <- "Bradford"
   DF[,varname][(DF[,varname2]=="Blackburn with Darwen")] <- "Blackburn"
-  DF[,varname][(DF[,varname2]=="Bury")] <- "Bury"
   DF[,varname][DF[,varname2]=="Cheshire East"] <- "Cheshire East"
   DF[,varname][DF[,varname2]=="Cornwall and Isles of Scilly PCT"] <- "Cornwall"
   DF[,varname][DF[,varname2]=="County Durham"] <- "County Durham"
@@ -159,8 +158,6 @@ recodeContraception <- function(DF,varname,varname2){
                  DF[,varname2]=="Northern Ireland Southern PCT" |
                  DF[,varname2]=="Northern Ireland Western PCT"] <- "Northern Ireland"
   DF[,varname][DF[,varname2]=="Nottingham"] <- "Nottingham"
-  DF[,varname][DF[,varname2]=="Oldham"] <- "Oldham"
-  DF[,varname][DF[,varname2]=="Rochdale"] <- "Rochdale"
   DF[,varname][DF[,varname2]=="Rotherham"] <- "Rotherham"
   DF[,varname][DF[,varname2]=="Rutland"] <- "Rutland"
   DF[,varname][(DF[,varname2]=="Southend-on-Sea")] <- "Southend"
@@ -171,6 +168,8 @@ recodeContraception <- function(DF,varname,varname2){
   DF[,varname][DF[,varname2]=="Warrington"] <- "Warrington"
   DF[,varname][DF[,varname2]=="Wirral"] <- "Wirral"
   
+  DF[,varname][DF[,varname2]=="Oldham" | DF[,varname2]=="Rochdale" | DF[,varname2]=="Bury"] <- "Orbish"
+ 
   DF[,varname] <- as.factor(DF[,varname])  #change class back to factor
   DF[,varname] #prints out variable 
 }
