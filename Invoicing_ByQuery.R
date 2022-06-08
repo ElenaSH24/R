@@ -1,14 +1,16 @@
 # producing Xero file
 
 # read STI orders, CT treatment, contraception and photo diagnosis files from backing data
-invSTI = read.csv("20220510_invoicing.csv")
-bolts = read.csv("20220502_EC_Now_boltons_Disaggregated.csv")
+
+# specific files for invoicing:
+invSTI = read.csv("20220606_Invoicing.csv")
+bolts = read.csv("20220606_EC_Now_boltons_Disaggregated.csv")
 
 # set date variables 
-v1 <- '2022-04'               #v1: reporting month
-v2 <- '01.04.2022-30.04.2022' #v2: activity period being invoiced
-v3 <- "30/04/2022"            #v3: InvoiceDate
-v4 <- "31/05/2022"            #v4: DueDate
+v1 <- '2022-05'               #v1: reporting month
+v2 <- '01.05.2022-31.05.2022' #v2: activity period being invoiced
+v3 <- "31/05/2022"            #v3: InvoiceDate
+v4 <- "30/06/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -65,7 +67,6 @@ test1 <- test1[grep('Orders',test1$Description),]
 test2 <- invSTI[(invSTI$MonthYear == v1),]
 test2 <- test2[grep('Returns',test2$Description),]
 
-names(Treatments)
 
 # Include CT treatments. Read the file. Get needed columns
 invTreatments <- Treatments[ , c("Region","Dispatched.MonthYear")]
@@ -77,7 +78,6 @@ invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatch
 
 
 # Include contraception
-names(ContCOC)
 invCOC <- ContCOC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
 invPOP <- ContPOP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
 invEC <- ECNow[ , c("Region","Dispatched.at.month.year","Drug")]
@@ -141,7 +141,6 @@ invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
 
 # Include bolt-ons
-names(bolts)
 invBolts <- bolts[ , c("Dispatched.MthYr.EC.Now","Region","Any.bolt.ons.")]
 # count only prescriptions that have been dispatched
 invBolts <- invBolts[(invBolts$Dispatched.MthYr.EC.Now != "" & invBolts$Any.bolt.ons. != ""),]
@@ -200,8 +199,8 @@ names(invBolts)
 invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Dispatched,RPR.Returned,invPDConsult,invPDTreatm,invBolts)
 
 # check
-testinvoicing <- as.data.frame(table(invoicing$Description, invoicing$MonthYear == v1))  
-write.table (testinvoicing, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\Xero_Quantities_2022.April_v9.csv", row.names=F, sep=",")
+#### testinvoicing <- as.data.frame(table(invoicing$Description, invoicing$MonthYear == v1))  
+#### write.table (testinvoicing, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\Xero_Quantities_2022.April_v9.csv", row.names=F, sep=",")
 
 
 # Create variable to group freetesting, Ireland etc together
@@ -344,7 +343,7 @@ invMonth_1$DueDate <- v4
 # remove dataframe rows based on zero values in one column
 invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
 # export to check figures 
-write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\Xero_Quantities_2022.April_v3.csv", row.names=F, sep=",")
+write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\Check_Xero_Quantities_2022.May.csv", row.names=F, sep=",")
 
 
 # create price data frames
@@ -411,6 +410,7 @@ Description <- c('Orders - All STIs (dual site)','Orders - All STIs (single site
               'Bolt on condoms',
               'Bolt on lube',
               'Bolt on pregnancy test',
+              'Bolt on STI test',
               'Contraception EC EllaOne',
               'Contraception EC Levonelle',
               'Contraception EC Levonorgestrel 1.5mg',
@@ -437,7 +437,7 @@ Fee1DiscountRM <-c( 3.60, 3.04, 4.18, 2.99, 2.34, 3.16,2.72, 3.60, 3.04, 4.18, 2
                    21.11,
                    16.30,16.65,16.65,16.65,16.65,19.61,26.50,26.50,26.50,26.50,26.22,36.35,36.35,36.35,36.35,
                    17.92,14.92,17.61,22.85,20.00,20.37,32.70,25.08,23.13,
-                    3.48, 0.52, 0.79, 0.65,
+                    3.48, 0.52, 0.79, 0.65, 4.25,
                    28.50,15.00,15.00,
                    18.95,64.54,33.77,22.87,18.79,33.77,
                    0.00,12.10,
@@ -448,7 +448,7 @@ Fee2Standard <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4
                   20.05,
                   16.30,16.65,16.65,16.65,16.65,19.61,26.50,26.50,26.50,26.50,26.22,36.35,36.35,36.35,36.35,
                   17.92,14.92,17.61,22.85,20.00,20.37,32.70,25.08,23.13,
-                   3.48, 0.52, 0.79, 0.65,
+                   3.48, 0.52, 0.79, 0.65, 4.25,
                   28.50,15.00,15.00,
                   18.95,64.54,33.77,22.87,18.79,33.77,
                   0.00,12.10,
@@ -459,7 +459,7 @@ Fee3Discount <- c( 3.60, 3.04, 4.18, 2.99, 2.34, 3.16,2.72, 3.60, 3.04, 4.18, 2.
                   21.11,
                   16.30,16.65,16.65,16.65,16.65,19.61,26.50,26.50,26.50,26.50,26.22,36.35,36.35,36.35,36.35,
                   17.92,14.92,17.61,22.85,20.00,20.37,32.70,25.08,23.13,
-                   3.48, 0.52, 0.79, 0.65,
+                   3.48, 0.52, 0.79, 0.65, 4.25,
                   28.50,15.00,15.00,
                   18.95,64.54,33.77,22.87,18.79,33.77,
                   0.00,12.10,
@@ -470,7 +470,7 @@ Fee4DiscountRM5 <- c( 3.42, 2.89, 3.97, 2.84, 2.22, 3.00,2.58, 3.42, 2.89, 3.97,
                      20.05,
                      16.30,16.65,16.65,16.65,16.65,19.61,26.50,26.50,26.50,26.50,26.22,36.35,36.35,36.35,36.35,
                      17.92,14.92,17.61,22.85,20.00,20.37,32.70,25.08,23.13,
-                      3.48, 0.52, 0.79, 0.65,
+                      3.48, 0.52, 0.79, 0.65, 4.25,
                      28.50,15.00,15.00,
                      18.95,64.54,33.77,22.87,18.79,33.77,
                      0.00,12.10,
@@ -482,7 +482,7 @@ Fee5Freetesting <- c(0.00,0.00,0.00,0.00,0.00,0.00,2.72,0.00,0.00,0.00, 2.72,0.0
                      0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,0.00,0.00,
+                     0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,
@@ -493,7 +493,7 @@ eSRH <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4.94, 4.9
           21.11,
           16.30,16.65,16.65,16.65,16.65,19.61,26.50,26.50,26.50,26.50,26.22,36.35,36.35,36.35,36.35,
           17.92,14.92,17.61,22.85,20.00,20.37,32.70,25.08,23.13,
-           3.48, 0.52, 0.79, 0.65,
+           3.48, 0.52, 0.79, 0.65, 4.25,
           28.50,15.00,15.00,
           18.95,64.54,33.77,22.87,18.79,33.77,
           0.00,12.10,
@@ -504,7 +504,7 @@ eSRH5 <- c( 6.21, 5.24, 7.22, 5.17, 4.04, 5.56, 4.69, 6.21, 5.24, 7.22, 4.69, 4.
            21.11,
            16.30,16.65,16.65,16.65,16.65,19.61,26.50,26.50,26.50,26.50,26.22,36.35,36.35,36.35,36.35,
            17.92,14.92,17.61,22.85,20.00,20.37,32.70,25.08,23.13,
-            3.48, 0.52, 0.79, 0.65,
+            3.48, 0.52, 0.79, 0.65, 4.25,
            28.50,15.00,15.00,
            18.95,64.54,33.77,22.87,18.79,33.77,
            0.00,12.10,
@@ -515,7 +515,7 @@ FeeZero <- c( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0.00,0.00,0.00,0.00,0.
             0.00,
             0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
             0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
-            0.00,0.00,0.00,0.00,
+            0.00,0.00,0.00,0.00,0.00,
             0.00,0.00,0.00,
             0.00,0.00,0.00,0.00,0.00,0.00,
             0.00,0.00,
@@ -539,7 +539,7 @@ InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$Contact
                         | invMonth_2$ContactName=="Derby City" | invMonth_2$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
                         | invMonth_2$ContactName=="Dorset" | invMonth_2$ContactName=="Halton"
                         | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
-                        | invMonth_2$ContactName=="Nottingham City Council" | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
+                        | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
                         | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside"  | invMonth_2$ContactName=="Orbish"
                         | invMonth_2$ContactName=="Hertfordshire" 
                         | invMonth_2$ContactName=="Bury" | invMonth_2$ContactName=="Rochdale" | invMonth_2$ContactName=="Oldham"),]
@@ -563,7 +563,8 @@ InvFee6 <- invMonth_2 [(invMonth_2$ContactName=="Buckinghamshire" | invMonth_2$C
                         | invMonth_2$ContactName=="Rotherham" | invMonth_2$ContactName=="Stockport" | invMonth_2$ContactName=="Tameside"),]
 
 InvFee7 <- invMonth_2 [(invMonth_2$ContactName=="Essex" | invMonth_2$ContactName=="Thurrock" | invMonth_2$ContactName=="Wirral"
-                        | invMonth_2$ContactName=="Bradford" | invMonth_2$ContactName=="Kirklees"),]
+                        | invMonth_2$ContactName=="Bradford" | invMonth_2$ContactName=="Kirklees" 
+                          | invMonth_2$ContactName=="Nottingham City Council"),]
 
 # some areas not invoiced. Count them anyway to check whole picture
 InvFeeZero <- invMonth_2 [(invMonth_2$ContactName=="Ireland") | (invMonth_2$ContactName=="Romania") | (invMonth_2$ContactName=="Fettle")
@@ -604,8 +605,6 @@ InvoicesFeeZero <- rename(InvoicesFeeZero, UnitAmount = FeeZero)
 
 # Stack data sets one on top of the other 
 InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee3, InvoicesFee4, InvoicesFee6, InvoicesFee7, InvoicesFeeZero)  
-write.table (InvoicesStack, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\20220510_Xero_Apr_v5.csv", row.names=F, sep=",")
-
 
 
 # create the rest of the variables needed for the Xero file
@@ -645,4 +644,4 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\20220512_Xero_Apr.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\20220608_Xero_May.csv", row.names=F, sep=",")
