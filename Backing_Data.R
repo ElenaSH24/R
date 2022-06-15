@@ -35,18 +35,6 @@ table(orders1$test_kit_index,orders1$DispatchedMonthYr=="2021-06")
 
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
-# 1st June 2022 files 
-Treatments = read.csv("20220601_CT_Treatments.csv")
-ContCOC = read.csv("20220601_COC.csv")
-ContPOP = read.csv("20220601_POP.csv")
-ECFuture = read.csv("20220601_ECFuture_disaggregat.csv")
-ECNow = read.csv("20220601_ECNow_disaggregated.csv")
-PhotoConsult = read.csv("20220601_PD_consultations.csv")
-PhotoTreatm = read.csv("20220601_PD_treatments.csv")
-Injectable = read.csv("20220601_Injectable.csv")
-Patch = read.csv("20220601_Patch.csv")  
-Ring = read.csv("20220601_Ring.csv")
-
 # 06th June 2022 files 
 Treatments = read.csv("20220606_CT_Treatments.csv")
 ContCOC = read.csv("20220606_COC.csv")
