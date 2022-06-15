@@ -35,19 +35,12 @@ table(invSTI$overall_type, invSTI$Dispatched.MonthYear == v1)
 invSTI$Description <- paste(invSTI$overall_type, invSTI$invoice_category_billable, sep=" - ")
 
 # some returns are blank, showing in data.frame as 'Returns -'
-# they relate to lab_results not interpreted by the mapping table in the DB
+# they relate to lab_results not interpreted by the mapping table in the DB. We are not charging for these.
 # code blanks to be able to identify them with grep later
 invSTI$Description[invSTI$invoice_category_billable == ""] <- "blank"
-       # table(invSTI$Description)
-        # assimilate 'blank' categories to 'Returns - HIV' in Freetesting - use grep twice ----
-       # invSTI$Description[invSTI$Description == "blank" & (grepl('Freetesting -', invSTI$default_la) | grepl('PHE', invSTI$default_la))] <- "Returns - HIV"
-        # assimilate 'blank' categories to CT/GC (single site) in all areas except Freetesting
-       # invSTI$Description[invSTI$Description == "blank" & !(grepl('Freetesting -', invSTI$default_la) | grepl('PHE', invSTI$default_la))] <- "Returns - CT/GC (single site)"
-        # check that figures for the relevant month add up ok in freetesting / PHE
-       # table(invSTI$Description, grepl('Freetesting -', invSTI$default_la), invSTI$Dispatched.MonthYear==v1)
-       # table(invSTI$Description, grepl('PHE', invSTI$default_la), invSTI$Dispatched.MonthYear==v1)
-
+table(invSTI$Description)
         
+
 # remove variables not needed anymore
 invSTI$overall_type = NULL
 invSTI$invoice_category_billable = NULL
@@ -93,10 +86,7 @@ invInjectable$Description <- paste('Contraception Sayana Press 104mg / 0.65ml',i
 invPatch$Description <- paste('Contraception Evra Patch',invPatch$Patch.months.prescribed,"mth")
 invRing$Description <- paste('Contraception Nuva Ring',invRing$Ring.months.prescribed,"mth")
 
-              # REMOVE?: # Check that prescriptions no dispatched don't have a 'months.prescribed'
-              # table(invCOC$Description, invCOC$Dispatched.at.month.year != "")
-              # table(invInjectable$Description, invInjectable$Dispatched.Month.Year != "")
-
+              
 # rename (new variable name = existing variable name) to have same names in all data frames----
 invCOC <- rename(invCOC, default_la = Region, MonthYear = Dispatched.at.month.year)
 invPOP <- rename(invPOP, default_la = Region, MonthYear = Dispatched.at.month.year)
@@ -152,6 +142,7 @@ invBolts$Description[invBolts$Any.bolt.ons. == "pop"] <- "POP bolt-on Desogestre
 invBolts$Description[invBolts$Any.bolt.ons. == "condoms"] <- "Bolt-on condoms"
 invBolts$Description[invBolts$Any.bolt.ons. == "lube"] <- "Bolt-on lube"
 invBolts$Description[invBolts$Any.bolt.ons. == "pregnancy test"] <- "Bolt-on pregnancy test"
+invBolts$Description[invBolts$Any.bolt.ons. == "sti test"] <- "Bolt-on STI test"
 # rename (new variable name = existing variable name) to have same names in all data frames
 invBolts <- rename(invBolts, default_la = Region, MonthYear = Dispatched.MthYr.EC.Now)
 # drop columns no needed
@@ -161,11 +152,9 @@ invBolts$Any.bolt.ons. = NULL
 # kits dispatched that include Syphilis RPR in reporting month = v1----
 RPR.Dispatched <- orders[(orders$Dispatched.at.month.year == v1), c("Default.LA","Test.regime","Dispatched.at.month.year") ]
 RPR.Dispatched <- RPR.Dispatched[grep('RPR',RPR.Dispatched$Test.regime),]
-table (RPR.Dispatched$Default.LA, useNA = "always")
 # Kits returned that include Syphilis RPR
 RPR.Returned <- orders[(orders$Lab.results.at.month.year == v1), c("Default.LA","Test.regime","Lab.results.at.month.year") ]
 RPR.Returned <- RPR.Returned[grep('RPR',RPR.Returned$Test.regime),]
-table (RPR.Returned$Default.LA, useNA = "always")
 
 # add column with description
 RPR.Dispatched$Description <- "RPR Syphilis tests dispatched"
@@ -238,7 +227,6 @@ invMonth <- invoicing[(invoicing$MonthYear == v1),c("ContactName","MonthYear",'D
 # check
 test3 <- invMonth[grep('Orders',invMonth$Description),]
 test4 <- invMonth[grep('Returns',invMonth$Description),]
-
 
 # convert to data.frame to get the count of the number of tests
 invMonth_1 = as.data.frame(table (invMonth$ContactName,invMonth$Description))
@@ -343,7 +331,14 @@ invMonth_1$DueDate <- v4
 # remove dataframe rows based on zero values in one column
 invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
 # export to check figures 
-write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\Check_Xero_Quantities_2022.May.csv", row.names=F, sep=",")
+write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\Check_Xero_Quantities_2022.May_v1.csv", row.names=F, sep=",")
+
+
+
+#remove Description = blank (those are the returns that came with a lab_error, we don't charge for them)
+invMonth_2 <- invMonth_2[invMonth_2$Description != 'blank', ]
+#remove Medway invoice
+invMonth_2 <- invMonth_2[(invMonth_2$ContactName != 'Medway'), ]
 
 
 # create price data frames
@@ -641,7 +636,8 @@ InvoicesStack_Ordered <- InvoicesStack [c("ContactName","EmailAddress","POAddres
 # order data first by Area (=ContactName) and second by the invoicing category (=Description)
 InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$ContactName),]
 
+
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\20220608_Xero_May.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\20220613_Xero_May_test.csv", row.names=F, sep=",")
