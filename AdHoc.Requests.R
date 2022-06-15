@@ -780,6 +780,22 @@ install.packages('forecast')
 #options(repos = repo)
 #rm(repo)
 
+# 2022.06.12 Freetesting - Suffolk MSM
+Suf <- orders[(orders$Default.LA=='Freetesting - Suffolk'),]
+table(Suf$Dispatched.at.month.year)
+table(Suf$Gender,Suf$Sexual.preference)
+table(Suf$Gender.Identity,Suf$Sexual.preference)
+table(Suf$Genitals,Suf$Sexual.preference)
+
+write.table (Suf, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.06.12.Suffolk.csv", row.names=F, sep=",")
+
+
+# 2022.06.14 Nottingham
+Nott <- orders[(orders$Default.LA == 'Nottingham'),]
+table(Nott$Dispatched.at.month.year)
+
+
+#########################
 
 install.packages("tidyverse",dependencies=TRUE)
 
