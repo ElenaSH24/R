@@ -794,6 +794,27 @@ write.table (Suf, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc
 Nott <- orders[(orders$Default.LA == 'Nottingham'),]
 table(Nott$Dispatched.at.month.year)
 
+# 2022.06.15 check if LA of Residence is being populated in May 2022
+residence <- orders[(orders$Dispatched.at.month.year == "2022-05"),]
+
+hill <- orders[(orders$Dispatched.at.month.year == "2022-04" & 
+                   orders$Default.LA == "Hillingdon"),]
+table(hill$LA.of.residence)
+
+
+# 2022.06.20 HIV reactives from Manchester, Salford, Bolton, Trafford, Stockport, Tameside, Oldham, Rochdale, Bury & Wigan
+# Dates: 2019 - End Sept 2021
+Stuart <- orders[(orders$Default.LA == "Freetesting - Bolton" | orders$Default.LA == "Freetesting - Bury" |
+                    orders$Default.LA == "Freetesting - Manchester" |orders$Default.LA == "Freetesting - Oldham" |
+                    orders$Default.LA == "Freetesting - Rochdale" |orders$Default.LA == "Freetesting - Salford" |
+                    orders$Default.LA == "Freetesting - Stockport" |orders$Default.LA == "Freetesting - Tameside" |
+                    orders$Default.LA == "Freetesting - Trafford" |orders$Default.LA == "Freetesting - Wigan" ),]
+
+
+write.table (Stuart, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.06.20_freetesting_Stuart.csv", row.names=F, sep=",")
+
+
+
 
 #########################
 
