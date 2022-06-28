@@ -83,8 +83,8 @@ invCOC$Description <- paste("Contraception COC",invCOC$Months.prescribed,"mth",i
 invPOP$Description <- paste("Contraception POP",invPOP$Months.prescribed,"mth",invPOP$Drug)
 invEC$Description <- paste("Contraception EC",invEC$Drug)
 invInjectable$Description <- paste('Contraception Sayana Press 104mg / 0.65ml',invInjectable$Injectable.months.prescribed,"mth")
-invPatch$Description <- paste('Contraception Evra Patch',invPatch$Patch.months.prescribed,"mth")
-invRing$Description <- paste('Contraception Nuva Ring',invRing$Ring.months.prescribed,"mth")
+invPatch$Description <- paste('Contraception Patch',invPatch$Patch.months.prescribed,"mth")
+invRing$Description <- paste('Contraception Ring',invRing$Ring.months.prescribed,"mth")
 
               
 # rename (new variable name = existing variable name) to have same names in all data frames----
@@ -417,12 +417,12 @@ Description <- c('Orders - All STIs (dual site)','Orders - All STIs (single site
               'Photo Treatments 3030 Condyline',
               'RPR Syphilis tests dispatched',
               'RPR Syphilis tests processed',
-              'Contraception Nuva Ring 3 mth',
-              'Contraception Nuva Ring 6 mth',
-              'Contraception Nuva Ring 12 mth',
-              'Contraception Evra Patch 3 mth',
-              'Contraception Evra Patch 6 mth',
-              'Contraception Evra Patch 12 mth',
+              'Contraception Ring 3 mth',
+              'Contraception Ring 6 mth',
+              'Contraception Ring 12 mth',
+              'Contraception Patch 3 mth',
+              'Contraception Patch 6 mth',
+              'Contraception Patch 12 mth',
               'Contraception Sayana Press 104mg / 0.65ml 3 mth',
               'Contraception Sayana Press 104mg / 0.65ml 6 mth',
               'Contraception Sayana Press 104mg / 0.65ml 12 mth')
