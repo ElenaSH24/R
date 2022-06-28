@@ -51,8 +51,8 @@ Ring = read.csv("20220606_Ring.csv")
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
 reactivity = read.csv("20210506_Reactivity_levels_PHE.csv")
 
-FranECNow = read.csv("20220301_ECNow_disaggregated.csv")
-FranECFut = read.csv("20220301_ECFuture_disaggregat.csv")
+FranECNow = read.csv("20220606_ECNow_disaggregated.csv")
+FranECFut = read.csv("20220606_ECFuture_disaggregat.csv")
 
 LSOA = read.csv("Lower_Layer_Super_Output_Area_(2011)_to_Ward_(2019)_Lookup_in_England_and_Wales.csv") # England and Wales
 
@@ -287,8 +287,6 @@ BackingMin_noSH24 <- OrdersToWork[,c('Customer.ID','Reason.for.visit','LSOA.name
 
 
 
-
-
 ### Slack with Justin 2021: SHALL WE ADD DISTRIBUTION CENTER & METHOD TO ALL AREAS?!?!?!?!
 
 
@@ -299,9 +297,26 @@ class(Data_Buckinghamshire$Created.at)
 Data_Buckinghamshire$Created.at <- as.Date(Data_Buckinghamshire$Created.at, format = "%Y-%m-%d")
 Data_Buckinghamshire <- Data_Buckinghamshire[(Data_Buckinghamshire$Created.at > "2020-12-31"),]
 
-Data_Cornwall <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Cornwall and Isles of Scilly PCT"
-                                     | BackingMin_noSH24$Default.LA=="Southend-on-Sea"
-                                     |BackingMin_noSH24$Default.LA=="Blackburn with Darwen"),]
+
+### REMOVE 22th 06 2022 Data_Cornwall <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Cornwall and Isles of Scilly PCT"
+###                                  | BackingMin_noSH24$Default.LA=="Southend-on-Sea"
+###                                  |BackingMin_noSH24$Default.LA=="Blackburn with Darwen"),]
+
+# 2022.06.22 Include Hep.B and Hep.C in Cornwall (Blackburn request - Dimitrious email)
+Data_Cornwall <- OrdersToWork [(OrdersToWork$Default.LA=="Cornwall and Isles of Scilly PCT"| OrdersToWork$Default.LA=="Southend-on-Sea"
+                                     |OrdersToWork$Default.LA=="Blackburn with Darwen"),
+                                    c('Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
+                                      'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                                      'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.5.days',
+                                      'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                                      'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                                      'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
+                                      "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at","Previously.diagnosed.with.HIV",
+                                      "Prep.user","Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                                      "Previously.treated.for.Syphilis",
+                                      'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C',"Test.for.Syphilis.RPR")]
+
+
 Data_Hillingdon <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Hillingdon"),]
 
 #Data_Medway <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Medway"),]
