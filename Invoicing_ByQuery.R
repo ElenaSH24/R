@@ -1,16 +1,12 @@
-# producing Xero file
+# Script to produce Xero file
 
-# read STI orders, CT treatment, contraception and photo diagnosis files from backing data
-
-# specific files for invoicing:
-invSTI = read.csv("20220606_Invoicing.csv")
-bolts = read.csv("20220606_EC_Now_boltons_Disaggregated.csv")
+# read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2022-05'               #v1: reporting month
-v2 <- '01.05.2022-31.05.2022' #v2: activity period being invoiced
-v3 <- "31/05/2022"            #v3: InvoiceDate
-v4 <- "30/06/2022"            #v4: DueDate
+v1 <- '2022-07'               #v1: reporting month
+v2 <- '01.07.2022-31.07.2022' #v2: activity period being invoiced
+v3 <- "31/07/2022"            #v3: InvoiceDate
+v4 <- "31/08/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -130,23 +126,6 @@ invPDTreatm <- rename(invPDTreatm, default_la = name, MonthYear = dispatched_mon
 invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
 
-# Include bolt-ons
-invBolts <- bolts[ , c("Dispatched.MthYr.EC.Now","Region","Any.bolt.ons.")]
-# count only prescriptions that have been dispatched
-invBolts <- invBolts[(invBolts$Dispatched.MthYr.EC.Now != "" & invBolts$Any.bolt.ons. != ""),]
-# create variable 'Description'
-table(invBolts$Any.bolt.ons.)
-
-invBolts$Description <- 0
-invBolts$Description[invBolts$Any.bolt.ons. == "pop"] <- "POP bolt-on Desogestrel 3 months"
-invBolts$Description[invBolts$Any.bolt.ons. == "condoms"] <- "Bolt-on condoms"
-invBolts$Description[invBolts$Any.bolt.ons. == "lube"] <- "Bolt-on lube"
-invBolts$Description[invBolts$Any.bolt.ons. == "pregnancy test"] <- "Bolt-on pregnancy test"
-invBolts$Description[invBolts$Any.bolt.ons. == "sti test"] <- "Bolt-on STI test"
-# rename (new variable name = existing variable name) to have same names in all data frames
-invBolts <- rename(invBolts, default_la = Region, MonthYear = Dispatched.MthYr.EC.Now)
-# drop columns no needed
-invBolts$Any.bolt.ons. = NULL
 
 # Count of RPR kits
 # kits dispatched that include Syphilis RPR in reporting month = v1----
@@ -181,11 +160,12 @@ names(RPR.Dispatched)
 names(RPR.Returned)
 names(invPDConsult)
 names(invPDTreatm)
-names(invBolts)
+#names(invBolts)
 
 
 # Stack data sets one on top of the other ----
-invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Dispatched,RPR.Returned,invPDConsult,invPDTreatm,invBolts)
+invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Dispatched,RPR.Returned,invPDConsult,invPDTreatm)
+
 
 # check
 #### testinvoicing <- as.data.frame(table(invoicing$Description, invoicing$MonthYear == v1))  
@@ -236,65 +216,90 @@ colnames(invMonth_1)[2] <- "Description"
 colnames(invMonth_1)[3] <- "Quantity"
 
 
+# Include bolt-ons ----
+invBolts <- bolts
+# concatenate year and month
+invBolts$MonthYear <- paste(invBolts$year, invBolts$month, sep="-")
+# extract MonthYear = relevant month
+invBolts <- invBolts[(invBolts$MonthYear == '2022-7'),]
+# rename (new variable name = existing variable name) to have same names in all data frames
+invBolts <- rename(invBolts, ContactName = region_name, Description = product_name, Quantity = count)
+# name bolt-ons as per invoicing categories
+invBolts$Description[invBolts$Description == "pop"] <- "POP bolt-on Desogestrel 3 months"
+invBolts$Description[invBolts$Description == "condoms"] <- "Bolt-on condoms"
+invBolts$Description[invBolts$Description == "lube"] <- "Bolt-on lube"
+invBolts$Description[invBolts$Description == "pregnancy test"] <- "Bolt-on pregnancy test"
+invBolts$Description[invBolts$Description == "sti test"] <- "Bolt-on STI test"
+# delete not-needed variables
+invBolts$year = NULL
+invBolts$month = NULL
+invBolts$parent_order_type = NULL
+invBolts$MonthYear = NULL
+# END Include bolt-ons ----
+
+# Stack the boltons to the rest of the invoicing ----
+invMonth_2 <- rbind(invMonth_1,invBolts)
+
+
 # create invoice number column----
 # first half of the invoice number is the month
-invMonth_1$Invoice <- 'Inv '
+invMonth_2$Invoice <- 'Inv '
 # second half of the invoice number is associated to the specific Trust/Region, which we call ContactName in this script
-invMonth_1$Number <- ""
-invMonth_1$Number[invMonth_1$ContactName == "Essex"] <- "0001"
-invMonth_1$Number[invMonth_1$ContactName == "Shropshire"] <- "0002"
-invMonth_1$Number[invMonth_1$ContactName == "Telford and Wrekin"] <- "0003"
-invMonth_1$Number[invMonth_1$ContactName == "Worcestershire"] <- "0005"
-invMonth_1$Number[invMonth_1$ContactName == "London Northwest Healthcare"] <- "0006"
-invMonth_1$Number[invMonth_1$ContactName == "County Durham and Darlington NHS Foundation Trust"] <- "0007"
-invMonth_1$Number[invMonth_1$ContactName == "Derbyshire Community Health Services NHS Foundation Trust"] <- "0008"
-invMonth_1$Number[invMonth_1$ContactName == "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"] <- "0009"
-invMonth_1$Number[invMonth_1$ContactName == "Hertfordshire"] <- "00010"
-invMonth_1$Number[invMonth_1$ContactName == "Hertfordshire hertstestyourself Council"] <- "00011"
-invMonth_1$Number[invMonth_1$ContactName == "Berkshire"] <- "00012"
-invMonth_1$Number[invMonth_1$ContactName == "Bradford"] <- "00013"
-invMonth_1$Number[invMonth_1$ContactName == "Knowsley"] <- "00014"
-invMonth_1$Number[invMonth_1$ContactName == "Darlington"] <- "00015"
-invMonth_1$Number[invMonth_1$ContactName == "Leicester City"] <- "00016"
-invMonth_1$Number[invMonth_1$ContactName == "Rutland"] <- "00017"
-invMonth_1$Number[invMonth_1$ContactName == "Leicestershire"] <- "00018"
-invMonth_1$Number[invMonth_1$ContactName == "Derby City"] <- "00019"
-invMonth_1$Number[invMonth_1$ContactName == "North Staffordshire"] <- "00020"
-invMonth_1$Number[invMonth_1$ContactName == "Gateshead"] <- "00021"
-invMonth_1$Number[invMonth_1$ContactName == "Cheshire East"] <- "00022"
-invMonth_1$Number[invMonth_1$ContactName == "Halton"] <- "00023"
-invMonth_1$Number[invMonth_1$ContactName == "Warrington"] <- "00024"
-invMonth_1$Number[invMonth_1$ContactName == "Northern Ireland"] <- "00025"
-invMonth_1$Number[invMonth_1$ContactName == "UKHSA"] <- "00026"
-invMonth_1$Number[invMonth_1$ContactName == "Cornwall and Isles of Scilly"] <- "00027"
-invMonth_1$Number[invMonth_1$ContactName == "Liverpool"] <- "00028"
-invMonth_1$Number[invMonth_1$ContactName == "Stoke on Trent"] <- "00029"
-invMonth_1$Number[invMonth_1$ContactName == "Sunderland"] <- "00030"
-invMonth_1$Number[invMonth_1$ContactName == "Nottingham City Council"] <- "00031"
-invMonth_1$Number[invMonth_1$ContactName == "Buckinghamshire"] <- "00032"
-invMonth_1$Number[invMonth_1$ContactName == "Dorset"] <- "00033"
-invMonth_1$Number[invMonth_1$ContactName == "Kirklees"] <- "00035"
-invMonth_1$Number[invMonth_1$ContactName == "South Tyneside"] <- "00036"
-invMonth_1$Number[invMonth_1$ContactName == "East Sussex"] <- "00037"
-invMonth_1$Number[invMonth_1$ContactName == "UKHSA PrEP Trial"] <- "00038"
-invMonth_1$Number[invMonth_1$ContactName == "Bromley"] <- "00039"
-invMonth_1$Number[invMonth_1$ContactName == "Blackburn"] <- "00040"
-invMonth_1$Number[invMonth_1$ContactName == "Southend"] <- "00041"
-invMonth_1$Number[invMonth_1$ContactName == "Teesside"] <- "00042"
-invMonth_1$Number[invMonth_1$ContactName == "Thurrock"] <- "00043"
-invMonth_1$Number[invMonth_1$ContactName == "Wirral"] <- "0056"
-invMonth_1$Number[invMonth_1$ContactName == "Rotherham"] <- "0057"
-invMonth_1$Number[invMonth_1$ContactName == "Stockport"] <- "0058"
-invMonth_1$Number[invMonth_1$ContactName == "Tameside"] <- "0059"
-invMonth_1$Number[invMonth_1$ContactName == "Orbish"] <- "0060"
+invMonth_2$Number <- ""
+invMonth_2$Number[invMonth_2$ContactName == "Essex"] <- "0001"
+invMonth_2$Number[invMonth_2$ContactName == "Shropshire"] <- "0002"
+invMonth_2$Number[invMonth_2$ContactName == "Telford and Wrekin"] <- "0003"
+invMonth_2$Number[invMonth_2$ContactName == "Worcestershire"] <- "0005"
+invMonth_2$Number[invMonth_2$ContactName == "London Northwest Healthcare"] <- "0006"
+invMonth_2$Number[invMonth_2$ContactName == "County Durham and Darlington NHS Foundation Trust"] <- "0007"
+invMonth_2$Number[invMonth_2$ContactName == "Derbyshire Community Health Services NHS Foundation Trust"] <- "0008"
+invMonth_2$Number[invMonth_2$ContactName == "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"] <- "0009"
+invMonth_2$Number[invMonth_2$ContactName == "Hertfordshire"] <- "00010"
+invMonth_2$Number[invMonth_2$ContactName == "Hertfordshire hertstestyourself Council"] <- "00011"
+invMonth_2$Number[invMonth_2$ContactName == "Berkshire"] <- "00012"
+invMonth_2$Number[invMonth_2$ContactName == "Bradford"] <- "00013"
+invMonth_2$Number[invMonth_2$ContactName == "Knowsley"] <- "00014"
+invMonth_2$Number[invMonth_2$ContactName == "Darlington"] <- "00015"
+invMonth_2$Number[invMonth_2$ContactName == "Leicester City"] <- "00016"
+invMonth_2$Number[invMonth_2$ContactName == "Rutland"] <- "00017"
+invMonth_2$Number[invMonth_2$ContactName == "Leicestershire"] <- "00018"
+invMonth_2$Number[invMonth_2$ContactName == "Derby City"] <- "00019"
+invMonth_2$Number[invMonth_2$ContactName == "North Staffordshire"] <- "00020"
+invMonth_2$Number[invMonth_2$ContactName == "Gateshead"] <- "00021"
+invMonth_2$Number[invMonth_2$ContactName == "Cheshire East"] <- "00022"
+invMonth_2$Number[invMonth_2$ContactName == "Halton"] <- "00023"
+invMonth_2$Number[invMonth_2$ContactName == "Warrington"] <- "00024"
+invMonth_2$Number[invMonth_2$ContactName == "Northern Ireland"] <- "00025"
+invMonth_2$Number[invMonth_2$ContactName == "UKHSA"] <- "00026"
+invMonth_2$Number[invMonth_2$ContactName == "Cornwall and Isles of Scilly"] <- "00027"
+invMonth_2$Number[invMonth_2$ContactName == "Liverpool"] <- "00028"
+invMonth_2$Number[invMonth_2$ContactName == "Stoke on Trent"] <- "00029"
+invMonth_2$Number[invMonth_2$ContactName == "Sunderland"] <- "00030"
+invMonth_2$Number[invMonth_2$ContactName == "Nottingham City Council"] <- "00031"
+invMonth_2$Number[invMonth_2$ContactName == "Buckinghamshire"] <- "00032"
+invMonth_2$Number[invMonth_2$ContactName == "Dorset"] <- "00033"
+invMonth_2$Number[invMonth_2$ContactName == "Kirklees"] <- "00035"
+invMonth_2$Number[invMonth_2$ContactName == "South Tyneside"] <- "00036"
+invMonth_2$Number[invMonth_2$ContactName == "East Sussex"] <- "00037"
+invMonth_2$Number[invMonth_2$ContactName == "UKHSA PrEP Trial"] <- "00038"
+invMonth_2$Number[invMonth_2$ContactName == "Bromley"] <- "00039"
+invMonth_2$Number[invMonth_2$ContactName == "Blackburn"] <- "00040"
+invMonth_2$Number[invMonth_2$ContactName == "Southend"] <- "00041"
+invMonth_2$Number[invMonth_2$ContactName == "Teesside"] <- "00042"
+invMonth_2$Number[invMonth_2$ContactName == "Thurrock"] <- "00043"
+invMonth_2$Number[invMonth_2$ContactName == "Wirral"] <- "0056"
+invMonth_2$Number[invMonth_2$ContactName == "Rotherham"] <- "0057"
+invMonth_2$Number[invMonth_2$ContactName == "Stockport"] <- "0058"
+invMonth_2$Number[invMonth_2$ContactName == "Tameside"] <- "0059"
+invMonth_2$Number[invMonth_2$ContactName == "Orbish"] <- "0060"
 
 
 # create InvoiceNumber as concatenate of 'Invoice' and 'Number'
-invMonth_1$InvoiceNumber <- paste(invMonth_1$Invoice, v1, invMonth_1$Number, sep=" ")
+invMonth_2$InvoiceNumber <- paste(invMonth_2$Invoice, v1, invMonth_2$Number, sep=" ")
 
 # remove columns no needed anymore
-invMonth_1$Invoice = NULL
-invMonth_1$Number = NULL
+invMonth_2$Invoice = NULL
+invMonth_2$Number = NULL
 
 
 # REMOVE AS TARAN INCLUDES THE PO IN EACH INVOICE - DISCUSS WITH BLAKE
@@ -322,23 +327,24 @@ invMonth_1$Number = NULL
 # invMonth_1$PO[invMonth_1$ContactName == "Warrington"] <- "PO RQ6N400039417"
 
 # create reference. Use 'Region' instead of 'ContactName' as a better reference to our records
-invMonth_1$Reference <- paste("SH:24 ",invMonth_1$ContactName, "activity", v2)
+invMonth_2$Reference <- paste("SH:24 ",invMonth_2$ContactName, "activity", v2)
 # invoice dates----
-invMonth_1$InvoiceDate <- v3
-invMonth_1$DueDate <- v4
+invMonth_2$InvoiceDate <- v3
+invMonth_2$DueDate <- v4
 
         
 # remove dataframe rows based on zero values in one column
-invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
+invMonth_3 <- invMonth_2[invMonth_2$Quantity != 0, ]
 # export to check figures 
-write.table (invMonth_2, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\Check_Xero_Quantities_2022.May_v1.csv", row.names=F, sep=",")
+# use ~ to avoid portability issues when defining Home Directory
+write.table (invMonth_3, file="~/Reports/1.Monthly_Reports/Invoicing/2022_07/Check_Xero_Quantities_2022.07.csv", row.names=F, sep=",")
 
 
 
 #remove Description = blank (those are the returns that came with a lab_error, we don't charge for them)
-invMonth_2 <- invMonth_2[invMonth_2$Description != 'blank', ]
+invMonth_3 <- invMonth_3[invMonth_3$Description != 'blank', ]
 #remove Medway invoice
-invMonth_2 <- invMonth_2[(invMonth_2$ContactName != 'Medway'), ]
+invMonth_3 <- invMonth_3[(invMonth_3$ContactName != 'Medway'), ]
 
 
 # create price data frames
@@ -528,44 +534,44 @@ fee0 <- data.frame(Description, FeeZero)
 
 
 # break down the main invoicing data set as per the fee contracted in each area 
-InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$ContactName=="Bromley"
-                        | invMonth_2$ContactName=="Cheshire East" | invMonth_2$ContactName=="Cornwall and Isles of Scilly"
-                        | invMonth_2$ContactName=="County Durham and Darlington NHS Foundation Trust" | invMonth_2$ContactName=="Darlington"
-                        | invMonth_2$ContactName=="Derby City" | invMonth_2$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
-                        | invMonth_2$ContactName=="Dorset" | invMonth_2$ContactName=="Halton"
-                        | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"
-                        | invMonth_2$ContactName=="UKHSA" | invMonth_2$ContactName=="Southend"  
-                        | invMonth_2$ContactName=="Warrington" | invMonth_2$ContactName=="East Sussex" | invMonth_2$ContactName=="Teesside"  | invMonth_2$ContactName=="Orbish"
-                        | invMonth_2$ContactName=="Hertfordshire" 
-                        | invMonth_2$ContactName=="Bury" | invMonth_2$ContactName=="Rochdale" | invMonth_2$ContactName=="Oldham"),]
+InvFee1 <- invMonth_3 [(invMonth_3$ContactName=="Blackburn" | invMonth_3$ContactName=="Bromley"
+                        | invMonth_3$ContactName=="Cheshire East" | invMonth_3$ContactName=="Cornwall and Isles of Scilly"
+                        | invMonth_3$ContactName=="County Durham and Darlington NHS Foundation Trust" | invMonth_3$ContactName=="Darlington"
+                        | invMonth_3$ContactName=="Derby City" | invMonth_3$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
+                        | invMonth_3$ContactName=="Dorset" | invMonth_3$ContactName=="Halton"
+                        | invMonth_3$ContactName=="Knowsley" | invMonth_3$ContactName=="Liverpool"
+                        | invMonth_3$ContactName=="UKHSA" | invMonth_3$ContactName=="Southend"  
+                        | invMonth_3$ContactName=="Warrington" | invMonth_3$ContactName=="East Sussex" | invMonth_3$ContactName=="Teesside"  | invMonth_3$ContactName=="Orbish"
+                        | invMonth_3$ContactName=="Hertfordshire" 
+                        | invMonth_3$ContactName=="Bury" | invMonth_3$ContactName=="Rochdale" | invMonth_3$ContactName=="Oldham"),]
 
-InvFee2 <- invMonth_2 [(invMonth_2$ContactName=="Gateshead" | invMonth_2$ContactName=="Glasgow" 
-                        | invMonth_2$ContactName=="London Northwest Healthcare" | invMonth_2$ContactName=="South Tyneside" 
-                        | invMonth_2$ContactName=="Sunderland" | invMonth_2$ContactName=="Worcestershire"
+InvFee2 <- invMonth_3 [(invMonth_3$ContactName=="Gateshead" | invMonth_3$ContactName=="Glasgow" 
+                        | invMonth_3$ContactName=="London Northwest Healthcare" | invMonth_3$ContactName=="South Tyneside" 
+                        | invMonth_3$ContactName=="Sunderland" | invMonth_3$ContactName=="Worcestershire"
                         ) , ]
 
-InvFee3 <- invMonth_2 [(invMonth_2$ContactName=="Berkshire"),]
+InvFee3 <- invMonth_3 [(invMonth_3$ContactName=="Berkshire"),]
 
-InvFee4 <- invMonth_2 [(invMonth_2$ContactName=="Leicester City" | invMonth_2$ContactName=="Leicestershire"
-                        | invMonth_2$ContactName=="North Staffordshire" | invMonth_2$ContactName=="Rutland"
-                        | invMonth_2$ContactName=="Shropshire" | invMonth_2$ContactName=="South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
-                        | invMonth_2$ContactName=="Stoke on Trent" | invMonth_2$ContactName=="Telford and Wrekin") ,]
+InvFee4 <- invMonth_3 [(invMonth_3$ContactName=="Leicester City" | invMonth_3$ContactName=="Leicestershire"
+                        | invMonth_3$ContactName=="North Staffordshire" | invMonth_3$ContactName=="Rutland"
+                        | invMonth_3$ContactName=="Shropshire" | invMonth_3$ContactName=="South Staffordshire and Shropshire Healthcare NHS Foundation Trust"
+                        | invMonth_3$ContactName=="Stoke on Trent" | invMonth_3$ContactName=="Telford and Wrekin") ,]
 
 # freetesting done separately
-InvFee5 <- invMonth_2 [(invMonth_2$ContactName=="Freetesting"),] 
+InvFee5 <- invMonth_3 [(invMonth_3$ContactName=="Freetesting"),] 
 
-InvFee6 <- invMonth_2 [(invMonth_2$ContactName=="Buckinghamshire" | invMonth_2$ContactName=="Northern Ireland"
-                        | invMonth_2$ContactName=="Rotherham" | invMonth_2$ContactName=="Stockport" | invMonth_2$ContactName=="Tameside"),]
+InvFee6 <- invMonth_3 [(invMonth_3$ContactName=="Buckinghamshire" | invMonth_3$ContactName=="Northern Ireland"
+                        | invMonth_3$ContactName=="Rotherham" | invMonth_3$ContactName=="Stockport" | invMonth_3$ContactName=="Tameside"),]
 
-InvFee7 <- invMonth_2 [(invMonth_2$ContactName=="Essex" | invMonth_2$ContactName=="Thurrock" | invMonth_2$ContactName=="Wirral"
-                        | invMonth_2$ContactName=="Bradford" | invMonth_2$ContactName=="Kirklees" 
-                          | invMonth_2$ContactName=="Nottingham City Council"),]
+InvFee7 <- invMonth_3 [(invMonth_3$ContactName=="Essex" | invMonth_3$ContactName=="Thurrock" | invMonth_3$ContactName=="Wirral"
+                        | invMonth_3$ContactName=="Bradford" | invMonth_3$ContactName=="Kirklees" 
+                          | invMonth_3$ContactName=="Nottingham City Council"),]
 
 # some areas not invoiced. Count them anyway to check whole picture
-InvFeeZero <- invMonth_2 [(invMonth_2$ContactName=="Ireland") | (invMonth_2$ContactName=="Romania") | (invMonth_2$ContactName=="Fettle")
-                        | (invMonth_2$ContactName == "Medway"),]
+InvFeeZero <- invMonth_3 [(invMonth_3$ContactName=="Ireland") | (invMonth_3$ContactName=="Romania") | (invMonth_3$ContactName=="Fettle")
+                        | (invMonth_3$ContactName == "Medway"),]
 
-# check that sum of the invoices grouped equals total of invoicing in file invMonth_2:
+# check that sum of the invoices grouped equals total of invoicing in file invMonth_3:
 nrow(InvFee1)
 nrow(InvFee2)
 nrow(InvFee3)
@@ -640,4 +646,5 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_05\\20220613_Xero_May_test.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022_07/20220808_Xero_July.csv", row.names=F, sep=",")
+
