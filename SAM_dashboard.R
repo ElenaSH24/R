@@ -1,9 +1,11 @@
 # upload dplyr package for function: left_join
 
 # set working directory
-setwd("~/Documents/Reports/1.Monthly_Reports/SAM")
 
-SAM_Original = read.csv("SAM_orders_20220111_0112.csv")
+setwd("~/Reports/1.Monthly_Reports/SAM")
+
+
+SAM_Original = read.csv("SAM_orders_20220808_0117.csv")
 
 #clean up the environment
 rm(list = ls())
@@ -27,6 +29,20 @@ SAMOrdersFile$Lab.receipt_FormatDate <- as.Date(SAMOrdersFile$Lab.receipt, "%Y-%
 SAMOrdersFile$Lab.results_FormatDate <- as.Date(SAMOrdersFile$Lab.results..returned.kit.samples., "%Y-%m-%d")
 SAMOrdersFile$Notified_FormatDate <- as.Date(SAMOrdersFile$Notified, "%Y-%m-%d")
 
+#### For Aug.2022 submission to Gillian: exclude orders before 01.08.2021
+# SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Created_MonthYear!="2021-02"),]
+class(SAMOrdersFile$Created_FormatDate)
+
+SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Created.at..date.of.registration.order. >= "2021-08-01" &
+                                  SAMOrdersFile$Created.at..date.of.registration.order. <= "2022-07-31"),]
+# DELETE? SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Consultation..date. >= "2021-08-01" & SAMOrdersFile$Consultation..date. <= "2022-07-31"),]
+# DELETE? SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Dispatched.date >= "2021-08-01" & SAMOrdersFile$Dispatched.date <= "2022-07-31"),]
+# DELETE? SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Lab.receipt >= "2021-08-01" & SAMOrdersFile$Lab.receipt <= "2022-07-31"),]
+# DELETE? SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Lab.results..returned.kit.samples. >= "2021-08-01" & SAMOrdersFile$Lab.results..returned.kit.samples. <= "2022-07-31"),]
+# DELETE? SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Notified >= "2021-08-01" & SAMOrdersFile$Notified <= "2022-07-31"),]
+
+
+
 #create MonthYear columns. class will be "character" ----
 SAMOrdersFile$Created_MonthYear <- format(SAMOrdersFile$Created_FormatDate, "%Y-%m")
 SAMOrdersFile$Consultation_MonthYear <- format(SAMOrdersFile$Consultation_FormatDate, "%Y-%m")
@@ -40,6 +56,8 @@ SAMOrdersFile$TOT.dispatched.created <- SAMOrdersFile$Dispatched_FormatDate - SA
 SAMOrdersFile$TOT.Notified.LabReceipt <- SAMOrdersFile$Notified_FormatDate - SAMOrdersFile$Lab.receipt_FormatDate
 
 table(SAMOrdersFile$TOT.dispatched.created)
+
+
 
 #### ONLY 17th.02.2021 submission to Gillian: exclude February 2021 orders 
 # SAMOrdersFile <- SAMOrdersFile[(SAMOrdersFile$Created_MonthYear!="2021-02"),]
@@ -130,8 +148,16 @@ SAMOrdered <- SAMOrdersFile [c("Created.at..date.of.registration.order.","Create
                                "Chlamydia","Gonorrhoea","Syphilis","HIV","Processing.errors",
                                "Last.STI.test","How.did.you.hear.about.SAM","Previous.HIV.diagnosis","Previous.Syphilis.diagnosis","Incoming.SMS","Did.not.return.flag")]
 
-#export data to csv. Use double \\ when setting destination file----
-write.table (SAMOrdered, file="/Users/ElenaArdines1/Documents/Reports/1.Monthly_Reports/SAM/SAM_RFile_NewDate_v1.csv", row.names=F, sep=",")
+#export data to csv----
+        outcome <- file.path("~","Reports","1.Monthly_Reports","SAM")
+        fileName = paste(outcome, 'SAM_RFile_v1.csv',sep = '')
+        write.table(SAMOrdered,fileName)
+
+write.table (SAMOrdered, file="~/Reports/1.Monthly_Reports/SAM/SAM_RFile_FromAug2021.csv", row.names=F, sep=",")
+
+
+
+
 
 ######REPEAT USERS----
 #To be able to work on repeat users, order file in chronological date created, use FormatDate (class = Date)
@@ -220,4 +246,5 @@ table(SAMOrdersFile$Created_MonthYear, useNA = "always")
 (795/(757+795))*100  #2021.Feb: 51.22% Not sure this one is right
 (2473/(739+2473))*100  #2021.Aug: 76.99%
 (3815/(1219+3815))*100  #2022.Jan: 75.78%
-
+(5084/(2624+5084))*100  #2022.Aug: 65.96%
+(1235/(1329+1235))*100  #From Aug.21 to Aug.22: 48.17%
