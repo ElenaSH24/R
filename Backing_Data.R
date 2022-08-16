@@ -10,8 +10,6 @@ install.packages("dplyr")
 # package to work with dates: yearmon
 install.packages("zoo")
 
-
-
 # increasing the available memory for Java
 options(java.parameters = "-Xmx6000m")
 
@@ -31,9 +29,10 @@ path.expand("~")
 # PATH JOIN: gold standard on setting working directory, to avoid syntax issues and address portability concerns (i.e. moving Operating Systems, different languages, etc)
 file.path("~", "Reports","1.Monthly_Reports","Invoicing","2022","2022_04","Xero_Quantities_2022.April_v9.csv")
 
-orders = read.csv("20220802_sti_order_report.csv")
+orders = read.csv("20220810_sti_order_report_v1.csv")
 
 
+table(orders10thAug$Dispatched.at.month.year, orders10thAug$Dispatched.at.month.year =='2022-07')
 
 # REPEATS INVESTIGATION----
 orders = read.csv("20210706_Sti_IncludingRepeats.csv")
@@ -584,13 +583,14 @@ write.table (POP_Cornwall, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.M
 
 # Invoicing backing data Essex----
 invSTIessex <- invSTI[(invSTI$default_la == 'Essex'),]
+invSTIessexThurr <- invSTI[(invSTI$default_la == 'Essex' | invSTI$default_la == 'Thurrock'),]
 # create MonthYear column
-invSTIessex$MonthYear <- as.Date(invSTIessex$processed_at, "%Y-%m-%d")
-invSTIessex$MonthYear <- format(as.Date(invSTIessex$MonthYear), "%Y-%m")
+invSTIessexThurr$MonthYear <- as.Date(invSTIessexThurr$processed_at, "%Y-%m-%d")
+invSTIessexThurr$MonthYear <- format(as.Date(invSTIessexThurr$MonthYear), "%Y-%m")
 # extract data for reporting month and relevant columns
-invSTIessexMonth <- invSTIessex[(invSTIessex$MonthYear == v1), c("overall_type","default_la","repeat_kit","processed_at","MonthYear","invoice_category_all","invoice_category_billable")]  
+invSTIessexThurrMonth <- invSTIessexThurr[(invSTIessexThurr$MonthYear == v1), c("overall_type","default_la","repeat_kit","processed_at","MonthYear","invoice_category_all","invoice_category_billable")]  
 
-write.table (invSTIessexMonth, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022.07_invoic_Essex.csv", row.names=F, sep=",")
+write.table (invSTIessexThurrMonth, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022.07_invoic_EssexThurrock.csv", row.names=F, sep=",")
 # END Invoicing backing data Essex
 
 
