@@ -582,7 +582,6 @@ write.table (POP_Cornwall, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.M
 
 
 # Invoicing backing data Essex----
-invSTIessex <- invSTI[(invSTI$default_la == 'Essex'),]
 invSTIessexThurr <- invSTI[(invSTI$default_la == 'Essex' | invSTI$default_la == 'Thurrock'),]
 # create MonthYear column
 invSTIessexThurr$MonthYear <- as.Date(invSTIessexThurr$processed_at, "%Y-%m-%d")
