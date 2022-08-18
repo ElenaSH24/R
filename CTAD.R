@@ -184,5 +184,5 @@ Ctad3Long1 <- Ctad3Long1 [c("Lab_ID","Test_ID","Patient_ID","NHS_Number","NHS_Nu
          ,"Registered_GP_Code","Postcode_Testing_Service","Venue_code","Specimen_Type","Testing_Service_Type","NCSP_Clinic_Code","Specimen_Date","Receipt_date"
          ,"Date_Result_authorised","CT_Result")]
 
-write.table (Ctad3Long1, file="~/Reports/NHS Reports/CTAD/YGMDR_Q2_2022.csv", row.names=F, sep=",")
+write.table (Ctad3Long1, file="~/Reports/NHS Reports/CTAD/2022/YGMDR_Q2_2022.csv", row.names=F, sep=",")
 
