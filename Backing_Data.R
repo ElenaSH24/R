@@ -65,8 +65,8 @@ bolts = read.csv("20220802_Combined_BoltOns.csv")
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
 reactivity = read.csv("20210506_Reactivity_levels_PHE.csv")
 
-FranECNow = read.csv("20220606_ECNow_disaggregated.csv")
-FranECFut = read.csv("20220606_ECFuture_disaggregat.csv")
+FranECNow = read.csv("20220802_ECNow.csv")
+FranECFut = read.csv("20220802_ECFuture.csv")
 
 LSOA = read.csv("Lower_Layer_Super_Output_Area_(2011)_to_Ward_(2019)_Lookup_in_England_and_Wales.csv") # England and Wales
 
@@ -381,7 +381,7 @@ Data_Ireland$S.code = NULL
 Data_Ireland$PrEP.impact.trial.number = NULL
 table(Data_Ireland$Dispatched.at.month.year, Data_Ireland$Default.LA)
 
-write.table (Data_Ireland, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022.07.04_Justin_Ireland_STI.csv", row.names=F, sep=",")
+write.table (Data_Ireland, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022.07.18_Justin_Ireland_STI.csv", row.names=F, sep=",")
 # END Ireland Justin----
 
 #Remove 'Area' from the files (no need to include it)
