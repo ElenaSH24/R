@@ -8,6 +8,7 @@ Orders1$Type <- 'STI'
 # extract only columns needed
 Orders1 <- Orders1[,grep("^created|dispa|customer|SH24.UID|Default|customer|Type",colnames(Orders1),perl = T,value = T,ignore.case = T)] 
 
+
 #merge Orders with Treatments to get the Area
 Treatments1 <- merge(Treatments[,c("sh24_uid","customer_id","created_at","dispatched_at")], Orders1[,c("SH24.UID","Default.LA")]
                      , by.x = "sh24_uid", by.y = "SH24.UID" , all.x = TRUE)
@@ -80,12 +81,9 @@ Fettle.OrdersAndUnique = merge(x = Fettle.OrdersCreated, y = Fettle.Unique, by =
 print(Fettle.OrdersAndUnique)
 
 
-
-
-
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.03.14.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2. Ad-hoc reports/2022.08.18.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 # Cross-product orders
@@ -109,11 +107,21 @@ DataStackFettle_1 <- as.data.frame(table(DataStackFettle$Customer.ID,DataStackFe
 # Fran REPEAT USERS Fettle----
 # To be able to work on repeat users, order file in chronological date, use FormatDate (class = Date)
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
+
+# adjust data to orders created by end of a given month
+v1 <- '2022-03-31'
+class(OrdersRepeat$Created.at)
+OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
+# extract data up to the end of the relevant month
+OrdersRepeat <- OrdersRepeat[(OrdersRepeat$Created.at <= v1),]
+
+
 # Subset for Fettle and dispatched orders (dispatched different than blank)
 FettleDispatched <- OrdersRepeat[(OrdersRepeat$Site == "Fettle Hub" & OrdersRepeat$Dispatched.at != ''),]
 # new data frame with unique (no duplicate) customer IDs
 Fettle.Users = FettleDispatched[!duplicated(FettleDispatched$Customer.ID),]
-# create data frame with Customer.ID grouped (i.e. how many times each Customer.ID shows up) - need package dplyr
+# create data frame with Customer.ID grouped (i.e. how many times each Customer.ID shows up) 
+# load dplyr for function %>%
 Fettle.UsersGrouped <- FettleDispatched %>% group_by(Customer.ID) %>% summarise(How.Many.Times=n())
 # count frequency: those who bought less than twice (= they bought once)
 Bought.Fettle.Once <- Fettle.UsersGrouped[(Fettle.UsersGrouped$How.Many.Times<2),]
@@ -135,14 +143,12 @@ FettleCOC <- ContCOC[ ,c('SH.24.UID','Customer.ID',"Region","Created.at","Create
 FettleCOC <- FettleCOC[(order(as.Date(FettleCOC$Created.at))),]
 # Subset for Fettle and dispatched orders (dispatched different than blank)
 FettleDispatchedCOC <- FettleCOC[(FettleCOC$Region == "Fettle" & FettleCOC$Dispatched.at != ''),]
-# convert Created.at into date to be able to select by date
 
-# # run ONLY if need data only to a certain date----
-# class(FettleDispatchedCOC$Created.at)
-# FettleDispatchedCOC$Created.at <- as.Date(FettleDispatchedCOC$Created.at, format = "%Y-%m-%d")
-# ## run only if need data to a certain date: 
-# FettleDispatchedCOC <- FettleDispatchedCOC[(FettleDispatchedCOC$Created.at < "2020-08-31"),]
-# # END run only if need data only to a certain date----
+# convert Created.at into date to be able to select by date, if need data up to a certain date----
+class(FettleDispatchedCOC$Created.at)
+FettleDispatchedCOC$Created.at <- as.Date(FettleDispatchedCOC$Created.at, format = "%Y-%m-%d")
+FettleDispatchedCOC <- FettleDispatchedCOC[(FettleDispatchedCOC$Created.at <= v1),]
+# END if need data up to a certain date----
 
 
 # new data frame with unique (no duplicate) customer IDs
@@ -163,19 +169,20 @@ nrow(Bought.COC.Three)
 nrow(Bought.COC.FourPlus)
 # END Fran REPEAT USERS COC Fettle----
 
+
+
 # Fran REPEAT USERS POP Fettle----
 FettlePOP <- ContPOP[ ,c('Customer.ID',"Region","Created.at","Created.at.month.year","Dispatched.at")]
 # order files in chronological date, use FormatDate (class = Date)
 FettlePOP <- FettlePOP[(order(as.Date(FettlePOP$Created.at))),]
 # Subset for Fettle and dispatched orders (dispatched different than blank)
 FettleDispatchedPOP <- FettlePOP[(FettlePOP$Region == "Fettle" & FettlePOP$Dispatched.at != ''),]
-# convert Created.at into date to be able to select by date
 
-# # run ONLY if need data only to a certain date----
-# class(FettleDispatchedPOP$Created.at)
-# FettleDispatchedPOP$Created.at <- as.Date(FettleDispatchedPOP$Created.at, format = "%Y-%m-%d")
-# FettleDispatchedPOP <- FettleDispatchedPOP[(FettleDispatchedPOP$Created.at < "2020-08-31"),]
-# # END run only if need data only to a certain date----
+# convert Created.at into date to be able to select by date, if need data up to a certain date----
+class(FettleDispatchedPOP$Created.at)
+FettleDispatchedPOP$Created.at <- as.Date(FettleDispatchedPOP$Created.at, format = "%Y-%m-%d")
+FettleDispatchedPOP <- FettleDispatchedPOP[(FettleDispatchedPOP$Created.at <= v1),]
+# END if need data up to a certain date----
 
 # new data frame with unique (no duplicate) customer IDs
 FettlePOP.Users = FettleDispatchedPOP[!duplicated(FettleDispatchedPOP$Customer.ID),]
@@ -196,6 +203,8 @@ nrow(Bought.POP.Three)
 nrow(Bought.POP.FourPlus)
 # END Fran REPEAT USERS POP Fettle----
 
+
+
 # Fran REPEAT USERS EC Fettle----
 FettleECNow <- FranECNow[ ,c('customer_id',"Region","Created.at","Dispatched.at")]
 FettleECFuture <- FranECFut[ ,c('customer_id',"Region","Created.at","Dispatched.at")]
@@ -205,6 +214,13 @@ FettleEC <- rbind(FettleECNow,FettleECFuture)
 FettleEC <- FettleEC[(order(as.Date(FettleEC$Created.at))),]
 # Subset for Fettle and dispatched orders (dispatched different than blank)
 FettleDispatchedEC <- FettleEC[(FettleEC$Region == "Fettle" & FettleEC$Dispatched.at != ''),]
+
+# convert Created.at into date to be able to select by date, if need data up to a certain date----
+class(FettleDispatchedEC$Created.at)
+FettleDispatchedEC$Created.at <- as.Date(FettleDispatchedEC$Created.at, format = "%Y-%m-%d")
+FettleDispatchedEC <- FettleDispatchedEC[(FettleDispatchedEC$Created.at <= v1),]
+# END if need data up to a certain date----
+
 # unique (no duplicate) customer IDs
 FettleEC.Users = FettleDispatchedEC[!duplicated(FettleDispatchedEC$customer_id),]
 # create data frame with Customer.ID grouped (i.e. how many times each Customer.ID shows up) - need package dplyr
@@ -814,6 +830,11 @@ Stuart <- orders[(orders$Default.LA == "Freetesting - Bolton" | orders$Default.L
 write.table (Stuart, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.06.20_freetesting_Stuart.csv", row.names=F, sep=",")
 
 
+# 2022.08.25 Blake - freetesting-Hertfordshire offline kits
+ordersFreeHertsOffline <- orders[(orders$Default.LA=='Freetesting - Hertfordshire' & orders$Distribution.method=='offline_kits'),]
+table(ordersFreeHertsOffline$Dispatched.at.month.year)
+
+
 
 
 #########################
@@ -838,8 +859,4 @@ library(forecast)
 
 #run the function library() without arguments, to get the list of packages installed in different libraries on your computer
 library()
-
-
-
-
 
