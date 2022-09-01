@@ -67,8 +67,8 @@ invTreatments <- rename(invTreatments, default_la = Region, MonthYear = Dispatch
 
 
 # Include contraception
-invCOC <- ContCOC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
-invPOP <- ContPOP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
+invCOC <- COC[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
+invPOP <- POP[ , c("Dispatched.at.month.year","Months.prescribed","Drug","Region")]
 invEC <- ECNow[ , c("Region","Dispatched.at.month.year","Drug")]
 invInjectable <- Injectable[ , c("region","Injectable.months.prescribed","Dispatched.Month.Year")]
 invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year")]

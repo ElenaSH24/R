@@ -615,44 +615,44 @@ Summary8 = merge(x = Summary7, y = Safeg, by = "Area", all = TRUE)
 # CONTRACEPTION----
 # Add 'Area' in COC and POP from recoding 'function' in Tab "Saskia_Code_Area.R"
 # Create Area variable in both data sets, for COC and for POP, and set to 0
-ContCOC$Area <- 0
-ContPOP$Area <- 0
+COC$Area <- 0
+POP$Area <- 0
 Injectable$Area <- 0
 Patch$Area <- 0
 Ring$Area <- 0
 
 #run function and save output in Area; important to write your variable names in colons (but not the data frame name)
-ContCOC$Area <- recodeContraception(DF= ContCOC,varname="Area",varname2="Region")
-ContPOP$Area <- recodeContraception(DF= ContPOP,varname="Area",varname2="Region")
+COC$Area <- recodeContraception(DF= COC,varname="Area",varname2="Region")
+POP$Area <- recodeContraception(DF= POP,varname="Area",varname2="Region")
 Injectable$Area <- recodeContraception(DF= Injectable,varname="Area",varname2="region")
 Patch$Area <- recodeContraception(DF= Patch,varname="Area",varname2="region")
 Ring$Area <- recodeContraception(DF= Ring,varname="Area",varname2="region")
-table(ContCOC$Dispatched.at.month.year == v1)
-table(ContPOP$Dispatched.at.month.year == v1)
+table(COC$Dispatched.at.month.year == v1)
+table(POP$Dispatched.at.month.year == v1)
 table(Injectable$Dispatched.Month.Year == v1)
 table(Patch$Dispatched.Month.Year == v1)
 table(Ring$Dispatched.Month.Year == v1)
 
 # CHECK: find out POP prescriptions with no Area, if any (there shouldn't be any!)
-Zero <- ContPOP[(ContPOP$Area==0),]
+Zero <- POP[(POP$Area==0),]
 rm(Zero)
 
 
 # subset for relevant month
 # use Dispatched.MonthYear for COC and POP as date is from signed_prescriptions table and includes roll-backs
-ContCOCMonth <- ContCOC [(ContCOC$Dispatched.at.month.year ==  v1),]
-ContPOPMonth <- ContPOP [(ContPOP$Dispatched.at.month.year == v1),]
+COCMonth <- COC [(COC$Dispatched.at.month.year ==  v1),]
+POPMonth <- POP [(POP$Dispatched.at.month.year == v1),]
 InjectableMonth <- Injectable [(Injectable$Dispatched.Month.Year == v1),]
 PatchMonth <- Patch [(Patch$Dispatched.Month.Year == v1),]
 RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
 
 # and convert into a data frame
-ContCOCMonth1 = as.data.frame(table(ContCOCMonth$Area), useNA = "always")
-colnames(ContCOCMonth1)[1] <- "Area"
-colnames(ContCOCMonth1)[2] <- "COC"
-ContPOPMonth1 = as.data.frame(table(ContPOPMonth$Area), useNA = "always")
-colnames(ContPOPMonth1)[1] <- "Area"
-colnames(ContPOPMonth1)[2] <- "POP"
+COCMonth1 = as.data.frame(table(COCMonth$Area), useNA = "always")
+colnames(COCMonth1)[1] <- "Area"
+colnames(COCMonth1)[2] <- "COC"
+POPMonth1 = as.data.frame(table(POPMonth$Area), useNA = "always")
+colnames(POPMonth1)[1] <- "Area"
+colnames(POPMonth1)[2] <- "POP"
 InjectableMonth = as.data.frame(table(InjectableMonth$Area), useNA = "always")
 colnames(InjectableMonth)[1] <- "Area"
 colnames(InjectableMonth)[2] <- "Injectable"
@@ -663,7 +663,7 @@ RingMonth = as.data.frame(table(RingMonth$Area), useNA = "always")
 colnames(RingMonth)[1] <- "Area"
 colnames(RingMonth)[2] <- "Ring"
 
-Contraception1 = merge(x = ContCOCMonth1, y = ContPOPMonth1, by = "Area", all = TRUE)
+Contraception1 = merge(x = COCMonth1, y = POPMonth1, by = "Area", all = TRUE)
 Contraception2 = merge(x = Contraception1, y = InjectableMonth, by = "Area", all = TRUE)
 Contraception3 = merge(x = Contraception2, y = PatchMonth, by = "Area", all = TRUE)
 Contraception4 = merge(x = Contraception3, y = RingMonth, by = "Area", all = TRUE)
