@@ -7,7 +7,8 @@ library(reshape2)
 
 
 # use ~ as a shortcut to the Home Directory, to avoid portability issues (i.e. changing Operating Systems, versions of R, or programming language)
-setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2022_07")
+setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_08")
+
 
 # to know the destination file used by the language
 path.expand("~")
@@ -19,8 +20,8 @@ orders = read.csv("20220810_sti_order_report_v1.csv")
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
 Treatments = read.csv("20220802_CT_Treatments.csv")
-ContCOC = read.csv("20220802_COC.csv")
-ContPOP = read.csv("20220802_POP.csv")
+COC = read.csv("20220901_COC_slim.csv")
+POP = read.csv("20220901_POP_slim.csv")
 ECFuture = read.csv("20220802_ECFuture.csv")
 ECNow = read.csv("20220802_ECNow.csv")
 PhotoConsult = read.csv("20220802_PD_consultations.csv")
@@ -400,45 +401,35 @@ table(TreatmentsMerge$Area=="Darlington")
 names(TreatmentsMerge)
 write.table (Treatment.Durham.Darlington, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2020\\2020 05\\backing_dataata\\2020.01.Treatment.Durham.Darlington.csv", row.names=F, sep=",")
 
-
-# Backing data CONTRACEPTION----
-COCToWork <- ContCOC[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
-                         "Taken.COC.before.","Ordered.COC.from.SH.24.before.","Ordered.OC.from.SH.24.before.","LSOA.name")]
-
-POPToWork <- ContPOP[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
-                         "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before.","LSOA.name")]
-
-
+# Backing data CONTRACEPTION
 
 # run "recodeContraception" function and save output in Area
-COCToWork$Area <- 0
-COCToWork$Area <- recodeContraception(DF=COCToWork,varname="Area",varname2="Region")
-POPToWork$Area <- 0
-POPToWork$Area <- recodeContraception(DF=POPToWork,varname="Area",varname2="Region")
+COC$Area <- 0
+COC$Area <- recodeContraception(DF=COC,varname="Area",varname2="Region")
+POP$Area <- 0
+POP$Area <- recodeContraception(DF=POP,varname="Area",varname2="Region")
 
 # check that all orders are allocated to an Area
-Zero <- COCToWork[(COCToWork$Area==0),]
-Zero <- POPToWork[(POPToWork$Area==0),]
+Zero <- COC[(COC$Area==0),]
+Zero <- POP[(POP$Area==0),]
 rm(Zero)
 
 
-COC_LLR.MPFT <- COCToWork [(COCToWork$Area=="Leicester" | COCToWork$Area=="Leicestershire" | COCToWork$Area=="Rutland" | COCToWork$Area=="Shropshire" |
-                              COCToWork$Area=="Telford and Wrekin" | COCToWork$Area=="Staffordshire" | COCToWork$Area=="North Staffordshire" | COCToWork$Area=="Stoke"),]
-POP_LLR.MPFT <- POPToWork [(POPToWork$Area=="Leicester" | POPToWork$Area=="Leicestershire" |POPToWork$Area=="Rutland" | POPToWork$Area=="Shropshire" |
-                              POPToWork$Area=="Telford and Wrekin" | POPToWork$Area=="Staffordshire" | POPToWork$Area=="North Staffordshire" | POPToWork$Area=="Stoke"),]
+COC_LLR.MPFT <- COC [(COC$Area=="Leicester" | COC$Area=="Leicestershire" | COC$Area=="Rutland" | COC$Area=="Shropshire" |
+                              COC$Area=="Telford and Wrekin" | COC$Area=="Staffordshire" | COC$Area=="North Staffordshire" | COC$Area=="Stoke"),]
+POP_LLR.MPFT <- POP [(POP$Area=="Leicester" | POP$Area=="Leicestershire" |POP$Area=="Rutland" | POP$Area=="Shropshire" |
+                              POP$Area=="Telford and Wrekin" | POP$Area=="Staffordshire" | POP$Area=="North Staffordshire" | POP$Area=="Stoke"),]
 
-COC_DerbyshireDerby <- COCToWork [(COCToWork$Clinic=="Wheatbridge Clinic" | COCToWork$Clinic=="London Road Community Hospital"),]
-POP_DerbyshireDerby <- POPToWork [(POPToWork$Clinic=="Wheatbridge Clinic" | POPToWork$Clinic=="London Road Community Hospital"),]
+COC_DerbyshireDerby <- COC [(COC$Clinic=="Wheatbridge Clinic" | COC$Clinic=="London Road Community Hospital"),]
+POP_DerbyshireDerby <- POP [(POP$Clinic=="Wheatbridge Clinic" | POP$Clinic=="London Road Community Hospital"),]
 
-COC_Dorset <- COCToWork [(COCToWork$Area=="Dorset"),]
-POP_Dorset <- POPToWork [(POPToWork$Area=="Dorset"),]
+COC_Dorset <- COC [(COC$Area=="Dorset"),]
+POP_Dorset <- POP [(POP$Area=="Dorset"),]
 
-COC_Cornwall <- COCToWork [(COCToWork$Region=="Cornwall and Isles of Scilly PCT" | COCToWork$Region=="Blackburn with Darwen" 
-                            | COCToWork$Region=="Southend-on-Sea"),]
-POP_Cornwall <- POPToWork [(POPToWork$Region=="Cornwall and Isles of Scilly PCT" | POPToWork$Region=="Blackburn with Darwen"
-                            | POPToWork$Region=="Southend-on-Sea"),]
+COC_Cornwall <- COC [(COC$Region=="Cornwall and Isles of Scilly PCT" | COC$Region=="Blackburn with Darwen" 
+                            | COC$Region=="Southend-on-Sea"),]
+POP_Cornwall <- POP [(POP$Region=="Cornwall and Isles of Scilly PCT" | POP$Region=="Blackburn with Darwen"
+                            | POP$Region=="Southend-on-Sea"),]
 COC_Cornwall$SH.24.UID = NULL
 POP_Cornwall$SH.24.UID = NULL
 
