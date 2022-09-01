@@ -240,40 +240,8 @@ nrow(Bought.EC.FourPlus)
 # END REPEAT USERS EC Fettle----
 
 
-# Blake PrEP impact trial 19.01.2021 ----
-PrepTrial <- orders[ ,c("PrEP.impact.trial.number",'Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
-                        "Sites.tested",'Test.regime','Clinic.visited','Clinic.visited.12','Attended.clinic',
-                        "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at","Notified.at.month.year",
-                        "Lab.results.at","Lab.results.at.month.year","Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",'Syphilis','HIV',"Chlamydia","Gonorrhoea","Hep.B","Hep.C",
-                        "Test.for.Chlamydia.Urine","Test.for.Chlamydia.Oral","Test.for.Chlamydia.Rectal","Test.for.Chlamydia.Vaginal",
-                        "Test.for.Gonorrhoea.Urine","Test.for.Gonorrhoea.Oral","Test.for.Gonorrhoea.Rectal","Test.for.Gonorrhoea.Vaginal")]
 
-# Subset using 'grep' and 'or' | (if 'Default LA' includes the string 'freetesting', or 'phe' or prep')
-PrepTrial1 <- PrepTrial[grep('Freetesting|PHE|PrEP', PrepTrial$Default.LA),]
-# users who belong to SH:24 areas (no freetesting or PrEP) and complete their Impact.trial.number
-PrepTrial2 <- PrepTrial[(PrepTrial$PrEP.impact.trial.number!=""),]
-# include UppeTier Name with 'merge' getting all the observations from the data set on the left (all.x = TRUE)
-PrepTrial3 <- merge(PrepTrial2, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
-PrepTrial3$LSOA.name = NULL
-write.table (PrepTrial3, file="\\Users\\Elena Ardines\\Documents\\Reports\\1. Monthly Reports\\Invoicing\\2020\\2020 12\\Backing data\\20210119.PrepTrial.csv", row.names=F, sep=",")
-# END PrEP impact trial 19.01.2021 ----
 
-# 1 million kits posted----
-OrdersPosted <- orders[(orders$Dispatched.at != ""),]
-nrow(OrdersPosted)
-table(OrdersPosted$Test.for.Chlamydia.Vaginal != "not_requested", useNA = "always")
-table(OrdersPosted$Test.for.Chlamydia.Oral != "not_requested", useNA = "always")
-table(OrdersPosted$Test.for.Chlamydia.Rectal != "not_requested", useNA = "always")
-table(OrdersPosted$Test.for.Chlamydia.Urine != "not_requested", useNA = "always")
-table(OrdersPosted$Test.for.Hiv != "not_requested", useNA = "always")
-
-table(OrdersPosted$Chlamydia== "positive", useNA = "always")
-table(OrdersPosted$Gonorrhoea== "positive", useNA = "always")
-table(OrdersPosted$HIV== "reactive", useNA = "always")
-table(OrdersPosted$Syphilis== "reactive", useNA = "always")
-table(OrdersPosted$Hep.B== "positive", useNA = "always")
-table(OrdersPosted$Hep.C== "positive", useNA = "always")
-# END 1 million kits posted----
 
 # insufficient and haemolised blood samples----
 InsuffHaem <- orders[(orders$Site=="Garden Clinic"),c("SH24.UID",'Customer.ID','LA.of.residence',"LSOA.name","Sites.tested","Test.regime",'Site','Age','Gender'
@@ -288,111 +256,6 @@ i1 <- grepl('Bill Payment', df1$Product) & grepl('Mobile', df1$Product)
 plot(InsuffHaem$HIV=="haemolysed", InsuffHaem$HIV=="insufficient")
 # End insufficient and haemolised----
 
-# Justin_Gurdees_Worcestershire CT/GC----
-Gurdees <- orders[ ,c('SH24.UID','Customer.ID','LSOA.name','Default.LA','LA.of.residence','Site',
-                      'Age','Gender','Ethnicity','Sexual.preference', "Sites.tested",'Test.regime',
-                      "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at",
-                      "Lab.results.at","Lab.results.at.month.year",
-                      "Chlamydia","Gonorrhoea",'Syphilis','HIV','Test.for.Hiv','Test.for.Syphilis.EIA',"Test.1.for.Syphilis.RPR")]
-
-Gurdees <- Gurdees [(Gurdees$Default.LA=='Worcestershire'),]
-Gurdees$AgeSplit <- 0
-Gurdees$AgeSplit = ifelse(Gurdees$Age>24,"25+","Under 25")
-table(Gurdees$Dispatched.at.month.year)
-
-Gurdees.UpperTier <- merge(Gurdees, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM",'lsoa')], by.x = "LSOA.name", by.y = "LSOA11NM")
-
-write.table (Gurdees.UpperTier, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\Gurdees.UpperTier.LAs.202007.csv", row.names=F, sep=",")
-# END Justin_Gurdees 2020_03_18 CT/GC----
-
-
-# Cornwall data request 2020.06.29----
-Cornwall <- OrdersToWork[,c('LSOA.name','Default.LA','LA.of.residence','Age','Gender',
-                            "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year")]
-Cornwall <- Cornwall [(Cornwall$Default.LA == "Cornwall and Isles of Scilly PCT"),]   
-
-#Cornwall <- Cornwall [(Cornwall$Default.LA == "Cornwall and Isles of Scilly PCT" & 
-#                          (Cornwall$Dispatched.at.month.year == "2019-12" | Cornwall$Dispatched.at.month.year == "2020-01" |
-#                           Cornwall$Dispatched.at.month.year == "2020-02" | Cornwall$Dispatched.at.month.year == "2020-03" |
-#                           Cornwall$Dispatched.at.month.year == "2020-04" | Cornwall$Dispatched.at.month.year == "2020-05")),]
-
-Cornwall <- merge(Cornwall, LSOA[,c('LSOA11NM',"WD19NM")], by.x = "LSOA.name", by.y = "LSOA11NM")
-#rename(new variable name = existing variable name) DPLYR package
-Cornwall <- rename(Cornwall, Ward = WD19NM)
-Cornwall$LSOA.name = NULL
-write.table (Cornwall, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\202007_Cornwall.csv", row.names=F, sep=",")
-# END Cornwall data request----
-
-
-# Alice data request ----
-OrdersAlice <- orders[ ,c('UUID','SH24.UID','Customer.ID',"LSOA.name",'Default.LA','LA.of.residence','Site',
-                          'Age','Gender','Sexual.preference','Ethnicity',"Sexually.assaulted.risk.assessment","Unprotected.sex.in.last.3.days","Unprotected.sex.in.last.5.days",    
-                          "Pressured.into.sex","Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
-                          "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Notified.at","Notified.at.month.year","Lab.results.at","Lab.results.at.month.year",
-                          'Chlamydia','Gonorrhoea',"Syphilis","HIV","Hep.B","Hep.C","Sites.tested","Test.regime","Reason.for.visit","Clinic.visited","Clinic.visited.12")]
-
-OrdersAliceNI <- OrdersAlice[(OrdersAlice$Default.LA == "Northern Ireland Belfast PCT" | OrdersAlice$Default.LA == "Northern Ireland Northern PCT" |
-                                OrdersAlice$Default.LA == "Northern Ireland South Eastern PCT" | OrdersAlice$Default.LA == "Northern Ireland Southern PCT" |
-                                OrdersAlice$Default.LA == "Northern Ireland Western PCT"), ]
-
-OrdersAlice <- merge(OrdersAlice, LSOA[,c('LSOA11NM',"LAD18NM")], by.x = "LSOA.name", by.y = "LSOA11NM")
-
-OrdersAlice$Created.at1 <- as.Date(OrdersAlice$Created.at, format = "%Y-%m-%d")
-OrdersAlice1 <- OrdersAlice [(OrdersAlice$Created.at1 > "2019-09-30"),]
-OrdersAlice2 <- OrdersAlice1 [(OrdersAlice1$Created.at1 < "2020-02-01"),]
-write.table (OrdersAlice2, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020_03 OrdersAlice.csv", row.names=F, sep=",")
-write.table (OrdersAliceNI, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020_03 OrdersAliceNI.csv", row.names=F, sep=",")
-names(OrdersAlice2)
-# END Alice data request ----
-
-# Jen HIV reactives 2020.07.15----
-ReactHIV <- orders[ ,c('SH24.UID','Customer.ID','Default.LA',"LSOA.name", "Lab","Reason.for.visit",
-                       "Age","Gender","Gender.at.birth","Sexual.preference","Ethnicity","Sexuality",
-                       "Sexually.assaulted.risk.assessment","Unprotected.sex.in.last.3.days","Unprotected.sex.in.last.5.days",
-                       "Pressured.into.sex","Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
-                       "Clinic.visited","Clinic.visited.12","Attended.clinic","Sites.tested","Test.regime",
-                       "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Notified.at","Notified.at.month.year",
-                       "Lab.results.at","Lab.results.at.month.year","PrEP.impact.trial.number",'Syphilis','HIV',"Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",
-                       "Test.for.Hiv","Test.1.for.Hiv")]
-
-ReactHIV1 <- ReactHIV[grep('2018-12|2019|2020', ReactHIV$Lab.results.at.month.year),]
-write.table (ReactHIV1, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020.07.16.ReactiveHIV_Jen.csv", row.names=F, sep=",")
-
-names(orders$Previously.treated.for.Syphilis)
-# END Jen HIV reactives----
-
-# Ahimza Essex 2020.07.22----
-# STI
-AhimzaEssex <- orders[(orders$Default.LA=="Essex"),
-                      c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
-                        'Age','Gender','Sexual.preference','Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
-                        'Sexuality','Click.and.collect',"Sexually.assaulted.risk.assessment","Unprotected.sex.in.last.3.days","Unprotected.sex.in.last.5.days","Pressured.into.sex",                
-                        "Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
-                        "Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",'Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
-                        "Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at", 
-                        "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C")]
-
-AhimzaEssex$Created.at1 <- as.Date(AhimzaEssex$Created.at, format = "%Y-%m-%d")
-AhimzaEssexNov <- AhimzaEssex [(AhimzaEssex$Created.at1 > "2019-10-31"),]
-# CT treatments
-CT.TreatmentsAhimzaEssex <- TreatmentsMerge [(TreatmentsMerge$Area=="Essex")
-                                             , c("SH24.UID",'LSOA.name','Site','Area',"Created.at","Offered.at","Prescription.at","Dispatched.at",'Age','Gender','Sexual.preference','Ethnicity')]
-CT.TreatmentsAhimzaEssex$Created.at1 <- as.Date(CT.TreatmentsAhimzaEssex$Created.at, format = "%Y-%m-%d") 
-CT.TreatmentsAhimzaEssexNov <- CT.TreatmentsAhimzaEssex [(CT.TreatmentsAhimzaEssex$Created.at1 > "2019-10-31"),]
-# Contraception
-COCAhimza <- ContCOC
-COCAhimza$Created.at1 <- as.Date(COCAhimza$Created.at, format = "%Y-%m-%d")
-COCAhimzaEssex <- COCAhimza[(COCAhimza$Region=="Essex" & COCAhimza$Created.at1 > "2020-01-31"),]
-
-POPAhimza <- ContPOP
-POPAhimza$Created.at1 <- as.Date(POPAhimza$Created.at, format = "%Y-%m-%d")
-POPAhimzaEssex <- POPAhimza[(POPAhimza$Region=="Essex" & POPAhimza$Created.at1 > "2019-10-31"),]
-
-write.table (AhimzaEssexNov, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020_08_18 STIAhimzaEssex.csv", row.names=F, sep=",")
-write.table(CT.TreatmentsAhimzaEssexNov, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020_07 CTtreatment.AhimzaEssex.csv", row.names=F, sep=",")
-write.table(COCAhimzaEssex, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020_09 COCAhimzaEssex.csv", row.names=F, sep=",")
-write.table(POPAhimzaEssex, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2020_09 POPAhimzaEssex.csv", row.names=F, sep=",")
-# END Ahimza Essex----
 
 
 # Herts KPI's Blake 20200722----
@@ -444,136 +307,6 @@ prop.table(table(HertsKPI3$NegatResults3d.Group))*100
 # END Herts KPI's Blake 20200722
 
 
-# Justin 20200724: STI data from april for Halton, Warrington and Chehsire East----
-OrdersJustin <- orders
-OrdersJustin <- orders[(orders$Default.LA == "Halton" | orders$Default.LA == "Warrington" | orders$Default.LA == "Cheshire East"),]
-
-OrdersJustin$Created.at1 <- as.Date(OrdersJustin$Created.at, format = "%Y-%m-%d")
-OrdersJustin <- OrdersJustin [(OrdersJustin$Created.at1 > "2020-03-31"),]
-
-write.table (OrdersJustin, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\202007 Halton_Warrington_CheshireEast Justin.csv", row.names=F, sep=",")
-# END Justin 20200724: STI data
-
-
-
-
-
-
-# 25.08.2020 Dorset Justin----
-Data_Dorset <- BackingMinimum [(BackingMinimum$Area=="Dorset"),]
-Data_Dorset1 <- merge(Data_Dorset, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM")
-Data_Dorset2 <- merge(Data_Dorset1, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
-
-write.table (Data_Dorset2, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\Data_Dorset2.csv", row.names=F, sep=",")
-
-# END Dorset Justin----
-
-# 2020.10.20 Feedback SH:24 STI Justin/Blake----
-feedback = read.csv("20201020_Feedback_tokens.csv") # produce with 'feedback' query in DataGrip
-rm(FeedbackMerge1)
-FeedbackMerge <- merge(orders[,c('SH24.UID','Default.LA','Age','Gender',"Gender.at.birth","Genitals",
-                                 "Gender.identity.same.as.birth.sex","Gender.Identity",'Sexual.preference','Ethnicity',"Lab.results.at.month.year")], 
-                       feedback[,c('feedback_token',"sh24_uid")], by.x = "SH24.UID", by.y = "sh24_uid", all.y = TRUE)
-
-FeedbackMerge$AgeSplit <- 0
-FeedbackMerge$AgeSplit = ifelse(FeedbackMerge$Age>24,"25+","Under 25")
-
-FeedbackMerge$EthnicityGroup <- "Non white"
-FeedbackMerge$EthnicityGroup[FeedbackMerge$Ethnicity=='not_asked'] = "Not asked"
-FeedbackMerge$EthnicityGroup[FeedbackMerge$Ethnicity=='not_known' | FeedbackMerge$Ethnicity=='prefer_not_to_say'] = "Not known/Prefer not to say"
-FeedbackMerge$EthnicityGroup[FeedbackMerge$Ethnicity=='white_english_welsh_scottish_northern_irish_british' | FeedbackMerge$Ethnicity=='other_white' |
-                               FeedbackMerge$Ethnicity=='irish' | FeedbackMerge$Ethnicity=='gypsy_or_irish_traveller'] = "White"
-
-### FIX EXTRACT OF RELEVANT MONTH
-FeedbackMerge1 <- FeedbackMerge[(FeedbackMerge$Lab.results.at.month.year=="2020-07"|FeedbackMerge$Lab.results.at.month.year=="2020-08"|FeedbackMerge$Lab.results.at.month.year=="2020-09")
-                                ,c('feedback_token','SH24.UID',"Default.LA","Age",'"AgeSplit')]
-
-
-write.table (FeedbackMerge, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\FeedbackMerge.csv", row.names=F, sep=",")
-# END 2020.10.20 Feedback SH:24 STI ----
-
-
-
-# 2021.04.15 Amber - include feedback AND THEN REMOVE ALL UIDS----
-#recode Area in 'orders' data frame. Use 'orders' instead of 'OrdersToWork' cause it has all the variables requested
-#run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
-orders1 <- orders
-orders1$Area <- 0
-orders1$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
-
-Data_Ireland <- orders1[,c("Area","Feedback.token","New.or.follow.up",'Reason.for.visit','Postcode','LSOA.name','Default.LA','LA.of.residence','Site',
-                           'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.5.days',
-                           'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
-                           'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity','Sexuality',
-                           'Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',"Test.kit.code","Test.kit.color",
-                           "Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",
-                           'Syphilis','HIV','Chlamydia','Gonorrhoea',"Hep.B","Hep.C","Test.for.Hiv","Test.for.Syphilis.EIA",
-                           "Test.for.Chlamydia.Urine","Test.for.Chlamydia.Oral","Test.for.Chlamydia.Rectal","Test.for.Chlamydia.Vaginal",
-                           "Test.for.Gonorrhoea.Urine","Test.for.Gonorrhoea.Oral","Test.for.Gonorrhoea.Rectal","Test.for.Gonorrhoea.Vaginal",
-                           "Test.for.Hepatitis.B","Test.for.Hepatitis.C","Test.for.Syphilis.RPR","Test.1.for.Hiv","Test.1.for.Syphilis.EIA",
-                           "Test.1.for.Chlamydia.Urine","Test.1.for.Chlamydia.Oral","Test.1.for.Chlamydia.Rectal","Test.1.for.Chlamydia.Vaginal",
-                           "Test.1.for.Gonorrhoea.Urine","Test.1.for.Gonorrhoea.Oral","Test.1.for.Gonorrhoea.Rectal","Test.1.for.Gonorrhoea.Vaginal",
-                           "Test.1.for.Hepatitis.B","Test.1.for.Hepatitis.C","Test.1.for.Syphilis.RPR")]
-
-Data_Ireland <-  Data_Ireland [(Data_Ireland$Default.LA=="Ireland - Dublin" 
-                                | Data_Ireland$Default.LA=="Ireland - Cork" 
-                                | Data_Ireland$Default.LA=="Ireland - Kerry"),]
-
-#download feedback from Typform. Merge with data set
-feedbackIreland = read.csv("20210415_SH24_Ireland_STI_feedback.csv")
-Data_IrelandMerge <- merge(Data_Ireland, feedbackIreland, by.x = "Feedback.token", by.y = "uid", all.x = TRUE)
-#remove uids and variables not needed
-Data_IrelandMerge$Feedback.token = NULL 
-Data_IrelandMerge$X. = NULL
-Data_IrelandMerge$uid = NULL
-Data_IrelandMerge$Network.ID = NULL
-Data_IrelandMerge$Start.Date..UTC. = NULL
-Data_IrelandMerge$Submit.Date..UTC. = NULL
-write.table (Data_IrelandMerge, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2021.04.15_Amber_Ireland_STI.csv", row.names=F, sep=",")
-# END Ireland Amber----
-
-# 2021.04.25 Anamika Syphilis and HIV----
-OrdersAnamika <- orders[ ,c('SH24.UID',"PrEP.impact.trial.number",'Default.LA','Site',
-                            'Age','Gender',"Gender.at.birth","Genitals","Gender.Identity","Gender.identity.same.as.birth.sex",
-                            'Sexual.preference','Sexuality',"Unprotected.sex.in.last.5.days",
-                            "Clinic.visited","Clinic.visited.12","Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis",
-                            "Sites.tested","Test.regime",
-                            "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Notified.at","Notified.at.month.year","Lab.results.at","Lab.results.at.month.year",
-                            "HIV","Syphilis","Test.for.Hiv","Test.for.Syphilis.EIA","Test.for.Syphilis.RPR")]
-
-# Period: 01/05/2019 to 31/08/2019, and 01/05/2020 to 31/08/2020
-# Only SH:24 and freetesting
-OrdersAnamika <- OrdersAnamika [((OrdersAnamika$Created.at.month.year=="2019-05"| OrdersAnamika$Created.at.month.year=="2019-06"|
-                                    OrdersAnamika$Created.at.month.year=="2019-07"| OrdersAnamika$Created.at.month.year=="2019-08"|
-                                    OrdersAnamika$Created.at.month.year=="2020-05"| OrdersAnamika$Created.at.month.year=="2020-06"|  
-                                    OrdersAnamika$Created.at.month.year=="2020-07"| OrdersAnamika$Created.at.month.year=="2020-08")
-                                 & (OrdersAnamika$Default.LA != "Fettle") & (OrdersAnamika$Default.LA != "Romania") 
-                                 & (OrdersAnamika$Lab.results.at != "N/A")),]
-# exclude tests with no Syphilis 
-OrdersAnamika1 <- OrdersAnamika [(OrdersAnamika$Syphilis != "not_requested" & OrdersAnamika$Syphilis != "missing" ),]
-table(OrdersAnamika1$Syphilis)
-table(OrdersAnamika1$HIV)
-
-# change PrEP.impact.trial.number for YES/NO
-OrdersAnamika1$PrEP.impact.trial = ifelse(OrdersAnamika1$PrEP.impact.trial.number != "", "There is a PrEP Impact Trial number","No number")
-table(OrdersAnamika1$PrEP.impact.trial)
-#remove PrEP.impact.trial.number - it's PID ! !
-OrdersAnamika1$PrEP.impact.trial.number = NULL
-
-# encrypt SH24 number
-x <- "Encrypted_uid_"
-OrdersAnamika1$Encrypted_SH24 <- sprintf("%s%0*d", x, 25 - nchar(x), 1:nrow(OrdersAnamika1))
-# order columns
-OrdersAnamika1 <- OrdersAnamika1 [c("SH24.UID","Encrypted_SH24","Default.LA","Site",
-                                    "Age","Gender","Gender.at.birth","Genitals","Gender.Identity","Gender.identity.same.as.birth.sex","Sexual.preference","Sexuality",
-                                    "Unprotected.sex.in.last.5.days","Clinic.visited","Clinic.visited.12",
-                                    "Previously.diagnosed.with.HIV","Previously.treated.for.Syphilis","Sites.tested","Test.regime",
-                                    "Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year","Notified.at","Notified.at.month.year",
-                                    "Lab.results.at","Lab.results.at.month.year",
-                                    "HIV","Syphilis","Test.for.Hiv","Test.for.Syphilis.EIA","Test.for.Syphilis.RPR","PrEP.impact.trial")]
-
-write.table (OrdersAnamika1, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\2021.04_Syphilis_Anamika.csv", row.names=F, sep=",")
-# END Anamika----
 
 #20.12.2021 Fran Bury: all orders for all products from under 18s, safeguarding flags----
 # upload files from Backing_Data tab
@@ -766,35 +499,8 @@ Model <- OrdersToWork %>%
 
 
 
-# list of packages we need
-list.of.packages <- c("DBI", "odbc", "config", "prophet", "lubridate", "tidyverse", "forecast")      
-
-# check if any of these packages are not already installed
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-
-## Packages to 
-#installed on 14.03.2021: 
-install.packages('DBI') 
-#installed on 14.03.2021: 
-install.packages('odbc')
-
 install.packages('tidyverse')
 
-
-#installed on 12.03.2021: 
-install.packages('prophet')
-#installed on 12.03.2021: 
-install.packages('lubridate')
-#installed on 12.03.2021: 
-install.packages('forecast')
-
-#installed on 14.03.2021 - disn't work. Tried this and didn't work:
-#cat(".Rprofile: Setting R repository:")
-#repo = getOption("repos") 
-## set up the server from which you will download the package.
-#repo["CRAN"] = "http://cran.case.edu" 
-#options(repos = repo)
-#rm(repo)
 
 # 2022.06.12 Freetesting - Suffolk MSM
 Suf <- orders[(orders$Default.LA=='Freetesting - Suffolk'),]
@@ -805,10 +511,6 @@ table(Suf$Genitals,Suf$Sexual.preference)
 
 write.table (Suf, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.06.12.Suffolk.csv", row.names=F, sep=",")
 
-
-# 2022.06.14 Nottingham
-Nott <- orders[(orders$Default.LA == 'Nottingham'),]
-table(Nott$Dispatched.at.month.year)
 
 # 2022.06.15 check if LA of Residence is being populated in May 2022
 residence <- orders[(orders$Dispatched.at.month.year == "2022-05"),]
@@ -835,28 +537,5 @@ ordersFreeHertsOffline <- orders[(orders$Default.LA=='Freetesting - Hertfordshir
 table(ordersFreeHertsOffline$Dispatched.at.month.year)
 
 
-
-
 #########################
-
 install.packages("tidyverse",dependencies=TRUE)
-
-
-
-
-
-# libraries for database connection
-library(DBI)
-library(odbc)
-library(config)
-
-# all other libraries for this notebook
-library(prophet)
-library(lubridate)
-library(tidyverse)
-library(forecast)
-
-
-#run the function library() without arguments, to get the list of packages installed in different libraries on your computer
-library()
-
