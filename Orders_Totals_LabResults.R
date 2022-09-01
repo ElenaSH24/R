@@ -335,19 +335,6 @@ Summary3 = merge(x = Summary2, y = DiagnosisReturns, by = "Area", all = TRUE)
 TreatmentsMerge <- merge(OrdersMonth [, c('SH24.UID','Area', 'Site','LA.of.residence')], Treatments, by.x = 'SH24.UID', by.y = 'sh24_uid')
 
 
-#### DELETE: 3.May.2022:
-#Include MonthYear dates: first convert date fields to date in d/m/y format to MonthYear
-#TreatmentsMerge$Created_FormatDate <- as.Date(TreatmentsMerge$created_at, "%Y-%m-%d")
-#TreatmentsMerge$Dispatched_FormatDate <- as.Date(TreatmentsMerge$dispatched_at, "%Y-%m-%d")
-
-#create MonthYear columns. class will be "character"
-#TreatmentsMerge$Created_MonthYear <- format(TreatmentsMerge$Created_FormatDate, "%Y-%m")
-#TreatmentsMerge$Dispatched_MonthYear <- format(TreatmentsMerge$Dispatched_FormatDate, "%Y-%m")
-
-#Export as table to Clinical Reports, as a summary of all CT treatments since the start of the service in all areas (inc London!)
-####write.table (TreatmentsMerge, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\CT_Treatment\\2022.06.CT.Treatments.csv", row.names=F, sep=",")
-
-
 #Prepare CT treatments to add to rest of summary: select data for relevant month
 # ckeck if using Dispatched.MonthYear or Dispatched.month.year.signed_prescrip as in the signed_prescriptions table, that includes roll-backs
 TreatmentsMonth <- TreatmentsMerge[(TreatmentsMerge$Dispatched.MonthYear == v1 & !is.na(TreatmentsMerge$Dispatched.MonthYear)),]
@@ -779,10 +766,6 @@ rm(Zero)
 PhotoConsult1 <- PhotoConsult
 PhotoConsult1 <- PhotoConsult [(PhotoConsult$diagnosed_month_year ==  v1),]
 
-#### DELETE: 02.05.2022
-####class(PhotoConsult1$diagnosed_at)
-####PhotoConsult1$diagnosed_at <- as.Date(PhotoConsult1$diagnosed_at, format = "%Y-%m-%d")
-####PhotoConsult1 <- PhotoConsult1[(PhotoConsult1$diagnosed_at >= "2022-02-01" & PhotoConsult1$diagnosed_at <= "2022-02-28"),]
 
 #convert to data.frame
 PhotoConsult1 = as.data.frame(table(PhotoConsult1$Area), useNA = "always")
