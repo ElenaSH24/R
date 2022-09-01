@@ -1,26 +1,11 @@
-# working directory: Masters for sharing
-# run recoding
-#install.packages("DBI")
-#install.packages("RPostgreSQL")
-#drv <- dbDriver("PostgreSQL")
 
 #Install the relevant libraries - do this one time
 install.packages("data.table")
 install.packages("dplyr")
-# package to work with dates: yearmon
-install.packages("zoo")
-
-# increasing the available memory for Java
-options(java.parameters = "-Xmx6000m")
-
-install.packages('xlsx')
-library(xlsx)
 install.packages("reshape2")
 library(reshape2)
 
-install.packages("openxlsx", dependencies = TRUE)
 
-## DELETE 8th Aug 2022: setwd("/Users/Elena Ardines/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022_07")
 # use ~ as a shortcut to the Home Directory, to avoid portability issues (i.e. changing Operating Systems, versions of R, or programming language)
 setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2022_07")
 
@@ -30,18 +15,6 @@ path.expand("~")
 file.path("~", "Reports","1.Monthly_Reports","Invoicing","2022","2022_04","Xero_Quantities_2022.April_v9.csv")
 
 orders = read.csv("20220810_sti_order_report_v1.csv")
-
-
-table(orders10thAug$Dispatched.at.month.year, orders10thAug$Dispatched.at.month.year =='2022-07')
-
-# REPEATS INVESTIGATION----
-orders = read.csv("20210706_Sti_IncludingRepeats.csv")
-orders1 <- orders[,c("Region","test_kit_index","dispatched_at")]
-orders1$Dispatched_day <- as.Date(orders1$dispatched_at, "%Y-%m-%d")
-orders1$DispatchedMonthYr <- format(as.Date(orders1$dispatched_at), "%Y-%m")
-names(orders)
-table(orders1$test_kit_index,orders1$DispatchedMonthYr=="2021-06")
-# End Repeats investigation----  
 
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
@@ -101,12 +74,6 @@ freetesting.Unique = freetesting2[!duplicated(freetesting2$SH24.UID),]
 # include LSOA Code with 'merge' getting all the observations from the data set on the left (all.x = TRUE)
 #### freetesting3 <- merge(freetesting.Unique, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
 freetesting4 <- merge(freetesting.Unique, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
-#CHECK THIS: ABOUT ADDING REACTIVITY LEVELS
-#split reactivity data frame in two, to get separate columns in the backing data - otherwise the SH24 number would show as duplicate
-#reactivityHIV <- reactivity[(reactivity$test_klass=="Hiv::Blood"),]
-#reactivityHIV.Unique = reactivityHIV[!duplicated(reactivityHIV$sh24_uid),] #get only unique SH24 uids
-#reactivitySyph <- reactivity[(reactivity$test_klass=="Syphilis::Treponemal"),]
-#freetesting5 <- merge(freetesting4, reactivityHIV.Unique[,c('result_value')], by.x = "SH24.UID", by.y = "sh24_uid", all.x = TRUE)
 
 write.table (freetesting4, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022.07 freetesting.PHE.ImpactPrEP.csv", row.names=F, sep=",")
 # End PHE/freetesting backing data----
@@ -135,10 +102,6 @@ OrdersToWork$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
 OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
-
-#Bucks <- OrdersToWork[(OrdersToWork$Default.LA=='Buckinghamshire'),]
-#table(Bucks$Created.at.month.year)
-
 # reporting month
 v1 <- '2022-07'
 
@@ -148,54 +111,6 @@ rm(Zero)
 
 table(OrdersToWork$Dispatched.at.month.year== v1)
 table(OrdersToWork$Lab.results.at.month.year== v1)
-
-
-#FETTLE ORDERS############################## ----
-#Select variables you need, and then extract only those Site=Fettle
-OrdersFettle <- orders[(orders$Site=="Fettle Hub"),]
-OrdersFettle <- OrdersFettle[,c("SH24.UID",'Customer.ID','LA.of.residence',"LSOA.name","Sites.tested","Test.regime",'Site','Age','Gender'
-                                ,"Sexual.preference","Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C","Charge.token","Feedback.token","Discount.code",
-                                "Requested.time","Created.at.month.year","Dispatched.at","Dispatched.at.month.year","Notified.at","Notified.at.month.year",
-                                "Lab.results.at","Lab.results.at.month.year")]
-
-class(OrdersFettle$Requested.time)
-structure(OrdersFettle$Requested.time)
-
-OrdersFettleTime <- OrdersFettle
-OrdersFettleTime <- tribble(~timestamp,OrdersFettle$Requested.time)
-
-OrdersFettle$TimeGrouped <- 0
-OrdersFettle$TimeGrouped[OrdersFettle$Requested.time=="Beckenham Beacon Sexual Health Clinic"|
-                           OrdersToWork$Site=="Camberwell"|
-                           OrdersToWork$Site=="Waldron Health Centre"] <- "London"
-#End FETTLE ORDERS##########################
-
-############################################
-
-# Stack two Stripe data sets one (April-17July) on top of the other (Jan-18June)
-StripeStack <- rbind(Stripe, Stripe1)  
-# new data frame with unique (no duplicate) 'customer IDs'id'
-StripeStackUnique = StripeStack[!duplicated(StripeStack$id),]
-
-# Merge both data sets: OrdersFettle (from admin) and Stripe (payments from Stripe). Like an Excel VLOOKUP, using merge()----
-# Use all.y = TRUE at the end to do Right Outer Join (with merge), for all rows from the right table, and any rows with matching keys from the left table
-names(Stripe)
-StripeMerge <- merge(OrdersFettle, Stripe[,c("id","Description","Created..UTC.","Created.MonthYear","Amount","Amount.Refunded","Fee","Status")],
-                     by.x = 'Charge.token', by.y = 'id', all.y = TRUE)
-
-# Include columns with "1" for the calculated field to calculate average value per day for Graham 
-StripeMerge$NumOrders <- 1
-
-#table per sites tested, and then get the proportions of the table----
-table(StripeMerge$Gender)
-prop.table(table(StripeMerge$Sites.tested))
-
-write.table (StripeMerge, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\Stripe_Fettle_SinceStart.csv", row.names=F, sep=",")
-
-#Fettle backing data to Graham
-FettleGraham <- OrdersFettle [(OrdersFettle$Site == "Fettle Hub") & (OrdersFettle$Created.at >"2018-12-31" & OrdersFettle$Created.at <"2019-01-31"),]
-write.table (FettleGraham, file="\\Users\\Elena Ardines\\Documents\\Reports\\2. Ad-hoc reports\\Fettle_Graham_2019_01.csv", row.names=F, sep=",")
-#End FETTLE ORDERS----
 
 
 # Backing data STI ######################################### ----
@@ -294,10 +209,6 @@ BackingMin_noSH24 <- OrdersToWork[,c('Customer.ID','Reason.for.visit','LSOA.name
                                      'Syphilis','HIV','Chlamydia','Gonorrhoea',"Test.for.Syphilis.RPR")]
 
 
-
-### Slack with Justin 2021: SHALL WE ADD DISTRIBUTION CENTER & METHOD TO ALL AREAS?!?!?!?!
-
-
 Data_Berkshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="East Berkshire"),]
 Data_Buckinghamshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Buckinghamshire"),]
 #Buckinghamshire data only from 1st Jan 2021
@@ -305,10 +216,6 @@ class(Data_Buckinghamshire$Created.at)
 Data_Buckinghamshire$Created.at <- as.Date(Data_Buckinghamshire$Created.at, format = "%Y-%m-%d")
 Data_Buckinghamshire <- Data_Buckinghamshire[(Data_Buckinghamshire$Created.at > "2020-12-31"),]
 
-
-### REMOVE 22th 06 2022 Data_Cornwall <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Cornwall and Isles of Scilly PCT"
-###                                  | BackingMin_noSH24$Default.LA=="Southend-on-Sea"
-###                                  |BackingMin_noSH24$Default.LA=="Blackburn with Darwen"),]
 
 # 2022.06.22 Include Hep.B and Hep.C in Cornwall (Blackburn request - Dimitrious email)
 Data_Cornwall <- OrdersToWork [(OrdersToWork$Default.LA=="Cornwall and Isles of Scilly PCT"| OrdersToWork$Default.LA=="Southend-on-Sea"
@@ -327,7 +234,6 @@ Data_Cornwall <- OrdersToWork [(OrdersToWork$Default.LA=="Cornwall and Isles of 
 
 Data_Hillingdon <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Hillingdon"),]
 
-#Data_Medway <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Medway"),]
 Data_NIreland <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Northern Ireland Belfast PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Northern PCT" |
                                        BackingMin_noSH24$Default.LA=="Northern Ireland South Eastern PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Southern PCT" |
                                        BackingMin_noSH24$Default.LA=="Northern Ireland Western PCT"),]
@@ -417,12 +323,6 @@ table(droplevels(Data_Manchester1$Default.LA))
 Data_Manchester1$Area = NULL
 Data_Manchester1$LA.of.residence = NULL
 write.table (Data_Manchester1, file="/Users/ElenaArdines1/Documents/Reports/2.Ad-hoc-reports/2022.01.25_PHE.Freetesting.Manchester_Blake.csv", row.names=F, sep=",")
-
-### Data_PHEManchester <- merge(Data_PHEManchester, LSOA[,c('LSOA11NM',"LAD19NM")], by.x = "LSOA.name", by.y = "LSOA11NM")
-### Data_PHEManchester <- rename(Data_PHEManchester, LA.Name = LAD19NM)
-### Subset using 'grep' and 'or' | 
-### Data_PHEManchester1 <- Data_PHEManchester[grep('Bolton|Bury|Manchester|Oldham|Rochdale|Salford|Stockport|Tameside|Trafford|Wigan', 
-###                                               Data_PHEManchester$LA.Name),]
 # END PHE and freetesting Manchester----
 
 # Freetesting Bedford----
@@ -484,19 +384,6 @@ write.table (Treatment.Thurrock, file="\\Users\\Elena Ardines\\Documents\\Report
 write.table (Treatment.LLR.MPFT, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022 Month LLR.MPFT Treatments.csv", row.names=F, sep=",")
 write.table (Treatment.NIreland, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022_07\\backing_data\\2022 Month NIreland Treatments.csv", row.names=F, sep=",")
 
-#specific request
-Data_Durham <- BackingMin_noSH24[(BackingMin_noSH24$LA.of.residence=="County Durham" &
-                                    (BackingMin_noSH24$Created.at >"2017-12-31" & BackingMin_noSH24$Created.at <"2019-01-01")),]
-Data_Darlington <- BackingMin_noSH24[(BackingMin_noSH24$LA.of.residence=="Darlington" &
-                                        (BackingMin_noSH24$Created.at >"2017-12-31" & BackingMin_noSH24$Created.at <"2019-01-01")),]
-
-Data_DarlingtonDurham <- BackingMin_noSH24[(BackingMin_noSH24$Default.LA=="Darlington" | BackingMin_noSH24$Default.LA=="County Durham"),]
-Data_DarlingtonDurham$Customer.ID = NULL
-
-table(BackingMin_noSH24$Default.LA)
-
-write.table (Data_DarlingtonDurham, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_04\\backing_data\\2020.06.10 DarlingtonDurham.csv", row.names=F, sep=",")
-
 
 #CT treatment for Darlington
 Treatment.Durham.Darlington <- TreatmentsMerge [(TreatmentsMerge$Site=="Bishop Auckland Hospital, Centre for Sexual Health" |
@@ -509,16 +396,9 @@ Treatment.Durham.Darlington <- TreatmentsMerge [(TreatmentsMerge$Area=="Darlingt
                                                 , c('Site','LA.of.residence',"Created.at","Offered.at","Prescription.at","Dispatched.at","Customer.ID")]
 
 
-
 table(TreatmentsMerge$Area=="Darlington")
 names(TreatmentsMerge)
 write.table (Treatment.Durham.Darlington, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2020\\2020 05\\backing_dataata\\2020.01.Treatment.Durham.Darlington.csv", row.names=F, sep=",")
-
-#CT treatment for Cheshire East 2021.05.10 Justin
-Treatment.CheshireEast <- TreatmentsMerge [(TreatmentsMerge$Area=="Cheshire East")
-                                           , c("SH24.UID",'LSOA.name','Site','Area',"created_at","offered_at","prescription_at","dispatched_at",'Age','Gender','Sexual.preference.x','Ethnicity')]
-write.table (Treatment.CheshireEast, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2021\\2021 06\\backing_dataata\\2021.05.10 Treatment.CheshireEast.Justin.csv", row.names=F, sep=",")
-# END CT TREATMENTS----
 
 
 # Backing data CONTRACEPTION----
@@ -600,14 +480,6 @@ rm(list =ls())
 
 
 # One-off ----
-# 2021.11.18 Hertfordshire Blake
-Data_Hertfordshire <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Hertfordshire"),]
-class (Data_Hertfordshire$Created.at)
-Data_Hertfordshire$Created.at <- as.Date(Data_Hertfordshire$Created.at, format = "%Y-%m-%d")
-Data_Hertfordshire <- Data_Hertfordshire [(Data_Hertfordshire$Created.at>'2021-07-01'),]
-Data_Hertfordshire$Customer.ID = NULL
-write.table (Data_Hertfordshire, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_02\\backing_data\\2021.10 Hertfordshire.csv", row.names=F, sep=",")
-
 # 2022.01.31 Negar/Justin add sh24 uids to Bucks data and CT treatment data with sh24 uids
 Data_Bucks <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Buckinghamshire"),]
 Data_Bucks$Created.at <- as.Date(Data_Bucks$Created.at, format = "%Y-%m-%d")
