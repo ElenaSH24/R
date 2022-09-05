@@ -103,14 +103,14 @@ invRing$Ring.months.prescribed = NULL
 
 # Photo diagnosis consultations and treatments
 # invoice consultations as per the number of consultations with a diagnose time stamp in the relevant month
-invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","Region")]
+invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","region")]
 # rename (new variable name = existing variable name) to have same names in all data frames
-invPDConsult <- rename(invPDConsult, default_la = Region, MonthYear = diagnosed_month_year)
+invPDConsult <- rename(invPDConsult, default_la = region, MonthYear = diagnosed_month_year)
 # create variable Description
 invPDConsult$Description <- "Photo Diagnosis Consultations"
 
 # invoice PD treatments depending on the drug posted
-invPDTreatm <- PhotoTreatm[,c('dispatched_month_year','Region',"Drug")]
+invPDTreatm <- PhotoTreatm[,c('dispatched_month_year','name',"Drug")]
 # include the name of the drug, related to the drug code
 invPDTreatm$DrugName <- ""
 invPDTreatm$DrugName[invPDTreatm$Drug == "3005"] <- "Imiquimod"
@@ -121,7 +121,7 @@ invPDTreatm$DrugName[invPDTreatm$Drug == "3030"] <- "Condyline"
 # concatenate values to create 'Description'
 invPDTreatm$Description <- paste("Photo Treatments",invPDTreatm$Drug,invPDTreatm$DrugName)
 # rename (new variable name = existing variable name) to have same names in all data frames
-invPDTreatm <- rename(invPDTreatm, default_la = Region, MonthYear = dispatched_month_year)
+invPDTreatm <- rename(invPDTreatm, default_la = name, MonthYear = dispatched_month_year)
 # drop columns no needed
 invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
@@ -539,6 +539,7 @@ InvFee1 <- invMonth_3 [(invMonth_3$ContactName=="Blackburn" | invMonth_3$Contact
                         | invMonth_3$ContactName=="County Durham and Darlington NHS Foundation Trust" | invMonth_3$ContactName=="Darlington"
                         | invMonth_3$ContactName=="Derby City" | invMonth_3$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
                         | invMonth_3$ContactName=="Dorset" | invMonth_3$ContactName=="Halton"
+                        | invMonth_3$ContactName=="Berkshire"
                         | invMonth_3$ContactName=="Knowsley" | invMonth_3$ContactName=="Liverpool"
                         | invMonth_3$ContactName=="UKHSA" | invMonth_3$ContactName=="Southend"  
                         | invMonth_3$ContactName=="Warrington" | invMonth_3$ContactName=="East Sussex" | invMonth_3$ContactName=="Teesside"  | invMonth_3$ContactName=="Orbish"
@@ -550,7 +551,8 @@ InvFee2 <- invMonth_3 [(invMonth_3$ContactName=="Gateshead" | invMonth_3$Contact
                         | invMonth_3$ContactName=="Sunderland" | invMonth_3$ContactName=="Worcestershire"
                         ) , ]
 
-InvFee3 <- invMonth_3 [(invMonth_3$ContactName=="Berkshire"),]
+    ### DELETE? 5th.Sep.2022 Berkshire changing to Discount + Royal Mail in August invoicing
+    ### InvFee3 <- invMonth_3 [(invMonth_3$ContactName=="Berkshire"),]
 
 InvFee4 <- invMonth_3 [(invMonth_3$ContactName=="Leicester City" | invMonth_3$ContactName=="Leicestershire"
                         | invMonth_3$ContactName=="North Staffordshire" | invMonth_3$ContactName=="Rutland"
@@ -574,7 +576,7 @@ InvFeeZero <- invMonth_3 [(invMonth_3$ContactName=="Ireland") | (invMonth_3$Cont
 # check that sum of the invoices grouped equals total of invoicing in file invMonth_3:
 nrow(InvFee1)
 nrow(InvFee2)
-nrow(InvFee3)
+   ### DELETE? 5th.Sep.2022 Berkshire was the only Trust on this tariff - not since August: nrow(InvFee3)
 nrow(InvFee4)
 nrow(InvFee5)
 nrow(InvFee6)
@@ -605,7 +607,7 @@ InvoicesFee7 <- rename(InvoicesFee7, UnitAmount = eSRH5)
 InvoicesFeeZero <- rename(InvoicesFeeZero, UnitAmount = FeeZero)
 
 # Stack data sets one on top of the other 
-InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee3, InvoicesFee4, InvoicesFee6, InvoicesFee7, InvoicesFeeZero)  
+InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee4, InvoicesFee6, InvoicesFee7, InvoicesFeeZero)  
 
 
 # create the rest of the variables needed for the Xero file
@@ -646,5 +648,5 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022_07/20220808_Xero_July.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/20220905_Xero_Aug.csv", row.names=F, sep=",")
 
