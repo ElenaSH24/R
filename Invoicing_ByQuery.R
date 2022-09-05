@@ -3,10 +3,10 @@
 # read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2022-07'               #v1: reporting month
-v2 <- '01.07.2022-31.07.2022' #v2: activity period being invoiced
-v3 <- "31/07/2022"            #v3: InvoiceDate
-v4 <- "31/08/2022"            #v4: DueDate
+v1 <- '2022-08'               #v1: reporting month
+v2 <- '01.08.2022-31.08.2022' #v2: activity period being invoiced
+v3 <- "31/08/2022"            #v3: InvoiceDate
+v4 <- "30/09/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -103,14 +103,14 @@ invRing$Ring.months.prescribed = NULL
 
 # Photo diagnosis consultations and treatments
 # invoice consultations as per the number of consultations with a diagnose time stamp in the relevant month
-invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","region")]
+invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","Region")]
 # rename (new variable name = existing variable name) to have same names in all data frames
-invPDConsult <- rename(invPDConsult, default_la = region, MonthYear = diagnosed_month_year)
+invPDConsult <- rename(invPDConsult, default_la = Region, MonthYear = diagnosed_month_year)
 # create variable Description
 invPDConsult$Description <- "Photo Diagnosis Consultations"
 
 # invoice PD treatments depending on the drug posted
-invPDTreatm <- PhotoTreatm[,c('dispatched_month_year','name',"Drug")]
+invPDTreatm <- PhotoTreatm[,c('dispatched_month_year','Region',"Drug")]
 # include the name of the drug, related to the drug code
 invPDTreatm$DrugName <- ""
 invPDTreatm$DrugName[invPDTreatm$Drug == "3005"] <- "Imiquimod"
@@ -121,7 +121,7 @@ invPDTreatm$DrugName[invPDTreatm$Drug == "3030"] <- "Condyline"
 # concatenate values to create 'Description'
 invPDTreatm$Description <- paste("Photo Treatments",invPDTreatm$Drug,invPDTreatm$DrugName)
 # rename (new variable name = existing variable name) to have same names in all data frames
-invPDTreatm <- rename(invPDTreatm, default_la = name, MonthYear = dispatched_month_year)
+invPDTreatm <- rename(invPDTreatm, default_la = Region, MonthYear = dispatched_month_year)
 # drop columns no needed
 invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
@@ -221,7 +221,7 @@ invBolts <- bolts
 # concatenate year and month
 invBolts$MonthYear <- paste(invBolts$year, invBolts$month, sep="-")
 # extract MonthYear = relevant month
-invBolts <- invBolts[(invBolts$MonthYear == '2022-7'),]
+invBolts <- invBolts[(invBolts$MonthYear == v1),]
 # rename (new variable name = existing variable name) to have same names in all data frames
 invBolts <- rename(invBolts, ContactName = region_name, Description = product_name, Quantity = count)
 # name bolt-ons as per invoicing categories
@@ -337,7 +337,7 @@ invMonth_2$DueDate <- v4
 invMonth_3 <- invMonth_2[invMonth_2$Quantity != 0, ]
 # export to check figures 
 # use ~ to avoid portability issues when defining Home Directory
-write.table (invMonth_3, file="~/Reports/1.Monthly_Reports/Invoicing/2022_07/Check_Xero_Quantities_2022.07.csv", row.names=F, sep=",")
+#### DELETE? 5th.Sep.20222: write.table (invMonth_3, file="~/Reports/1.Monthly_Reports/Invoicing/2022_07/Check_Xero_Quantities_2022.07.csv", row.names=F, sep=",")
 
 
 
