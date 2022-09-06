@@ -613,7 +613,7 @@ Safeg = merge(x = SafeguardAdultsFlags, y = SafegYP, by = "Area", all = TRUE)
 Summary8 = merge(x = Summary7, y = Safeg, by = "Area", all = TRUE)
 
 # CONTRACEPTION----
-# Add 'Area' in COC and POP from recoding 'function' in Tab "Saskia_Code_Area.R"
+# Add 'Area' in COC and POP from recoding 'function' in 'Recode_Area.R' script 
 # Create Area variable in both data sets, for COC and for POP, and set to 0
 COC$Area <- 0
 POP$Area <- 0
@@ -646,6 +646,44 @@ InjectableMonth <- Injectable [(Injectable$Dispatched.Month.Year == v1),]
 PatchMonth <- Patch [(Patch$Dispatched.Month.Year == v1),]
 RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
 
+  # extract for contraception disaggregation per prescription, for Invoicing report
+  PrescCOC <- COCMonth[ ,c('Area','Months.prescribed','Drug')]
+  PrescPOP <- POPMonth[ ,c('Area','Months.prescribed','Drug')]
+  PrescInj <- InjectableMonth[ ,c("region","Injectable.months.prescribed")]
+  PrescPatch <- PatchMonth[ ,c("region","Patch.months.prescribed")]
+  PrescRing <- RingMonth[ ,c("region","Ring.months.prescribed")]
+  
+  # create description concatenating months prescribed and drug
+  PrescCOC$Description <- paste('COC',PrescCOC$Months.prescribed,'mth',PrescCOC$Drug)
+  PrescPOP$Description <- paste('POP',PrescPOP$Months.prescribed,'mth',PrescPOP$Drug)
+  PrescInj$Description <- paste('Sayana Press 104mg / 0.65ml',PrescInj$Injectable.months.prescribed,'mth')
+  PrescPatch$Description <- paste('Patch',PrescPatch$Patch.months.prescribed,'mth')
+  PrescRing$Description <- paste('Ring',PrescRing$Ring.months.prescribed,'mth')
+  
+  # remove variables no longer needed
+  PrescCOC$Months.prescribed = NULL
+  PrescCOC$Drug = NULL
+  PrescPOP$Months.prescribed = NULL
+  PrescPOP$Drug = NULL
+  PrescInj$Injectable.months.prescribed = NULL
+  PrescPatch$Patch.months.prescribed = NULL
+  PrescRing$Ring.months.prescribed = NULL
+  
+    # stack the above data sets one on top of the other with rbind----
+  # rename variables to prepare for rbind: 'region' as 'Area'
+  PrescInj <- rename(PrescInj, Area = region)
+  PrescPatch <- rename(PrescPatch, Area = region)
+  PrescRing <- rename(PrescRing, Area = region)
+  # rbind to stack datasets that have same columns headers
+  prescrip2 <- rbind(PrescCOC,PrescPOP,PrescInj,PrescPatch,PrescRing)
+  # convert to matrix to have like a pivot table
+  prescrip3 <- as.data.frame.matrix(table(prescrip2$Description,prescrip2$Area))
+  
+  write.table (prescrip3, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_08/PrescriptionsPerArea.2022.08_v1.csv", col.names = F, row.names=T, sep=",")
+  
+  
+  
+  
 # and convert into a data frame
 COCMonth1 = as.data.frame(table(COCMonth$Area), useNA = "always")
 colnames(COCMonth1)[1] <- "Area"
@@ -754,7 +792,7 @@ PhotoTreatm$Area <- 0
 #rename 'region' as 'Region'
 PhotoConsult <- rename(PhotoConsult, Region = region)
 PhotoTreatm <- rename(PhotoTreatm, Region = name)
-#run recoding function (in Saskia Tab) and save output in Area; important to write your variable names in colons (but not the data frame name)
+#run recoding function (in 'Recode_Area.R' script) and save output in Area; important to write your variable names in colons (but not the data frame name)
 PhotoConsult$Area <- recodeContraception(DF= PhotoConsult,varname="Area",varname2="Region")
 PhotoTreatm$Area <- recodeContraception(DF= PhotoTreatm,varname="Area",varname2="Region")
 # find out prescriptions with no Area, if any (there shouldn't be any!)
