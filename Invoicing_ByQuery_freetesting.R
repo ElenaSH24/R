@@ -1,7 +1,7 @@
 # producing Xero quarterly file for freetesting activity
 # read generic invoicing file (same we use for SH:24 invoicing)
-invoicing = read.csv("20220404_Invoicing_AprToMar.csv")
-
+invSTI = read.csv("20220905_invoicing.csv")
+invoicing <- invSTI
 
 # extract freetesting activity, and the variables needed for invoicing
 invFre <- invoicing[grep('Freetesting -', invoicing$default_la)
@@ -12,14 +12,15 @@ invFre <- invoicing[grep('Freetesting -', invoicing$default_la)
 invFre$processed_at <- as.Date(invFre$processed_at,"%Y-%m-%d")
 # extract month from day date
 invFre$Dispatched.MonthYear <- format(as.Date(invFre$processed_at),"%Y-%m")
-# extract data for the relevant month
-v1 <- '2022-02'
-invFreet <- invFre[(invFre$Dispatched.MonthYear == v1),]
+# extract data for the relevant quarter
+invFreet <- invFre[(invFre$Dispatched.MonthYear == "2022-04" | invFre$Dispatched.MonthYear == "2022-05" | invFre$Dispatched.MonthYear == "2022-06"),]
 
 
 # assign values to 'overall_type' that align with invoicing
 invFreet$overall_type[invFreet$overall_type == 'kits_sent'] <- 'Orders'
 invFreet$overall_type[invFreet$overall_type == 'kits_tested'] <- 'Returns'
+table(invFreet$overall_type,invFreet$Dispatched.MonthYear)
+
 # concatenate values of both variables (type and category) to create the invoicing Description
 invFreet$Description <- paste(invFreet$overall_type, invFreet$invoice_category_billable, sep=" - ")
 
@@ -65,10 +66,7 @@ invFreet$ContactName[invFreet$default_la == "Freetesting - Leicester"] <- "Leice
 invFreet$ContactName[invFreet$default_la == "Freetesting - Leicestershire"] <- "Leicestershire County Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Manchester"] <- "Manchester City Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Middlesbrough"] <- "Middlesbrough Council"
-invFreet$ContactName[invFreet$default_la == "Freetesting - Milton Keynes"] <- "????????????????????????"
-
-##### CHECK MILTON KEYNES 
-
+invFreet$ContactName[invFreet$default_la == "Freetesting - Milton Keynes"] <- "Milton Keynes"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Newcastle upon Tyne"] <- "Newcastle City Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Norfolk"] <- "Norfolk County Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - North Tyneside"] <- "North Tyneside Council"
@@ -160,14 +158,13 @@ invFreet$EmailAddress[invFreet$default_la == "Freetesting - West Sussex"] <- "Pa
 invFreet$EmailAddress[invFreet$default_la == "Freetesting - Wigan"] <- "P.Jamieson@wigan.gov.uk"
 
 # Create POAddressLine1
+invFreet$POAddressLine1 <- ""
 
 # Create POPostalCode
-
-# Create Reference
-
+invFreet$POPostalCode <- ""
 
 # Define quarter to be invoiced 
-v2 <- 'InvQ1.2022'
+v2 <- 'InvQ2.2022'
 invFreet$InvoiceNumber <- ""
 invFreet$InvoiceNumber[invFreet$default_la == "Freetesting - Bedford"] <- paste(v2,"000001", sep="-")
 invFreet$InvoiceNumber[invFreet$default_la == "Freetesting - Blackburn with Darwen"] <- paste(v2,"000002", sep="-")
@@ -228,7 +225,7 @@ invFreet$InvoiceNumber[invFreet$default_la == "Freetesting - Wigan"] <- paste(v2
 
 # Create Reference
 invFreet$Reference <- ""
-v3 <- '01.01.2022-31.03.2022'
+v3 <- '01.04.2022-30.06.2022'
 invFreet$Reference[invFreet$default_la == "Freetesting - Bedford"] <- paste("SH24 Freetesting","Bedford",v3,"PO: 5160031", sep=" - ")
 invFreet$Reference[invFreet$default_la == "Freetesting - Blackburn with Darwen"] <- paste("SH24 Freetesting","Blackburn with Darwen",v3,"PO: P049854", sep=" - ")
 invFreet$Reference[invFreet$default_la == "Freetesting - Blackpool"] <- paste("SH24 Freetesting","Blackpool",v3,"", sep=" - ")
@@ -286,10 +283,16 @@ invFreet$Reference[invFreet$default_la == "Freetesting - Warwickshire"] <- paste
 invFreet$Reference[invFreet$default_la == "Freetesting - West Sussex"] <- paste("SH24 Freetesting","West Sussex",v3,"PO: 4100168727", sep=" - ")
 invFreet$Reference[invFreet$default_la == "Freetesting - Wigan"] <- paste("SH24 Freetesting","Wigan",v3,"", sep=" - ")
 
+names(invFreet)
+
+write.table (invFreet, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/2022.09.08_invoic_freetesting.csv", row.names=F, sep=",")
 
 
 
 
+
+
+############# Continue from here 08.09.2022
 
 invMonth <- invoicing[(invoicing$Processed_Month == x),c("ContactName","Processed_Month",'Description')]
 
