@@ -405,6 +405,23 @@ write.table (Treatment.Durham.Darlington, file="\\Users\\Elena Ardines\\Document
 
 # Backing data CONTRACEPTION
 
+
+
+COCT_1 <- COC[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
+                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
+                         "Ordered.COC.from.SH.24.before.","LSOA.name")]
+
+# 8th Sep 2022: Confirm if Lisa needs this:  "Taken.COC.before.","Ordered.OC.from.SH.24.before.",
+
+POP_1 <- POP[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
+                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
+                         "LSOA.name")]
+
+# 8th Sep 2022: Confirm if Lisa needs this:  "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before."
+
+
+
+
 # run "recodeContraception" function and save output in Area
 COC$Area <- 0
 COC$Area <- recodeContraception(DF=COC,varname="Area",varname2="Region")
@@ -517,3 +534,4 @@ safeFree <- safeFree[(orders$Age > 17),]
 table(safeFree$Sexually.assaulted.risk.assessment)
 
                                 
+names(COC)
