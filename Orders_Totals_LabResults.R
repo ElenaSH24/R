@@ -649,9 +649,9 @@ RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
   # extract for contraception disaggregation per prescription, for Invoicing report
   PrescCOC <- COCMonth[ ,c('Area','Months.prescribed','Drug')]
   PrescPOP <- POPMonth[ ,c('Area','Months.prescribed','Drug')]
-  PrescInj <- InjectableMonth[ ,c("region","Injectable.months.prescribed")]
-  PrescPatch <- PatchMonth[ ,c("region","Patch.months.prescribed")]
-  PrescRing <- RingMonth[ ,c("region","Ring.months.prescribed")]
+  PrescInj <- InjectableMonth[ ,c('Area',"Injectable.months.prescribed")]
+  PrescPatch <- PatchMonth[ ,c('Area',"Patch.months.prescribed")]
+  PrescRing <- RingMonth[ ,c('Area',"Ring.months.prescribed")]
   
   # create description concatenating months prescribed and drug
   PrescCOC$Description <- paste('COC',PrescCOC$Months.prescribed,'mth',PrescCOC$Drug)
@@ -669,17 +669,14 @@ RingMonth <- Ring [(Ring$Dispatched.Month.Year == v1),]
   PrescPatch$Patch.months.prescribed = NULL
   PrescRing$Ring.months.prescribed = NULL
   
-    # stack the above data sets one on top of the other with rbind----
-  # rename variables to prepare for rbind: 'region' as 'Area'
-  PrescInj <- rename(PrescInj, Area = region)
-  PrescPatch <- rename(PrescPatch, Area = region)
-  PrescRing <- rename(PrescRing, Area = region)
-  # rbind to stack datasets that have same columns headers
-  prescrip2 <- rbind(PrescCOC,PrescPOP,PrescInj,PrescPatch,PrescRing)
-  # convert to matrix to have like a pivot table
-  prescrip3 <- as.data.frame.matrix(table(prescrip2$Description,prescrip2$Area))
+  # stack the above data sets one on top of the other with rbind - needs same columns headers----
+  prescrip <- rbind(PrescCOC,PrescPOP,PrescInj,PrescPatch,PrescRing)
   
-  write.table (prescrip3, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_08/PrescriptionsPerArea.2022.08_v1.csv", col.names = F, row.names=T, sep=",")
+  # convert to matrix to have like a pivot table
+  prescrip1 <- as.data.frame.matrix(table(prescrip$Description,prescrip$Area), header=TRUE)
+  
+  write.table (prescrip1, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_08/PrescriptionsPerArea.2022.08_v4.csv", 
+               col.names = TRUE, row.names=T, sep=",")
   
   
   
