@@ -1,7 +1,7 @@
 # producing Xero quarterly file for freetesting activity
-# read generic invoicing file (same we use for SH:24 invoicing)
-invoicing = read.csv("20220404_Invoicing_AprToMar.csv")
+# read generic invoicing file (same we use for SH:24 invoicing): invSTI 
 
+invoicing <- invSTI
 
 # extract freetesting activity, and the variables needed for invoicing
 invFre <- invoicing[grep('Freetesting -', invoicing$default_la)
@@ -12,22 +12,25 @@ invFre <- invoicing[grep('Freetesting -', invoicing$default_la)
 invFre$processed_at <- as.Date(invFre$processed_at,"%Y-%m-%d")
 # extract month from day date
 invFre$Dispatched.MonthYear <- format(as.Date(invFre$processed_at),"%Y-%m")
-# extract data for the relevant month
-v1 <- '2022-02'
-invFreet <- invFre[(invFre$Dispatched.MonthYear == v1),]
+# extract data for the relevant quarter
+invFreet <- invFre[(invFre$Dispatched.MonthYear == "2022-04" | invFre$Dispatched.MonthYear == "2022-05" | invFre$Dispatched.MonthYear == "2022-06"),]
 
 
 # assign values to 'overall_type' that align with invoicing
 invFreet$overall_type[invFreet$overall_type == 'kits_sent'] <- 'Orders'
 invFreet$overall_type[invFreet$overall_type == 'kits_tested'] <- 'Returns'
+table(invFreet$overall_type,invFreet$Dispatched.MonthYear)
+
 # concatenate values of both variables (type and category) to create the invoicing Description
 invFreet$Description <- paste(invFreet$overall_type, invFreet$invoice_category_billable, sep=" - ")
 
 table(invFreet$Description, invFreet$overall_type=='Returns')
 # some returns are blank, showing in data.frame as 'Returns -'
-# assimilate those 'blank' categories to 'Returns - HIV' - only a few per month, and not sure how to allocate to exact category - DISCUSS WITH TEAM
-# they relate to categories not interpreted by the mapping table in the DB
-invFreet$Description[invFreet$Description == "Returns - "] <- "Returns - HIV"
+
+
+# Remove those 'blank' categories to 'Returns - HIV' - they are tests that haven't been processed
+invFreet <- invFreet[(invFreet$Description != "Returns - "),]
+
 # freetesting scheme is designed for 'HIV' and 'HIV & Syphilis'
 # Allocate any 'Syphilis' order or return to 'HIV' (charge for 1 blood). Again, only a few per month - DISCUSS WITH TEAM
 invFreet$Description[invFreet$Description == "Orders - Syphilis"] <- "Orders - HIV"
@@ -37,6 +40,19 @@ invFreet$Description[invFreet$Description == "Returns - Syphilis"] <- "Returns -
 invFreet$processed_at = NULL
 invFreet$overall_type = NULL
 invFreet$invoice_category_billable = NULL
+invFreet$Dispatched.MonthYear = NULL
+
+invFreet_1 <- invFreet
+
+# dplyr: grouping on two columns and counting distinct values
+# and convert to data frame
+invFreet <- as.data.frame(invFreet_1 %>% 
+                              dplyr::group_by(default_la,Description)%>%
+                              dplyr::summarise(Freq=n()) )
+
+
+
+
 
 # Create ContactName, to name regions as per invoicing requirements
 invFreet$ContactName <- invFreet$default_la
@@ -65,10 +81,7 @@ invFreet$ContactName[invFreet$default_la == "Freetesting - Leicester"] <- "Leice
 invFreet$ContactName[invFreet$default_la == "Freetesting - Leicestershire"] <- "Leicestershire County Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Manchester"] <- "Manchester City Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Middlesbrough"] <- "Middlesbrough Council"
-invFreet$ContactName[invFreet$default_la == "Freetesting - Milton Keynes"] <- "????????????????????????"
-
-##### CHECK MILTON KEYNES 
-
+invFreet$ContactName[invFreet$default_la == "Freetesting - Milton Keynes"] <- "Milton Keynes"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Newcastle upon Tyne"] <- "Newcastle City Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - Norfolk"] <- "Norfolk County Council"
 invFreet$ContactName[invFreet$default_la == "Freetesting - North Tyneside"] <- "North Tyneside Council"
@@ -160,14 +173,13 @@ invFreet$EmailAddress[invFreet$default_la == "Freetesting - West Sussex"] <- "Pa
 invFreet$EmailAddress[invFreet$default_la == "Freetesting - Wigan"] <- "P.Jamieson@wigan.gov.uk"
 
 # Create POAddressLine1
+invFreet$POAddressLine1 <- ""
 
 # Create POPostalCode
-
-# Create Reference
-
+invFreet$POPostalCode <- ""
 
 # Define quarter to be invoiced 
-v2 <- 'InvQ1.2022'
+v2 <- 'InvQ2.2022'
 invFreet$InvoiceNumber <- ""
 invFreet$InvoiceNumber[invFreet$default_la == "Freetesting - Bedford"] <- paste(v2,"000001", sep="-")
 invFreet$InvoiceNumber[invFreet$default_la == "Freetesting - Blackburn with Darwen"] <- paste(v2,"000002", sep="-")
@@ -228,7 +240,7 @@ invFreet$InvoiceNumber[invFreet$default_la == "Freetesting - Wigan"] <- paste(v2
 
 # Create Reference
 invFreet$Reference <- ""
-v3 <- '01.01.2022-31.03.2022'
+v3 <- '01.04.2022-30.06.2022'
 invFreet$Reference[invFreet$default_la == "Freetesting - Bedford"] <- paste("SH24 Freetesting","Bedford",v3,"PO: 5160031", sep=" - ")
 invFreet$Reference[invFreet$default_la == "Freetesting - Blackburn with Darwen"] <- paste("SH24 Freetesting","Blackburn with Darwen",v3,"PO: P049854", sep=" - ")
 invFreet$Reference[invFreet$default_la == "Freetesting - Blackpool"] <- paste("SH24 Freetesting","Blackpool",v3,"", sep=" - ")
@@ -286,90 +298,58 @@ invFreet$Reference[invFreet$default_la == "Freetesting - Warwickshire"] <- paste
 invFreet$Reference[invFreet$default_la == "Freetesting - West Sussex"] <- paste("SH24 Freetesting","West Sussex",v3,"PO: 4100168727", sep=" - ")
 invFreet$Reference[invFreet$default_la == "Freetesting - Wigan"] <- paste("SH24 Freetesting","Wigan",v3,"", sep=" - ")
 
+# export to local
+write.table (invFreet, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/2022.09.09_invoic_freetesting.csv", row.names=F, sep=",")
 
 
-
-
-
-invMonth <- invoicing[(invoicing$Processed_Month == x),c("ContactName","Processed_Month",'Description')]
-
-# convert to data.frame to get the count of the number of tests
-invMonth_1 = as.data.frame(table (invMonth$ContactName,invMonth$Description))
-#name the columns
-colnames(invMonth_1)[1] <- "ContactName"
-colnames(invMonth_1)[2] <- "Description"
-colnames(invMonth_1)[3] <- "Quantity"
-
-# create invoice number column----
-# first half of the invoice number is the month
-invMonth_1$Invoice <- 'Inv '
-# second half of the invoice number is associated to the specific Trust/Region, which we call ContactName in this script
-invMonth_1$Number <- ""
-invMonth_1$Number[invMonth_1$ContactName == "Essex"] <- "0001"
-invMonth_1$Number[invMonth_1$ContactName == "Wirral"] <- "0056"
-
-
-# create Reference as concatenate of 'Invoice' and 'Number'
-invMonth_1$Reference <- paste(invMonth_1$Invoice,x,invMonth_1$Number, sep=" ")
-
-# some Trusts have a Purchase Order
-invMonth_1$PO <- ""
-invMonth_1$PO[invMonth_1$ContactName == "Berkshire"] <- "PO 40157114"
-invMonth_1$PO[invMonth_1$ContactName == "Warrington"] <- "PO RQ6N400039417"
-
-# create reference. Use 'Region' instead of 'ContactName' as a better reference to our records
-invMonth_1$Reference <- paste("SH:24 ",invMonth_1$ContactName, " activity 01.02.2022-28.02.2022", invMonth_1$PO)
-# invoice dates----
-invMonth_1$InvoiceDate <- "28/02/2022"
-invMonth_1$DueDate <- "31/03/2022"
-
-        
-# remove dataframe rows based on zero values in one column
-invMonth_2 <- invMonth_1[invMonth_1$Quantity != 0, ]
-
-
+############# Continue from here 09.09.2022, include prices
 # create price data frames
 Description <- c('Orders - HIV',
-                'Orders - HIV & Syphilis',
-                'Orders - Syphilis',
-                'Returns - HIV',
-                'Returns - HIV & Syphilis',
-                'Returns - Syphilis')
+                 'Orders - HIV & Syphilis',
+                 'Orders - Syphilis',
+                 'Returns - HIV',
+                 'Returns - HIV & Syphilis',
+                 'Returns - Syphilis')
 
+# create the rest of the variables needed for the Xero file
 
-Fee5Freetesting
+InvoicesStack$PORegion <- ""
+InvoicesStack$POPostalCode <- ""
+InvoicesStack$POCountry <- ""
+InvoicesStack$Total <- ""
+InvoicesStack$InventoryItemCode <- ""
+InvoicesStack$Discount <- ""
+InvoicesStack$AccountCode <- "200"
+InvoicesStack$AccountCode[grepl("Contraception", InvoicesStack$Description)] <- "206"
+table(InvoicesStack$AccountCode)
+InvoicesStack$TaxType <- "No VAT"
+InvoicesStack$TaxAmount <- ""
+InvoicesStack$TrackingName1 <- "Workstream"
+InvoicesStack$TrackingOption1 <- "Operations"
+InvoicesStack$TrackingName2 <- ""
+InvoicesStack$TrackingOption2 <- ""
+InvoicesStack$Currency <- "GBP"
+InvoicesStack$BrandingTheme <- "Standard SH24 (Accounts)"
 
-# create data frame with prices per invoicing category
-fee1 <- data.frame(Description, Fee1DiscountRM)
-
-
-# break down the main invoicing data set as per the fee contracted in each area 
-InvFee1 <- invMonth_2 [(invMonth_2$ContactName=="Blackburn" | invMonth_2$ContactName=="Bradford" | invMonth_2$ContactName=="Bromley"
-                        | invMonth_2$ContactName=="Cheshire East" | invMonth_2$ContactName=="Cornwall and Isles of Scilly"
-                        | invMonth_2$ContactName=="County Durham and Darlington NHS Foundation Trust" | invMonth_2$ContactName=="Darlington"
-                        | invMonth_2$ContactName=="Derby City" | invMonth_2$ContactName=="Derbyshire Community Health Services NHS Foundation Trust"
-                        | invMonth_2$ContactName=="Dorset" | invMonth_2$ContactName=="Halton"
-                        | invMonth_2$ContactName=="Kirklees" | invMonth_2$ContactName=="Knowsley" | invMonth_2$ContactName=="Liverpool"),]
-
-
-
-# merge each price data set with its correspondent areas
-InvoicesFee1 = merge(x = InvFee1, y = fee1, by = "Description", all.x = TRUE)
-
-
-# rename variables in the data frames that include prices. Variables have to be called the same to be able to stack data frames
-#rename(new variable name = existing variable name)
-InvoicesFee1 <- rename(InvoicesFee1, Unit.Price = Fee1DiscountRM)
-
-# Stack data sets one on top of the other 
-InvoicesStack <- rbind(InvoicesFee1, InvoicesFee2, InvoicesFee3)  
 
 
 # select and order the columns we need
-InvoicesStack <- InvoicesStack [c("ContactName","Reference","Reference","InvoiceDate","DueDate","Description","Quantity","Unit.Price")]
-# order data first by Area (=ContactName) and second by the invoicing category (=Description)
-InvoicesStack <- InvoicesStack[order(InvoicesStack$ContactName,InvoicesStack$Description),]
+InvoicesStack_Ordered <- InvoicesStack [c("ContactName","EmailAddress","POAddressLine1","POAddressLine2","POAddressLine3","POAddressLine4",
+                                          "POCity","PORegion","POPostalCode","POCountry",
+                                          "InvoiceNumber","Reference","InvoiceDate","DueDate","Total","InventoryItemCode","Description",
+                                          "Quantity","UnitAmount","Discount","AccountCode","TaxType","TaxAmount","TrackingName1","TrackingOption1",
+                                          "TrackingName2","TrackingOption2","Currency","BrandingTheme")]
 
-# create blank variables
-InvoicesStack$Total <- ""
+# order data first by Area (=ContactName) and second by the invoicing category (=Description)
+InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$ContactName),]
+
+
+# Replace <NA> in Unit.Amount with zero ----
+InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
+
+
+
+
+
+
 
