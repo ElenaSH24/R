@@ -26,9 +26,10 @@ invFreet$Description <- paste(invFreet$overall_type, invFreet$invoice_category_b
 
 table(invFreet$Description, invFreet$overall_type=='Returns')
 # some returns are blank, showing in data.frame as 'Returns -'
-# assimilate those 'blank' categories to 'Returns - HIV' - only a few per month, and not sure how to allocate to exact category - DISCUSS WITH TEAM
+# we don't invoice those 'blank' - only a few per month that haven't been processed by lab
 # they relate to categories not interpreted by the mapping table in the DB
-invFreet$Description[invFreet$Description == "Returns - "] <- "Returns - HIV"
+invFreet <- invFreet[(invFreet$Description != "Returns - "),]
+
 # freetesting scheme is designed for 'HIV' and 'HIV & Syphilis'
 # Allocate any 'Syphilis' order or return to 'HIV' (charge for 1 blood). Again, only a few per month - DISCUSS WITH TEAM
 invFreet$Description[invFreet$Description == "Orders - Syphilis"] <- "Orders - HIV"
@@ -38,6 +39,30 @@ invFreet$Description[invFreet$Description == "Returns - Syphilis"] <- "Returns -
 invFreet$processed_at = NULL
 invFreet$overall_type = NULL
 invFreet$invoice_category_billable = NULL
+
+table(invFreet$Description)
+
+invFreet_1 <- invFreet
+
+##### create matrix or group by - install dplyr
+
+invFreet_1 %>%
+  dplyr::group_by(default_la,Description)%>%
+  dplyr::summarise(frequency()) # <-- dplyr
+
+names(invFreet)
+
+d %>%
+  dplyr::group_by(A,B)%>%
+  dplyr::summarise(UNIQUE_COUNT = n_distinct(C)) # <-- dplyr
+
+
+
+
+
+
+
+
 
 # Create ContactName, to name regions as per invoicing requirements
 invFreet$ContactName <- invFreet$default_la

@@ -403,25 +403,9 @@ table(TreatmentsMerge$Area=="Darlington")
 names(TreatmentsMerge)
 write.table (Treatment.Durham.Darlington, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2020\\2020 05\\backing_dataata\\2020.01.Treatment.Durham.Darlington.csv", row.names=F, sep=",")
 
-# Backing data CONTRACEPTION
 
 
-
-COCT_1 <- COC[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
-                         "Ordered.COC.from.SH.24.before.","LSOA.name")]
-
-# 8th Sep 2022: Confirm if Lisa needs this:  "Taken.COC.before.","Ordered.OC.from.SH.24.before.",
-
-POP_1 <- POP[ ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                         ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region",
-                         "LSOA.name")]
-
-# 8th Sep 2022: Confirm if Lisa needs this:  "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before."
-
-
-
-
+# Backing data CONTRACEPTION----
 # run "recodeContraception" function and save output in Area
 COC$Area <- 0
 COC$Area <- recodeContraception(DF=COC,varname="Area",varname2="Region")
@@ -434,21 +418,63 @@ Zero <- POP[(POP$Area==0),]
 rm(Zero)
 
 
-COC_LLR.MPFT <- COC [(COC$Area=="Leicester" | COC$Area=="Leicestershire" | COC$Area=="Rutland" | COC$Area=="Shropshire" |
-                              COC$Area=="Telford and Wrekin" | COC$Area=="Staffordshire" | COC$Area=="North Staffordshire" | COC$Area=="Stoke"),]
+# OC backing data files Dorset
+# 8th Sep 2022: Lisa confirms they don't need these variables: "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before."
+COC_Dorset <- COC[ (COC$Area=="Dorset")
+                   ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
+                   ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region","LSOA.name")]
+
+POP_Dorset <- POP [(POP$Area=="Dorset")
+                   ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
+                   ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region","LSOA.name")]
+
+write.table (COC_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month Dorset COC_v1.csv", row.names=F, sep=",")
+write.table (POP_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month Dorset POP_v1.csv", row.names=F, sep=",")
+
+
+
+# OC backing data files Derby and Derbyshire
+COC_DerbyshireDerby <- COC [(COC$Clinic=="Wheatbridge Clinic" | COC$Clinic=="London Road Community Hospital")
+                              ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year",
+                                 "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
+                                 "Months.prescribed","Clinic","Region",
+                                 "Taken.COC.before.","Ordered.COC.from.SH.24.before.","LSOA.name")]
+# 11.09.2022:add the columns we removed in Sep.2022
+# 11.09.2022: Sarah needs files with usual formatting, though they don't use those columns for reporting - they may be ok left blank: confirmn with Sarah
+COC_DerbyshireDerby$Ordered.OC.from.SH.24.before. <- ""
+COC_DerbyshireDerby$Area <- "Region" #add this variable here to keep original order of columns
+
+
+POP_DerbyshireDerby <- POP [(POP$Clinic=="Wheatbridge Clinic" | POP$Clinic=="London Road Community Hospital")
+                            ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year",
+                               "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
+                               "Months.prescribed","Clinic","Region","LSOA.name")]
+POP_DerbyshireDerby$Taken.POP.before. <- ""
+POP_DerbyshireDerby$Ordered.POP.from.SH.24.before. <- ""
+POP_DerbyshireDerby$Ordered.OC.from.SH.24.before. <- ""
+POP_DerbyshireDerby$Area <- "Region"
+
+# Merge contraception data with LSOA file, to get LSOA Code for LLR
+COC_DerbyshireDerby <- merge(COC_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
+POP_DerbyshireDerby <- merge(POP_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
+names(POP_DerbyshireDerby)
+
+write.table (COC_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month DerbyshireDerby COC_v1.csv", row.names=F, sep=",")
+write.table (POP_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month DerbyshireDerby POP_v1.csv", row.names=F, sep=",")
+
+
+
+COC_LLR.MPFT <- COC_1 [(COC_1_1$Area=="Leicester" | COC_1$Area=="Leicestershire" | COC_1$Area=="Rutland" | COC_1$Area=="Shropshire" |
+                              COC_1$Area=="Telford and Wrekin" | COC_1$Area=="Staffordshire" | COC_1$Area=="North Staffordshire" | COC_1$Area=="Stoke"),]
 POP_LLR.MPFT <- POP [(POP$Area=="Leicester" | POP$Area=="Leicestershire" |POP$Area=="Rutland" | POP$Area=="Shropshire" |
                               POP$Area=="Telford and Wrekin" | POP$Area=="Staffordshire" | POP$Area=="North Staffordshire" | POP$Area=="Stoke"),]
 
-COC_DerbyshireDerby <- COC [(COC$Clinic=="Wheatbridge Clinic" | COC$Clinic=="London Road Community Hospital"),]
-POP_DerbyshireDerby <- POP [(POP$Clinic=="Wheatbridge Clinic" | POP$Clinic=="London Road Community Hospital"),]
 
-COC_Dorset <- COC [(COC$Area=="Dorset"),]
-POP_Dorset <- POP [(POP$Area=="Dorset"),]
-
-COC_Cornwall <- COC [(COC$Region=="Cornwall and Isles of Scilly PCT" | COC$Region=="Blackburn with Darwen" 
-                            | COC$Region=="Southend-on-Sea"),]
+COC_Cornwall <- COC_1 [(COC_1$Region=="Cornwall and Isles of Scilly PCT" | COC_1$Region=="Blackburn with Darwen" 
+                            | COC_1$Region=="Southend-on-Sea"),]
 POP_Cornwall <- POP [(POP$Region=="Cornwall and Isles of Scilly PCT" | POP$Region=="Blackburn with Darwen"
                             | POP$Region=="Southend-on-Sea"),]
+
 COC_Cornwall$SH.24.UID = NULL
 POP_Cornwall$SH.24.UID = NULL
 
@@ -457,15 +483,9 @@ POP_Cornwall$SH.24.UID = NULL
 COC_LLR.MPFT <- merge(COC_LLR.MPFT, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
 POP_LLR.MPFT <- merge(POP_LLR.MPFT, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
 
-COC_DerbyshireDerby <- merge(COC_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
-POP_DerbyshireDerby <- merge(POP_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
 
 write.table (COC_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month LLR.MPFT COC.csv", row.names=F, sep=",")
 write.table (POP_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month LLR.MPFT POP.csv", row.names=F, sep=",")
-write.table (COC_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month DerbyshireDerby COC.csv", row.names=F, sep=",")
-write.table (POP_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month DerbyshireDerby POP.csv", row.names=F, sep=",")
-write.table (COC_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month Dorset COC.csv", row.names=F, sep=",")
-write.table (POP_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month Dorset POP.csv", row.names=F, sep=",")
 write.table (COC_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month Cornwall_Southe_Blackb COC.csv", row.names=F, sep=",")
 write.table (POP_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/BackingData/2022 Month Cornwall_Southe_Blackb POP.csv", row.names=F, sep=",")
 # End Backing Data CONTRACEPTION ----
