@@ -28,23 +28,23 @@ Treatments1 <- rename(Treatments1, Created.at = created_at)
 Treatments1 <- rename(Treatments1, Dispatched.at = dispatched_at)
 
 # create contraception datasets
-ContCOC1 <- ContCOC
-ContCOC1$Type <- 'COC'
-ContCOC1 <- ContCOC1[,grep("^customer|SH.24.UID|created|dispa|region|Type",colnames(ContCOC1),perl = T,value = T,ignore.case = T)] 
+COC1 <- COC
+COC1$Type <- 'COC'
+COC1 <- COC1[,grep("^customer|SH.24.UID|created|dispa|region|Type",colnames(COC1),perl = T,value = T,ignore.case = T)] 
 #rename column names, they should be identical in all data sets to be 'rbind'
-ContCOC1 <- rename(ContCOC1, SH24.UID = SH.24.UID, Default.LA = Region)
+COC1 <- rename(COC1, SH24.UID = SH.24.UID, Default.LA = Region)
 
-ContPOP1 <- ContPOP
-ContPOP1$Type <- 'POP'
-ContPOP1 <- ContPOP1[,grep("^customer|SH.24.UID|created|dispa|region|Type",colnames(ContPOP1),perl = T,value = T,ignore.case = T)] 
+POP1 <- POP
+POP1$Type <- 'POP'
+POP1 <- POP1[,grep("^customer|SH.24.UID|created|dispa|region|Type",colnames(POP1),perl = T,value = T,ignore.case = T)] 
 #rename column names, they should be identical in all data sets to be 'rbind'
-ContPOP1 <- rename(ContPOP1, SH24.UID = SH.24.UID, Default.LA = Region)
+POP1 <- rename(POP1, SH24.UID = SH.24.UID, Default.LA = Region)
 
-FranECNow1 <- FranECNow [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")]
-FranECFut1 <- FranECFut [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")] 
+ECNow1 <- ECNow [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")]
+ECFut1 <- ECFuture [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")] 
 
 # stack both EC datasets one on top of the other one
-EC1 <- rbind(FranECNow1, FranECFut1)
+EC1 <- rbind(ECNow1, ECFut1)
 #add type of order
 EC1$Type <- 'EC'
 #rename column names (install dplyr and data.table packages), they should be identical in all data sets to use 'rbind'
@@ -53,7 +53,7 @@ EC1 <- rename(EC1, Customer.ID = customer_id)
 EC1 <- rename(EC1, Default.LA = Region)
 
 # stack all data sets one of top of each other
-DataStack <- rbind(Orders1, Treatments1,ContCOC1,ContPOP1,EC1)
+DataStack <- rbind(Orders1, Treatments1,COC1,POP1,EC1)
 
 DataStackFettle <- DataStack[(DataStack$Default.LA == "Fettle"),]
 
@@ -83,22 +83,17 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2. Ad-hoc reports/2022.08.18.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.09.21.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
-# Cross-product orders
+# DELETE 21st Sep 2022: Cross-product orders
 # Reshape the data frame
 ################## CONTINUE FROM HERE 14.MARCH.2022 ###############
-DataStackFettle.Wide <- DataStackFettle[,c('Customer.ID','Type')]
-
-DataStackFettle.Wide1 <- reshape(DataStackFettle.Wide, idvar = "Customer.ID", timevar = "Type", direction = "wide")
-reshape(dat1, idvar = "name", timevar = "numbers", direction = "wide")
-
-COCandPOP$COC.POP[COCandPOP$Gender=="male" | GumcadQ$Genitals=="Penis"] <- 1 
-GumcadQ$Gender[GumcadQ$Gender=="male" | GumcadQ$Genitals=="Penis"] <- 1 
-
+#DataStackFettle.Wide <- DataStackFettle[,c('Customer.ID','Type')]
+#DataStackFettle.Wide1 <- reshape(DataStackFettle.Wide, idvar = "Customer.ID", timevar = "Type", direction = "wide")
+#reshape(dat1, idvar = "name", timevar = "numbers", direction = "wide")
 # TRY THIS?: convert to data frame to get the frequency of ordering per user
-DataStackFettle_1 <- as.data.frame(table(DataStackFettle$Customer.ID,DataStackFettle$Type))
+#DataStackFettle_1 <- as.data.frame(table(DataStackFettle$Customer.ID,DataStackFettle$Type))
 
 # End Stack all data sets----
 
@@ -109,7 +104,7 @@ DataStackFettle_1 <- as.data.frame(table(DataStackFettle$Customer.ID,DataStackFe
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2022-03-31'
+v1 <- '2022-08-31'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
