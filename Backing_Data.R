@@ -4,6 +4,7 @@ install.packages("data.table")
 install.packages("dplyr")
 install.packages("reshape2")
 library(reshape2)
+install.packages('tidyverse')
 
 
 # use ~ as a shortcut to the Home Directory, to avoid portability issues (i.e. changing Operating Systems, versions of R, or programming language)
