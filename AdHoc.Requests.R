@@ -133,7 +133,7 @@ nrow(Bought.Fettle.Three)
 nrow(Bought.Fettle.FourPlus)
 
 # Fran REPEAT USERS COC Fettle----
-FettleCOC <- ContCOC[ ,c('SH.24.UID','Customer.ID',"Region","Created.at","Created.at.month.year","Dispatched.at")]
+FettleCOC <- COC[ ,c('SH.24.UID','Customer.ID',"Region","Created.at","Created.at.month.year","Dispatched.at")]
 # order files in chronological date, use FormatDate (class = Date)
 FettleCOC <- FettleCOC[(order(as.Date(FettleCOC$Created.at))),]
 # Subset for Fettle and dispatched orders (dispatched different than blank)
@@ -167,7 +167,7 @@ nrow(Bought.COC.FourPlus)
 
 
 # Fran REPEAT USERS POP Fettle----
-FettlePOP <- ContPOP[ ,c('Customer.ID',"Region","Created.at","Created.at.month.year","Dispatched.at")]
+FettlePOP <- POP[ ,c('Customer.ID',"Region","Created.at","Created.at.month.year","Dispatched.at")]
 # order files in chronological date, use FormatDate (class = Date)
 FettlePOP <- FettlePOP[(order(as.Date(FettlePOP$Created.at))),]
 # Subset for Fettle and dispatched orders (dispatched different than blank)
@@ -201,8 +201,8 @@ nrow(Bought.POP.FourPlus)
 
 
 # Fran REPEAT USERS EC Fettle----
-FettleECNow <- FranECNow[ ,c('customer_id',"Region","Created.at","Dispatched.at")]
-FettleECFuture <- FranECFut[ ,c('customer_id',"Region","Created.at","Dispatched.at")]
+FettleECNow <- ECNow[ ,c('customer_id',"Region","Created.at","Dispatched.at")]
+FettleECFuture <- ECFuture[ ,c('customer_id',"Region","Created.at","Dispatched.at")]
 # stack Now and Future into one EC file with 'rbind'. Column names have to be identical. 
 FettleEC <- rbind(FettleECNow,FettleECFuture)
 # order files in chronological date, use FormatDate (class = Date)
@@ -303,61 +303,6 @@ prop.table(table(HertsKPI3$NegatResults3d.Group))*100
 
 
 
-#20.12.2021 Fran Bury: all orders for all products from under 18s, safeguarding flags----
-# upload files from Backing_Data tab
-BurySTI <- orders [(orders$Age<18),(c('Default.LA',"Created.at","Created.at.month.year","Dispatched.at",'Dispatched.at.month.year',
-                                      "Lab.results.at","Lab.results.at.month.year",
-                                      "Age","Gender","Genitals","Ethnicity","Sexual.preference","Sexuality","Sites.tested",
-                                      "Unprotected.sex.in.last.5.days","Sexually.assaulted.risk.assessment",
-                                      "Pressured.into.sex","Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
-                                      "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C"))]
-
-BuryCOC <- ContCOC[(ContCOC$Age<18),(c("Region","Created.at","Created.at.month.year",
-                                       "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
-                                       "Age","Ethnicity","Sexuality","Risk.of.pregnancy",
-                                       "Sexually.assaulted","Pressured","Bribed","Inebriated","Depression","Older.or.younger.partner"))]
-
-BuryPOP <- ContPOP[(ContPOP$Age<18),(c("Region","Created.at","Created.at.month.year",
-                                       "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
-                                       "Age","Ethnicity","Sexuality","Risk.of.pregnancy",
-                                       "Sexually.assaulted","Pressured","Bribed","Inebriated","Depression","Older.or.younger.partner"))]
-BuryCOC <- rename(BuryCOC, Unprotected.sex.Risk.pregnancy = Risk.of.pregnancy)
-BuryPOP <- rename(BuryPOP, Unprotected.sex.Risk.pregnancy = Risk.of.pregnancy)
-
-# include sexuality in the sql query
-ECNowBury = read.csv("20201220_FranBury_EC.csv")
-BuryECNow <- ECNowBury[(ECNowBury$Age<18) , (c("Region","Created.at","Created.at.month.year",
-                                               "Dispatched.at","Dispatched.at.month.year","prescription_day",
-                                               "Age","Ethnicity","Sexuality",
-                                               "Sexually.assaulted","Pressured.into.sex","Paid.for.sex",
-                                               "Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner"))]
-
-Patch = read.csv("FranBury_Patch.csv")
-BuryPatch <- Patch[(Patch$Age<18) , (c("region","Created.day","Created.Month.Year",
-                                       "Dispatched.day","Dispatched.Month.Year",
-                                       "Age","Ethnicity","Sexuality","Unprotected.sex",
-                                       "Sexually.assaulted",'Bribed',"Inebriated","Depression","Pressured","Older.or.younger.partner"))]
-
-Ring = read.csv("FranBury_Ring.csv")
-BuryRing <- Ring[(Ring$Age<18) , (c("region","Created.day","Created.Month.Year",
-                                    "Dispatched.day","Dispatched.Month.Year",
-                                    "Age","Ethnicity","Sexuality","Unprotected.sex",
-                                    "Sexually.assaulted",'Bribed',"Inebriated","Depression","Pressured","Older.or.younger.partner"))]
-
-Injectable = read.csv("Injectable_Test_v1.csv")
-BuryInjectable <- Injectable[(Injectable$Age<18),(c("region","Created.day","Created.Month.Year",
-                                                    "Dispatched.day","Dispatched.Month.Year",
-                                                    "Age","Ethnicity","Sexuality","Unprotected.sex",
-                                                    "Sexually.assaulted",'Bribed',"Inebriated","Depression","Pressured","Older.or.younger.partner"))]
-
-write.table (BurySTI, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_STI.csv", row.names=F, sep=",")
-write.table (BuryCOC, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_COC.csv", row.names=F, sep=",")
-write.table (BuryPOP, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_POP.csv", row.names=F, sep=",")
-write.table (BuryECNow, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_ECNow.csv", row.names=F, sep=",")
-write.table (BuryPatch, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_Patch.csv", row.names=F, sep=",")
-write.table (BuryRing, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_Ring.csv", row.names=F, sep=",")
-write.table (BuryInjectable, file="/Users/ElenaArdines1/Documents/Reports/2. Ad-hoc reports/PublicRegistrars/2021.12.20.FranB_Injectable.csv", row.names=F, sep=",")
-# END Fran Bury
 
 # EXPERIMENT Invoicing with testing service----
 orders = read.csv("20220103_StiOrders.csv")
@@ -448,9 +393,6 @@ write.table (EC, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-
 # END Georgia request 2022.04.06
 
 
-# 2022.04.28 Graham messages per customer (conversation)
-setwd("/Users/ElenaArdinesTomas/Documents/Reports/2.Ad-hoc-reports")
-mssg <- read.csv("20220428_MessagesPerConversation.csv")
 
 # 2022.05.17 Abi CT diagnosis and treatments period 15/7/21 to 14/1/22
 setwd("/Users/ElenaArdinesTomas/Documents/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_04")
@@ -485,16 +427,10 @@ write.table(Abi_1, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-ho
 # end Abi CT
 
 
-
-# Build a Model----
-Model <- OrdersToWork %>%
-  select(SH24.UID, Created.at, Area)
-
 ####################################################################################
 
 
 
-install.packages('tidyverse')
 
 
 # 2022.06.12 Freetesting - Suffolk MSM
