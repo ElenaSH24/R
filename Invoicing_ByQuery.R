@@ -3,10 +3,10 @@
 # read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2022-08'               #v1: reporting month
-v2 <- '01.08.2022-31.08.2022' #v2: activity period being invoiced
-v3 <- "31/08/2022"            #v3: InvoiceDate
-v4 <- "30/09/2022"            #v4: DueDate
+v1 <- '2022-09'               #v1: reporting month
+v2 <- '01.09.2022-30.09.2022' #v2: activity period being invoiced
+v3 <- "30/09/2022"            #v3: InvoiceDate
+v4 <- "31/10/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -301,30 +301,6 @@ invMonth_2$InvoiceNumber <- paste(invMonth_2$Invoice, v1, invMonth_2$Number, sep
 invMonth_2$Invoice = NULL
 invMonth_2$Number = NULL
 
-
-# REMOVE AS TARAN INCLUDES THE PO IN EACH INVOICE - DISCUSS WITH BLAKE
-#some Trusts have a Purchase Order
-# invMonth_1$PO <- ""
-# invMonth_1$PO[invMonth_1$ContactName == "Berkshire"] <- "PO 40157114"
-# invMonth_1$PO[invMonth_1$ContactName == "County Durham and Darlington NHS Foundation Trust"] <- "PO RXP0003834180"
-# invMonth_1$PO[invMonth_1$ContactName == "Bradford"] <- "PO L024942"
-# invMonth_1$PO[invMonth_1$ContactName == "Cheshire East"] <- "PO RQ6N400039417"
-# invMonth_1$PO[invMonth_1$ContactName == "Gateshead"] <- "PO RLNN400008230"
-# invMonth_1$PO[invMonth_1$ContactName == "Halton"] <- "PO RQ6N400039417"
-# invMonth_1$PO[invMonth_1$ContactName == "Hertfordshire"] <- "PO 000037852"
-# invMonth_1$PO[invMonth_1$ContactName == "Kirklees"] <- "PO L024941"
-# invMonth_1$PO[invMonth_1$ContactName == "Knowsley"] <- "PO RQ6N400039417"
-# invMonth_1$PO[invMonth_1$ContactName == "Leicester City"] <- "PO SS139020"
-# invMonth_1$PO[invMonth_1$ContactName == "Leicestershire"] <- "PO SS139020"
-# invMonth_1$PO[invMonth_1$ContactName == "North Staffordshire"] <- "PO SS139114"
-# invMonth_1$PO[invMonth_1$ContactName == "Nottingham City Council"] <- "PO NCC7156225"
-# invMonth_1$PO[invMonth_1$ContactName == "UKHSA PrEP Trial"] <- "PO 6695926"
-# invMonth_1$PO[invMonth_1$ContactName == "Rutland"] <- "PO SS139020"
-# invMonth_1$PO[invMonth_1$ContactName == "Shropshire"] <- "PO SS105992"
-# invMonth_1$PO[invMonth_1$ContactName == "South Staffordshire and Shropshire Healthcare NHS Foundation Trust"] <- "PO SS124036"
-# invMonth_1$PO[invMonth_1$ContactName == "Stoke on Trent"] <- "PO SS139114"
-# invMonth_1$PO[invMonth_1$ContactName == "Telford and Wrekin"] <- "PO SS80163"
-# invMonth_1$PO[invMonth_1$ContactName == "Warrington"] <- "PO RQ6N400039417"
 
 # create reference. Use 'Region' instead of 'ContactName' as a better reference to our records
 invMonth_2$Reference <- paste("SH:24 ",invMonth_2$ContactName, "activity", v2)
