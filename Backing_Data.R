@@ -232,22 +232,24 @@ Data_Hillingdon <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Hillingdon
 Data_NIreland <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Northern Ireland Belfast PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Northern PCT" |
                                        BackingMin_noSH24$Default.LA=="Northern Ireland South Eastern PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Southern PCT" |
                                        BackingMin_noSH24$Default.LA=="Northern Ireland Western PCT"),]
+
 Data_Worces_Hereford <- BackingMin_noSH24 [(BackingMin_noSH24$Site=="Worcestershire Hub" | BackingMin_noSH24$Site=="iSH Hereford"),]
 # End REST OF AREAS----
 
 
 # Ireland backing data Justin----
-Data_Ireland <- orders [(orders$Default.LA=="Ireland - Dublin" | orders$Default.LA=="Ireland - Cork" 
-                         | orders$Default.LA=="Ireland - Kerry" | orders$Default.LA=="Ireland - Kildare" 
-                         | orders$Default.LA=="Ireland - Wicklow" | orders$Default.LA=="Ireland - Cavan" |
-                           orders$Default.LA=="Ireland - Louth" | orders$Default.LA=="Ireland - Meath" |
-                           orders$Default.LA=="Ireland - Monaghan" | orders$Default.LA=="Ireland - Offaly" |
-                           orders$Default.LA=="Ireland - Galway" | orders$Default.LA=="Ireland - Mayo" |
-                           orders$Default.LA=="Ireland - Laois" | orders$Default.LA=="Ireland - Roscommon" |
-                           orders$Default.LA=="Ireland - Donegal" | orders$Default.LA=="Ireland - Sligo" |
-                           orders$Default.LA=="Ireland - Leitrim" | orders$Default.LA=="Ireland - Limerick" |
-                           orders$Default.LA=="Ireland - Clare" | orders$Default.LA=="Ireland - Tipperary" |
-                           orders$Default.LA=="Ireland - Carlow" | orders$Default.LA=="Ireland - Kilkenny"),]
+Data_Ireland <- orders [(orders$Default.LA=="Ireland - Carlow" | orders$Default.LA=="Ireland - Cavan" |
+                           orders$Default.LA=="Ireland - Clare" | orders$Default.LA=="Ireland - Cork" |
+                           orders$Default.LA=="Ireland - Donegal" | orders$Default.LA=="Ireland - Dublin" |
+                           orders$Default.LA=="Ireland - Galway" | orders$Default.LA=="Ireland - Kerry" | 
+                           orders$Default.LA=="Ireland - Kildare" | orders$Default.LA=="Ireland - Kilkenny" |
+                           orders$Default.LA=="Ireland - Laois" | orders$Default.LA=="Ireland - Leitrim" |
+                           orders$Default.LA=="Ireland - Limerick" | orders$Default.LA=="Ireland - Longford" |
+                           orders$Default.LA=="Ireland - Louth" | orders$Default.LA=="Ireland - Mayo" |
+                           orders$Default.LA=="Ireland - Meath" | orders$Default.LA=="Ireland - Monaghan" |
+                           orders$Default.LA=="Ireland - Offaly" | orders$Default.LA=="Ireland - Roscommon" |
+                           orders$Default.LA=="Ireland - Sligo" | orders$Default.LA=="Ireland - Tipperary" |
+                           orders$Default.LA=="Ireland - Westmeath" | orders$Default.LA=="Ireland - Wicklow"),]
 
 
 #remove unwanted variables
@@ -268,7 +270,7 @@ Data_Ireland$S.code = NULL
 Data_Ireland$PrEP.impact.trial.number = NULL
 table(Data_Ireland$Dispatched.at.month.year, Data_Ireland$Default.LA)
 
-write.table (Data_Ireland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.10.03_Justin_Ireland_STI.csv", row.names=F, sep=",")
+write.table (Data_Ireland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.10.06_Negar_Ireland_STI.csv", row.names=F, sep=",")
 # END Ireland Justin----
 
 #Remove 'Area' from the files (no need to include it)
