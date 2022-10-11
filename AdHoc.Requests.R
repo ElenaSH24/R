@@ -83,7 +83,7 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.09.21.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.10.10.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 # DELETE 21st Sep 2022: Cross-product orders
@@ -104,7 +104,7 @@ write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.09.21.DataSt
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2022-08-31'
+v1 <- '2022-09-30'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
