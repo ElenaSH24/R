@@ -57,8 +57,13 @@ DataStack <- rbind(Orders1, Treatments1,COC1,POP1,EC1)
 
 DataStackFettle <- DataStack[(DataStack$Default.LA == "Fettle"),]
 
+DataStack_RoyalLiverpool <- DataStack[(DataStack$Default.LA == "Warrington" |  DataStack$Default.LA == "Halton" |
+                                         DataStack$Default.LA == "Liverpool" | DataStack$Default.LA == "Cheshire East" |
+                                         DataStack$Default.LA == "Knowsley"),]
 
-# metrics
+
+
+# metrics for Fettle
 nrow(DataStackFettle) #number of orders from all Fettle products
 #number of orders per product
 Fettle.OrdersCreated <- as.data.frame(table(DataStackFettle$Type))
@@ -80,10 +85,35 @@ Fettle.OrdersAndUnique = merge(x = Fettle.OrdersCreated, y = Fettle.Unique, by =
 # print to copy and paste in Excel
 print(Fettle.OrdersAndUnique)
 
-
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
 write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.10.10.DataStack_Fettle.csv", row.names=F, sep=",")
+
+
+
+
+# for Royal Liverpool
+nrow(DataStack_RoyalLiverpool) #number of orders from all Fettle products
+#number of orders per product
+RoyalLiverpool.OrdersCreated <- as.data.frame(table(DataStack_RoyalLiverpool$Type))
+colnames(RoyalLiverpool.OrdersCreated)[1] <- "Product"
+colnames(RoyalLiverpool.OrdersCreated)[2] <- "Orders created"  
+
+# number of unique users per RoyalLiverpool product
+RoyalLiverpool.Unique <- aggregate(x = DataStack_RoyalLiverpool$Customer.ID, # Specify data column
+                           by = list(DataStack_RoyalLiverpool$Type), # Specify group indicator
+                           FUN = function(x) length(unique(x))) #Desired function
+
+colnames(RoyalLiverpool.Unique)[1] <- "Product"
+colnames(RoyalLiverpool.Unique)[2] <- "Count unique users"
+
+# put both data frames together:
+RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = RoyalLiverpool.Unique, by = "Product", all = TRUE)
+
+# remove SH24 number!
+DataStack_RoyalLiverpool$SH24.UID = NULL
+write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2022.10.26.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
+
 
 
 # DELETE 21st Sep 2022: Cross-product orders
@@ -468,5 +498,64 @@ ordersFreeHertsOffline <- orders[(orders$Default.LA=='Freetesting - Hertfordshir
 table(ordersFreeHertsOffline$Dispatched.at.month.year)
 
 
+# 2022.10.11 Safeguarding Andrew
+safeguarding <- orders
+
+# extract created in Jan-Sep 2022
+# date fields are imported as factor, convert factor to date----
+class(safeguarding$Created.at)
+safeguarding$Created.at <- as.Date(safeguarding$Created.at, format = "%Y-%m-%d")
+safeguarding_1 <- safeguarding[(safeguarding$Created.at >= "2022-01-01" & safeguarding$Created.at <= "2022-09-30"),]
+
+#Create Area variable and set to 0
+safeguarding_1$Area <- 0
+#run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
+safeguarding_1$Area <- recodeArea(DF=safeguarding_1,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+
+# extract orders created Jan-Sep 2022, and columns needed
+safeguarding_2 <- safeguarding_1[,(c("Customer.ID","Created.at.month.year",'Dispatched.at.month.year',"Lab.results.at.month.year",
+                    "Age","Gender","Genitals",
+                    "Sexually.assaulted.risk.assessment","Pressured.into.sex","Paid.for.sex","Drink.or.Drugs","Depression.or.low.mood","Older.or.younger.partner",
+                    "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C","Area"))]
+# breakdown age
+safeguarding_2$SplitAge <- 0
+safeguarding_2$SplitAge = ifelse(safeguarding_2$Age>=18,"18+","Under 18")
+table(safeguarding_2$SplitAge)
+
+safeguarding_2$Posted <- 0
+safeguarding_2$Posted = ifelse(safeguarding_2$Dispatched.at.month.year=='',"not posted","dispatched")
+table(safeguarding_2$Posted, safeguarding_2$SplitAge)
+
+safeguarding_3 <- safeguarding_2
+#create new variable (columns) flags that - first - equal the safeguarding columns and - then - assign 1 or 0 to those safeguarding flags
+safeguarding_3$Flag_SA <- safeguarding_3$Sexually.assaulted.risk.assessment
+safeguarding_3$Flag_PS <- safeguarding_3$Pressured.into.sex
+safeguarding_3$Flag_PAID <- safeguarding_3$Paid.for.sex
+safeguarding_3$Flag_DD <- safeguarding_3$Drink.or.Drugs
+safeguarding_3$Flag_DEP <- safeguarding_3$Depression.or.low.mood
+safeguarding_3$Flag_PARTNER <- safeguarding_3$Older.or.younger.partner
+#Code the safeguarding-flag variables just created by giving them a number, 1 for true/yes, and 0 for false/no:
+safeguarding_3$Flag_SA = ifelse(safeguarding_3$Flag_SA=="yes", 1,0)
+safeguarding_3$Flag_PS = ifelse(safeguarding_3$Flag_PS=="yes", 1,0)
+safeguarding_3$Flag_PAID = ifelse(safeguarding_3$Flag_PAID=="yes",1,0)
+safeguarding_3$Flag_DD = ifelse(safeguarding_3$Flag_DD=="yes",1,0)
+safeguarding_3$Flag_DEP = ifelse(safeguarding_3$Flag_DEP=="yes",1,0)
+safeguarding_3$Flag_PARTNER = ifelse(safeguarding_3$Flag_PARTNER=="yes",1,0)
+
+#create a new variable that gives a summary of all the other flags:
+safeguarding_3$Any_Flag <- 0
+safeguarding_3$Any_Flag = ifelse((safeguarding_3$Flag_SA==1 | safeguarding_3$Flag_PS==1 | safeguarding_3$Flag_PAID==1|
+                                 safeguarding_3$Flag_DD==1| safeguarding_3$Flag_DEP==1| safeguarding_3$Flag_PARTNER), 1,0)
+table(safeguarding_3$Any_Flag)
+
+
+
+
+
+
+
 #########################
 install.packages("tidyverse",dependencies=TRUE)
+
+
+
