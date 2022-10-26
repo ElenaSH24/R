@@ -1,6 +1,6 @@
 # producing Xero quarterly file for freetesting activity
 # read generic invoicing file (same we use for SH:24 invoicing)
-invSTI = read.csv("20220905_invoicing.csv")
+invSTI = read.csv("20221013_sti_invoicing.csv")
 invoicing <- invSTI
 
 # extract freetesting activity, and the variables needed for invoicing
@@ -13,7 +13,7 @@ invFre$processed_at <- as.Date(invFre$processed_at,"%Y-%m-%d")
 # extract month from day date
 invFre$Dispatched.MonthYear <- format(as.Date(invFre$processed_at),"%Y-%m")
 # extract data for the relevant quarter
-invFreet <- invFre[(invFre$Dispatched.MonthYear == "2022-04" | invFre$Dispatched.MonthYear == "2022-05" | invFre$Dispatched.MonthYear == "2022-06"),]
+invFreet <- invFre[(invFre$Dispatched.MonthYear == "2022-07" | invFre$Dispatched.MonthYear == "2022-08" | invFre$Dispatched.MonthYear == "2022-09"),]
 
 
 # assign values to 'overall_type' that align with invoicing
