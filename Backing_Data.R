@@ -518,12 +518,33 @@ write.table (Data_Bedford, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.M
 # END Freetesting Bedford----
 
 # RoyalLiverpool Justin----
-Data_RoyalLiverpool <-  BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Warrington" | BackingMin_WithSH24$Default.LA=="Halton" |
-                                                BackingMin_WithSH24$Default.LA=="Liverpool" | BackingMin_WithSH24$Default.LA=="Cheshire East" |
-                                                BackingMin_WithSH24$Default.LA=="Knowsley"),]
+Data_RoyalLiverpool <- orders[,c('Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence',
+                                 'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",
+                                 'Sexual.preference','Sexually.assaulted.risk.assessment','Unprotected.sex.in.last.5.days',
+                                 'Pressured.into.sex','Paid.for.sex','Drink.or.Drugs','Depression.or.low.mood','Older.or.younger.partner',
+                                 'Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
+                                 'Sexuality',"Sites.tested",'Test.regime',
+                                 "Created.at",'Created.at.month.year',"Dispatched.at","Dispatched.at.month.year","Lab.receipt.at","Notified.at",
+                                 "Lab.results.at","Lab.results.at.month.year",
+                                 "Previously.diagnosed.with.HIV",
+                                 "Vaccinated.against.hepatitis.B","Injected.drugs.groups.chems.fisting","Paid.sex.work",
+                                 "Previously.treated.for.Syphilis",
+                                 'Syphilis','HIV','Chlamydia','Gonorrhoea',"Test.for.Syphilis.RPR")]
+
+
+Data_RoyalLiverpool1 <-  Data_RoyalLiverpool [(Data_RoyalLiverpool$Default.LA=="Warrington" | Data_RoyalLiverpool$Default.LA=="Halton" |
+                                    Data_RoyalLiverpool$Default.LA=="Liverpool" | Data_RoyalLiverpool$Default.LA=="Cheshire East" |
+                                    Data_RoyalLiverpool$Default.LA=="Knowsley"),]
+
+Data_RoyalLiverpool2 <- merge(Data_RoyalLiverpool1, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
+
+write.table (Data_RoyalLiverpool2, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.09_RoyalLiverpool.csv", row.names=F, sep=",")
+
+
 
 Data_RoyalLiverpool <-  BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Liverpool"),]
 Data_RoyalLiverpool1 <- Data_RoyalLiverpool[(Data_RoyalLiverpool$Created.at > '2020-10-01'),]
+write.table (Data_CheshireEast1, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_01\\backing_data\\2021.05.10 Justin CheshireEast STI.csv", row.names=F, sep=",")
 
 Data_CheshireEast <-  BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Cheshire East"),]
 Data_CheshireEast1 <- Data_CheshireEast[(Data_CheshireEast$Created.at > '2020-09-20'),]
