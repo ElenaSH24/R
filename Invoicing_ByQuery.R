@@ -1,12 +1,11 @@
 # Script to produce Xero file
-
 # read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2022-09'               #v1: reporting month
-v2 <- '01.09.2022-30.09.2022' #v2: activity period being invoiced
-v3 <- "30/09/2022"            #v3: InvoiceDate
-v4 <- "31/10/2022"            #v4: DueDate
+v1 <- '2022-10'               #v1: reporting month
+v2 <- '01.10.2022-31.10.2022' #v2: activity period being invoiced
+v3 <- "31/10/2022"            #v3: InvoiceDate
+v4 <- "30/11/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -17,6 +16,65 @@ invSTI$Dispatched.MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
 STImonth <- invSTI[(invSTI$Dispatched.MonthYear == v1) , ]
 table(STImonth$overall_type, STImonth$repeat_kit)
 table(STImonth$overall_type)
+
+
+
+
+# Count of RPR kits as per invoicing query (https://github.com/sh24/sql_reports/blob/master/MIME_KEEP/sti_invoice_detail.sql)
+# kits dispatched that include Syphilis RPR in reporting month = v1----
+test <- invSTI[(invSTI$overall_type == "kits_tested" & invSTI$Dispatched.MonthYear == v1),]
+test1 <- test[(test$includes_syphilis_rpr == 1),]
+
+table(invSTI$includes_syphilis_rpr)
+
+class(invSTI$includes_syphilis_rpr)
+invSTI$includes_syphilis_rprSTRING <- as.str
+
+
+
+
+RPR.Dispatched_v1 <- invSTI[(invSTI$Dispatched.MonthYear == v1), c("default_la","Dispatched.MonthYear","includes_syphilis_rpr")]
+RPR.Dispatched_v1 <- RPR.Dispatched_v1[(RPR.Dispatched_v1$includes_syphilis_rpr == 1),]
+
+RPR.Dispatched_v2 <- invSTI[((invSTI$Dispatched.MonthYear == v1) & (invSTI$includes_syphilis_rpr == "1")),]
+
+table(RPR.Dispatched_v1$includes_syphilis_rpr)
+class(invSTI$includes_syphilis_rpr)
+
+RPR.Dispatched <- orders[(orders$Dispatched.at.month.year == v1), c("Default.LA","Test.regime","Dispatched.at.month.year") ]
+RPR.Dispatched <- RPR.Dispatched[grep('RPR',RPR.Dispatched$Test.regime),]
+# Kits returned that include Syphilis RPR
+RPR.Returned <- orders[(orders$Lab.results.at.month.year == v1), c("Default.LA","Test.regime","Lab.results.at.month.year") ]
+RPR.Returned <- RPR.Returned[grep('RPR',RPR.Returned$Test.regime),]
+
+# add column with description
+RPR.Dispatched$Description <- "RPR Syphilis tests dispatched"
+RPR.Returned$Description <- "RPR Syphilis tests processed"
+
+# remove columns not needed any more
+RPR.Dispatched$Test.regime = NULL
+RPR.Returned$Test.regime = NULL
+
+# rename (new variable name = existing variable name) to have same names in all data frames----
+RPR.Dispatched <- rename(RPR.Dispatched, default_la = Default.LA, MonthYear = Dispatched.at.month.year)
+RPR.Returned <- rename(RPR.Returned, default_la = Default.LA, MonthYear = Lab.results.at.month.year)
+# END count of Syphilis RPR----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # extract the columns we need for invoicing
@@ -127,26 +185,6 @@ invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
 
 
-# Count of RPR kits
-# kits dispatched that include Syphilis RPR in reporting month = v1----
-RPR.Dispatched <- orders[(orders$Dispatched.at.month.year == v1), c("Default.LA","Test.regime","Dispatched.at.month.year") ]
-RPR.Dispatched <- RPR.Dispatched[grep('RPR',RPR.Dispatched$Test.regime),]
-# Kits returned that include Syphilis RPR
-RPR.Returned <- orders[(orders$Lab.results.at.month.year == v1), c("Default.LA","Test.regime","Lab.results.at.month.year") ]
-RPR.Returned <- RPR.Returned[grep('RPR',RPR.Returned$Test.regime),]
-
-# add column with description
-RPR.Dispatched$Description <- "RPR Syphilis tests dispatched"
-RPR.Returned$Description <- "RPR Syphilis tests processed"
-
-# remove columns not needed any more
-RPR.Dispatched$Test.regime = NULL
-RPR.Returned$Test.regime = NULL
-
-# rename (new variable name = existing variable name) to have same names in all data frames----
-RPR.Dispatched <- rename(RPR.Dispatched, default_la = Default.LA, MonthYear = Dispatched.at.month.year)
-RPR.Returned <- rename(RPR.Returned, default_la = Default.LA, MonthYear = Lab.results.at.month.year)
-# END count of Syphilis RPR----
 
 
 names(invSTI)
