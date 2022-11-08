@@ -7,7 +7,7 @@ library(reshape2)
 install.packages('tidyverse')
 
 # use ~ as a shortcut to the Home Directory, to avoid portability issues (i.e. changing Operating Systems, versions of R, or programming language)
-setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_09")
+setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10")
 
 
 # to know the destination file used by the language
@@ -15,26 +15,26 @@ path.expand("~")
 # PATH JOIN: gold standard on setting working directory, to avoid syntax issues and address portability concerns (i.e. moving Operating Systems, different languages, etc)
 file.path("~", "Reports","1.Monthly_Reports","Invoicing","2022","2022_04","Xero_Quantities_2022.April_v9.csv")
 
-orders = read.csv("20221003_sti_order_report.csv")
+orders = read.csv("20221103_sti_order_report.csv")
 
 feedback = read.csv("20201020_Feedback_tokens.csv")
 
-Treatments = read.csv("20221003_CT_Treatments.csv")
-COC = read.csv("20221003_COC.csv")
-POP = read.csv("20221003_POP.csv")
-ECFuture = read.csv("20221003_ECFuture.csv")
-ECNow = read.csv("20221003_ECNow.csv")
-PhotoConsult = read.csv("20221003_PD_consultations.csv")
-PhotoTreatm = read.csv("20221003_PD_treatments.csv")
-Injectable = read.csv("20221003_Injectable.csv")
-Patch = read.csv("20221003_Patch.csv")  
-Ring = read.csv("20221003_Ring.csv")
+Treatments = read.csv("20221103_CT_Treatments.csv")
+COC = read.csv("20221104_COC.csv")
+POP = read.csv("20221104_POP.csv")
+ECFuture = read.csv("20221103_ECFuture.csv")
+ECNow = read.csv("20221103_ECNow.csv")
+PhotoConsult = read.csv("20221103_PD_consultations.csv")
+PhotoTreatm = read.csv("20221103_PD_treatments.csv")
+Injectable = read.csv("20221103_Injectable.csv")
+Patch = read.csv("20221103_Patch.csv")  
+Ring = read.csv("20221103_Ring.csv")
 
 
 # Invoicing data set from sti_invoice_detail.sql query
-invSTI = read.csv("20221003_invoicing.csv")
+invSTI = read.csv("20221104_sti_invoicing.csv")
 # bolt-ons data for invoicing
-bolts = read.csv("20221003_CombinedBoltOns.csv")
+bolts = read.csv("20221103_CombinedBoltOns.csv")
 
 
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
@@ -70,7 +70,7 @@ freetesting.Unique = freetesting2[!duplicated(freetesting2$SH24.UID),]
 # include LSOA Code with 'merge' getting all the observations from the data set on the left (all.x = TRUE)
 #### freetesting3 <- merge(freetesting.Unique, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
 freetesting4 <- merge(freetesting.Unique, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
-write.table (freetesting4, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.09 freetesting.PHE.ImpactPrEP.csv", row.names=F, sep=",")
+write.table (freetesting4, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.10 freetesting.PHE.ImpactPrEP.csv", row.names=F, sep=",")
 # End PHE/freetesting backing data----
 
 
@@ -98,7 +98,7 @@ OrdersToWork$Area <- 0
 OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
 
 # reporting month
-v1 <- '2022-09'
+v1 <- '2022-10'
 
 # check that all orders are allocated to an Area
 Zero <- OrdersToWork[(OrdersToWork$Area==0),]
@@ -268,32 +268,31 @@ Data_Ireland$Referred.via = NULL
 Data_Ireland$Charge.token = NULL
 Data_Ireland$S.code = NULL
 Data_Ireland$PrEP.impact.trial.number = NULL
-table(Data_Ireland$Dispatched.at.month.year, Data_Ireland$Default.LA)
 
-write.table (Data_Ireland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.10.06_Negar_Ireland_STI.csv", row.names=F, sep=",")
+write.table (Data_Ireland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.11.04_Ireland_STI_Negar.csv", row.names=F, sep=",")
 # END Ireland Justin----
 
 #Remove 'Area' from the files (no need to include it)
 Data_DerbyshireDerby$Area=NULL
 
 #export data to csv (export the data of the ordered file). Use double \\ when setting destination file----
-write.table (Data_Berkshire, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Berkshire STI.csv", row.names=F, sep=",")
-write.table (Data_Bromley, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Bromley STI.csv"
+write.table (Data_Berkshire, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Berkshire STI.csv", row.names=F, sep=",")
+write.table (Data_Bromley, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Bromley STI.csv"
              , row.names=F, sep=",")
 
-write.table (Data_Buckinghamshire, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Buckinghamshire STI.csv", row.names=F, sep=",")
+write.table (Data_Buckinghamshire, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Buckinghamshire STI.csv", row.names=F, sep=",")
 
-write.table (Data_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Cornwall_Southe_Blackb STI.csv", row.names=F, sep=",")
+write.table (Data_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Cornwall_Southe_Blackb STI.csv", row.names=F, sep=",")
 
 
-write.table (Data_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month DerbyshireDerby STI.csv", row.names=F, sep=",")
-write.table (Data_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Dorset STI.csv", row.names=F, sep=",")
-write.table (Data_Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Essex STI.csv", row.names=F, sep=",")
-write.table (Data_Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Thurrock STI.csv", row.names=F, sep=",")
-write.table (Data_Hillingdon, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Hillingdon STI.csv", row.names=F, sep=",")
-write.table (Data_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month LLR.MPFT STI_Hep.csv", row.names=F, sep=",")
-write.table (Data_NIreland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month NIreland STI.csv", row.names=F, sep=",")
-write.table (Data_Worces_Hereford, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Worces_Hereford STI.csv", row.names=F, sep=",")
+write.table (Data_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month DerbyshireDerby STI.csv", row.names=F, sep=",")
+write.table (Data_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Dorset STI.csv", row.names=F, sep=",")
+write.table (Data_Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Essex STI.csv", row.names=F, sep=",")
+write.table (Data_Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Thurrock STI.csv", row.names=F, sep=",")
+write.table (Data_Hillingdon, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Hillingdon STI.csv", row.names=F, sep=",")
+write.table (Data_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month LLR.MPFT STI_Hep.csv", row.names=F, sep=",")
+write.table (Data_NIreland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month NIreland STI.csv", row.names=F, sep=",")
+write.table (Data_Worces_Hereford, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Worces_Hereford STI.csv", row.names=F, sep=",")
 # End Backing Data STI ----
 
 
@@ -336,14 +335,14 @@ Treatment.Bromley <- TreatmentsMerge [(TreatmentsMerge$Area=="Bromley")
                                           'Age','Gender','Sexual.preference.x','Ethnicity',"no_of_partners_last_6_months",            
                                           "no_of_contact_for_partners","no_of_partners_notified")]
 
-write.table (Treatment.Berkshire, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Berkshire Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Bromley, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Bromley Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month DerbyshireDerby Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Dorset Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Essex Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Thurrock Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month LLR.MPFT Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.NIreland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month NIreland Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.Berkshire, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Berkshire Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.Bromley, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Bromley Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month DerbyshireDerby Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Dorset Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Essex Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Thurrock Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month LLR.MPFT Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.NIreland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month NIreland Treatments.csv", row.names=F, sep=",")
 
 
 
@@ -362,17 +361,18 @@ rm(Zero)
 
 # OC backing data files Dorset
 # 8th Sep 2022: Lisa confirms they don't need these variables: "Taken.POP.before.","Ordered.POP.from.SH.24.before.","Ordered.OC.from.SH.24.before."
-COC_Dorset <- COC[ (COC$Area=="Dorset")
-                   ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                   ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region","LSOA.name")]
-
-POP_Dorset <- POP [(POP$Area=="Dorset")
-                   ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
-                   ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region","LSOA.name")]
-
-write.table (COC_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Dorset COC.csv", row.names=F, sep=",")
-write.table (POP_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Dorset POP.csv", row.names=F, sep=",")
-
+# done via separate queries since Oct.2022
+            # COC_Dorset <- COC[ (COC$Area=="Dorset")
+            #                    ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
+            #                    ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region","LSOA.name")]
+            # 
+            # POP_Dorset <- POP [(POP$Area=="Dorset")
+            #                    ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year","Prescription.at","Prescription.at.month.year"
+            #                    ,"Dispatched.at","Dispatched.at.month.year","Months.prescribed","Clinic","Region","LSOA.name")]
+            # 
+            # write.table (COC_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Dorset COC.csv", row.names=F, sep=",")
+            # write.table (POP_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Dorset POP.csv", row.names=F, sep=",")
+            
 
 
 # OC backing data files Derby and Derbyshire
@@ -401,8 +401,8 @@ COC_DerbyshireDerby <- merge(COC_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')
 POP_DerbyshireDerby <- merge(POP_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
 names(POP_DerbyshireDerby)
 
-write.table (COC_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month DerbyshireDerby COC.csv", row.names=F, sep=",")
-write.table (POP_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month DerbyshireDerby POP.csv", row.names=F, sep=",")
+write.table (COC_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month DerbyshireDerby COC.csv", row.names=F, sep=",")
+write.table (POP_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month DerbyshireDerby POP.csv", row.names=F, sep=",")
 
 
 # OC backing data files LLR.MPFT
@@ -434,10 +434,10 @@ POP_Cornwall <- POP [(POP$Region=="Cornwall and Isles of Scilly PCT" | POP$Regio
                        "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
                        "Months.prescribed","Clinic","Region","LSOA.name")]
 
-write.table (COC_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month LLR.MPFT COC.csv", row.names=F, sep=",")
-write.table (POP_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month LLR.MPFT POP.csv", row.names=F, sep=",")
-write.table (COC_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Cornwall_Southe_Blackb COC.csv", row.names=F, sep=",")
-write.table (POP_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022 Month Cornwall_Southe_Blackb POP.csv", row.names=F, sep=",")
+write.table (COC_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month LLR.MPFT COC.csv", row.names=F, sep=",")
+write.table (POP_LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month LLR.MPFT POP.csv", row.names=F, sep=",")
+write.table (COC_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Cornwall_Southe_Blackb COC.csv", row.names=F, sep=",")
+write.table (POP_Cornwall, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 Month Cornwall_Southe_Blackb POP.csv", row.names=F, sep=",")
 # End Backing Data CONTRACEPTION ----
 
 
@@ -449,7 +449,7 @@ invSTIessexThurr$MonthYear <- format(as.Date(invSTIessexThurr$MonthYear), "%Y-%m
 # extract data for reporting month and relevant columns
 invSTIessexThurrMonth <- invSTIessexThurr[(invSTIessexThurr$MonthYear == v1), c("overall_type","default_la","repeat_kit","processed_at","MonthYear","invoice_category_all","invoice_category_billable")]  
 
-write.table (invSTIessexThurrMonth, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.09_invoic_EssexThurrock.csv", row.names=F, sep=",")
+write.table (invSTIessexThurrMonth, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022 10 invoic_EssexThurrock.csv", row.names=F, sep=",")
 # END Invoicing backing data Essex
 
 
@@ -538,7 +538,7 @@ Data_RoyalLiverpool1 <-  Data_RoyalLiverpool [(Data_RoyalLiverpool$Default.LA=="
 
 Data_RoyalLiverpool2 <- merge(Data_RoyalLiverpool1, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
 
-write.table (Data_RoyalLiverpool2, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_09/BackingData/2022.09_RoyalLiverpool.csv", row.names=F, sep=",")
+write.table (Data_RoyalLiverpool2, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.09_RoyalLiverpool.csv", row.names=F, sep=",")
 
 
 
