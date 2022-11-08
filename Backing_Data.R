@@ -171,6 +171,13 @@ Data_LLR.MPFT <- BackingLLR.MPFT [(BackingLLR.MPFT$Default.LA=="Leicester" | Bac
 Data_LLR.MPFT$Country.of.Birth <- 'unknown'
 # Include LSOA Code in LLR
 Data_LLR.MPFT <- merge(Data_LLR.MPFT, LSOA[,c('LSOA11NM',"LSOA11CD")], by.x = "LSOA.name", by.y = "LSOA11NM")
+# extract data from from 1st Jan 2021 (file from the start of the service is too heavy to send on nhs.net)
+class(Data_LLR.MPFT$Created.at)
+Data_LLR.MPFT$Created.at <- as.Date(Data_LLR.MPFT$Created.at, format = "%Y-%m-%d")
+Data_LLR.MPFT <- Data_LLR.MPFT[(Data_LLR.MPFT$Created.at > "2020-12-31"),]
+
+
+
 
 Data_Dorset <- BackingMin_WithSH24 [(BackingMin_WithSH24$Default.LA=="Dorset"),]
 
