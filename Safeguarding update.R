@@ -7,7 +7,7 @@ rm(list = ls())
 safeguarding <- orders
 
 # import outcome of url query with the url links to admin on the sh24 number
-links = read.csv("20220504_urls_safeguarding.csv")
+links = read.csv("20221108_urls_safeguarding.csv")
 
 #Create Area variable and set to 0
 safeguarding$Area <- 0
@@ -21,7 +21,7 @@ SelectedColumns <- safeguarding[,(c("SH24.UID","Customer.ID","Created.at","Creat
                   "Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C"))]
 
 # set reporting month
-v1 <- '2022-04'
+v1 <- '2022-10'
 
 
 #'table' gives a table with the selected variable and the number of occurrences
@@ -150,6 +150,8 @@ write.table (YoungPeopleFlagsOrdered, file="/Users/francescaboyle/Desktop/YoungP
 write.table (AdultsFlagOrdered, file="/Users/francescaboyle/Desktop/AdultsFlagOrdered.csv", row.names=F, sep=",")
 
 # export to Elena's machine
-write.table (YoungPeopleFlagsOrdered, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\1.Monthly_Reports\\Clinical_Team_Reports\\Safeguarding\\2022\\YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
+write.table (YoungPeopleFlagsOrdered, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
+write.table (AdultsFlagOrdered, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/AdultsFlagOrdered.csv", row.names=F, sep=",")
+
 
 
