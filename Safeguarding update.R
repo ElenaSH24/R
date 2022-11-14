@@ -38,7 +38,6 @@ str(SelectedColumns$Age)
 #There's a comma at the end of the command because we are selecting certain rows but all the columns.
 YoungPeople <- SelectedColumns [(SelectedColumns$Age<18 
                             & SelectedColumns$Created.at.month.year== v1),]
-install.packages("dplyr")
 
 links <- rename(links, SH24.UID = sh24_uid)
                                     
@@ -150,8 +149,7 @@ write.table (YoungPeopleFlagsOrdered, file="/Users/francescaboyle/Desktop/YoungP
 write.table (AdultsFlagOrdered, file="/Users/francescaboyle/Desktop/AdultsFlagOrdered.csv", row.names=F, sep=",")
 
 # export to Elena's machine
-write.table (YoungPeopleFlagsOrdered, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
-write.table (AdultsFlagOrdered, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/AdultsFlagOrdered.csv", row.names=F, sep=",")
-
+write.table (YoungPeopleFlagsOrdered, file="~/Reports/1.Monthly_Reports/Clinical_Team_Reports/Safeguarding/YoungPeopleFlagsOrdered.csv", row.names=F, sep=",")
+write.table (AdultsFlagOrdered, file="~/Reports/1.Monthly_Reports/Clinical_Team_Reports/Safeguarding/AdultsFlagOrdered.csv", row.names=F, sep=",")
 
 
