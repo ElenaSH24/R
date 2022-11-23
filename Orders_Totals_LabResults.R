@@ -19,7 +19,9 @@ OrdersMonth <- orders[,c('SH24.UID','Customer.ID','Reason.for.visit','LA.of.resi
 #Create Area variable and set to 0
 OrdersMonth$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
-OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+# DELETE### OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname1 = "Default.LA")
+
 
 # set reporting month
 v1 <- '2022-10'
@@ -331,6 +333,9 @@ DiagnosisReturns <- DiagnosisReturns[,c(1,4,5,2,3,6,7,8,9)]
 
 #Merge diagnosis with the rest of the summary
 Summary3 = merge(x = Summary2, y = DiagnosisReturns, by = "Area", all = TRUE)
+
+write.table (Summary3, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/SummaryPerformance.NewRecoding.csv", col.names = F, row.names=T, sep=",")
+
 
 #CT TREATMENTS: Include 'Area', 'Site' and 'LA of residence' from 'orders' file. Like an Excel VLOOKUP, using merge()----
 TreatmentsMerge <- merge(OrdersMonth [, c('SH24.UID','Area', 'Site','LA.of.residence')], Treatments, by.x = 'SH24.UID', by.y = 'sh24_uid')
