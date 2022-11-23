@@ -96,7 +96,8 @@ OrdersToWork$Unprotected.sex.in.last.3.days <- ""
 #Create Area variable and set to 0
 OrdersToWork$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
-OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+# DELETE### OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname1 = "Default.LA")
 
 
 
