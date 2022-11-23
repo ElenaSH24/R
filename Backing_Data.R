@@ -74,6 +74,7 @@ write.table (freetesting4, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022
 # End PHE/freetesting backing data----
 
 
+
 OrdersToWork <- orders[ ,c('SH24.UID','Customer.ID',"Feedback.token",'Reason.for.visit','Postcode','LSOA.name','Default.LA','LA.of.residence',
                            'Site',"Distribution.center", "Distribution.method",
                            'Age','Gender',"Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex","Gender.Identity",'Sexual.preference',
@@ -96,6 +97,13 @@ OrdersToWork$Unprotected.sex.in.last.3.days <- ""
 OrdersToWork$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
 OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+
+
+
+
+
+
+
 
 # reporting month
 v1 <- '2022-10'
@@ -245,6 +253,19 @@ Data_Worces_Hereford <- BackingMin_noSH24 [(BackingMin_noSH24$Site=="Worcestersh
 
 
 # Ireland backing data Justin----
+# Data_Ireland <- orders [(orders$Default.LA=="Ireland - Carlow" | orders$Default.LA=="Ireland - Cavan" |
+#                            orders$Default.LA=="Ireland - Clare" | orders$Default.LA=="Ireland - Cork" |
+#                            orders$Default.LA=="Ireland - Donegal" | orders$Default.LA=="Ireland - Dublin" |
+#                            orders$Default.LA=="Ireland - Galway" | orders$Default.LA=="Ireland - Kerry" | 
+#                            orders$Default.LA=="Ireland - Kildare" | orders$Default.LA=="Ireland - Kilkenny" |
+#                            orders$Default.LA=="Ireland - Laois" | orders$Default.LA=="Ireland - Leitrim" |
+#                            orders$Default.LA=="Ireland - Limerick" | orders$Default.LA=="Ireland - Longford" |
+#                            orders$Default.LA=="Ireland - Louth" | orders$Default.LA=="Ireland - Mayo" |
+#                            orders$Default.LA=="Ireland - Meath" | orders$Default.LA=="Ireland - Monaghan" |
+#                            orders$Default.LA=="Ireland - Offaly" | orders$Default.LA=="Ireland - Roscommon" |
+#                            orders$Default.LA=="Ireland - Sligo" | orders$Default.LA=="Ireland - Tipperary" |
+#                            orders$Default.LA=="Ireland - Westmeath" | orders$Default.LA=="Ireland - Wicklow"),]
+
 Data_Ireland <- orders [(orders$Default.LA=="Ireland - Carlow" | orders$Default.LA=="Ireland - Cavan" |
                            orders$Default.LA=="Ireland - Clare" | orders$Default.LA=="Ireland - Cork" |
                            orders$Default.LA=="Ireland - Donegal" | orders$Default.LA=="Ireland - Dublin" |
@@ -256,7 +277,8 @@ Data_Ireland <- orders [(orders$Default.LA=="Ireland - Carlow" | orders$Default.
                            orders$Default.LA=="Ireland - Meath" | orders$Default.LA=="Ireland - Monaghan" |
                            orders$Default.LA=="Ireland - Offaly" | orders$Default.LA=="Ireland - Roscommon" |
                            orders$Default.LA=="Ireland - Sligo" | orders$Default.LA=="Ireland - Tipperary" |
-                           orders$Default.LA=="Ireland - Westmeath" | orders$Default.LA=="Ireland - Wicklow"),]
+                           orders$Default.LA=="Ireland - Waterford" | orders$Default.LA=="Ireland - Westmeath" |
+                           orders$Default.LA=="Ireland - Wexford" | orders$Default.LA=="Ireland - Wicklow"),]
 
 
 #remove unwanted variables
@@ -276,7 +298,7 @@ Data_Ireland$Charge.token = NULL
 Data_Ireland$S.code = NULL
 Data_Ireland$PrEP.impact.trial.number = NULL
 
-write.table (Data_Ireland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.11.04_Ireland_STI_Negar.csv", row.names=F, sep=",")
+write.table (Data_Ireland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.11.23_Ireland_STI_Negar.csv", row.names=F, sep=",")
 # END Ireland Justin----
 
 #Remove 'Area' from the files (no need to include it)
@@ -543,9 +565,11 @@ Data_RoyalLiverpool1 <-  Data_RoyalLiverpool [(Data_RoyalLiverpool$Default.LA=="
                                     Data_RoyalLiverpool$Default.LA=="Liverpool" | Data_RoyalLiverpool$Default.LA=="Cheshire East" |
                                     Data_RoyalLiverpool$Default.LA=="Knowsley"),]
 
-Data_RoyalLiverpool2 <- merge(Data_RoyalLiverpool1, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
+## DELETE: UTLA are too high level, use Wards instead 
+##Data_RoyalLiverpool2 <- merge(Data_RoyalLiverpool1, LSOA.UpperTier[,c('LSOA11NM',"UTLA18NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
+Data_RoyalLiverpool2 <- merge(Data_RoyalLiverpool1, LSOA[,c('LSOA11NM',"WD19NM")], by.x = "LSOA.name", by.y = "LSOA11NM", all.x = TRUE)
 
-write.table (Data_RoyalLiverpool2, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.09_RoyalLiverpool.csv", row.names=F, sep=",")
+write.table (Data_RoyalLiverpool2, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/BackingData/2022.10_RoyalLiverpool.csv", row.names=F, sep=",")
 
 
 
