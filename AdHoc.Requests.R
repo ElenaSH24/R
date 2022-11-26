@@ -142,7 +142,7 @@ OrdersRepeat <- OrdersRepeat[(OrdersRepeat$Created.at <= v1),]
 
 
 # Subset for Fettle and dispatched orders (dispatched different than blank)
-FettleDispatched <- OrdersRepeat[(OrdersRepeat$Site == "Fettle Hub" & OrdersRepeat$Dispatched.at != ''),]
+FettleDispatched <- OrdersRepeat[(OrdersRepeat$Default.LA == "Fettle Hub" & OrdersRepeat$Dispatched.at != ''),]
 # new data frame with unique (no duplicate) customer IDs
 Fettle.Users = FettleDispatched[!duplicated(FettleDispatched$Customer.ID),]
 # create data frame with Customer.ID grouped (i.e. how many times each Customer.ID shows up) 
@@ -269,7 +269,7 @@ nrow(Bought.EC.FourPlus)
 
 
 # insufficient and haemolised blood samples----
-InsuffHaem <- orders[(orders$Site=="Garden Clinic"),c("SH24.UID",'Customer.ID','LA.of.residence',"LSOA.name","Sites.tested","Test.regime",'Site','Age','Gender'
+InsuffHaem <- orders[(orders$Default.LA=="East Berkshire"),c("SH24.UID",'Customer.ID','LA.of.residence',"LSOA.name","Sites.tested","Test.regime",'Age','Gender'
                                                       ,"Sexual.preference","Syphilis","HIV","Chlamydia","Gonorrhoea","Hep.B","Hep.C","Charge.token","Feedback.token","Discount.code",
                                                       "Requested.time","Created.at.month.year","Dispatched.at","Dispatched.at.month.year","Notified.at","Notified.at.month.year")]
 
@@ -285,7 +285,7 @@ plot(InsuffHaem$HIV=="haemolysed", InsuffHaem$HIV=="insufficient")
 
 # Herts KPI's Blake 20200722----
 HertsKPI <- orders[(orders$Default.LA=="Hertfordshire"),
-                   c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence','Site',
+                   c('SH24.UID','Customer.ID','Reason.for.visit','LSOA.name','Default.LA','LA.of.residence',
                      'Age','Gender','Sexual.preference','Clinic.visited','Clinic.visited.12','Attended.clinic','Ethnicity',
                      'Sexuality','Click.and.collect','Referred.from','Referred.to','Referred.via',"Sites.tested",'Test.regime',
                      "Created.at.month.year","Created.at","Dispatched.at","Lab.receipt.at","Notified.at","Lab.results.at",
@@ -510,7 +510,8 @@ safeguarding_1 <- safeguarding[(safeguarding$Created.at >= "2022-01-01" & safegu
 #Create Area variable and set to 0
 safeguarding_1$Area <- 0
 #run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
-safeguarding_1$Area <- recodeArea(DF=safeguarding_1,varname="Area",varname2="Site",varname3 = "LA.of.residence", varname4="Referred.from",varname5="Default.LA")
+safeguarding_1$Area <- recodeArea(DF=safeguarding_1,varname="Area",varname1 = "Default.LA")
+
 
 # extract orders created Jan-Sep 2022, and columns needed
 safeguarding_2 <- safeguarding_1[,(c("Customer.ID","Created.at.month.year",'Dispatched.at.month.year',"Lab.results.at.month.year",
