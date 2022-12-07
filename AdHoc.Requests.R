@@ -549,14 +549,48 @@ safeguarding_3$Any_Flag = ifelse((safeguarding_3$Flag_SA==1 | safeguarding_3$Fla
                                  safeguarding_3$Flag_DD==1| safeguarding_3$Flag_DEP==1| safeguarding_3$Flag_PARTNER), 1,0)
 table(safeguarding_3$Any_Flag)
 
+# 2022.12.03 freetesting and PHE invoicing start of the service
+# orders dispatched in Feb & Mar 2021 for phe: when were they were returned? Break down per month
+allinvoicing <- read.csv("20221203_sti_invoicing_secondary_all.csv")
+#extract orders from PHE or Freetesting users
+PHEfreet <- allinvoicing[((grepl('Freetesting',allinvoicing$default_la) | allinvoicing$default_la=='PHE')),]
+write.table (PHEfreet, file="~/Reports/2.Ad-hoc-reports/2022.12.02_invoicing_freetesting_PHE.csv", row.names=F, sep=",")
 
 
 
+# gender questions
+df <- orders
+names(df)
+table(df$Gender.Identity,df$Default.LA=="PHE")
+
+table(df$Genitals,df$Default.LA=="Fettle")
+
+
+dfNov <- df[(df$Dispatched.at.month.year==v1),]
+table(dfNov$Gender,dfNov$Default.LA=="Fettle")
+
+
+
+#Gender","Gender.at.birth","Genitals","Gender.identity.same.as.birth.sex,Gender.Identity",
+#"Sexual.preference", "Sexuality"
+
+# 2022.12.06 Sarah distribution centres
+table(orders$Distribution.center)
+df <- orders[(orders$Distribution.center=='Leicester City and Leicestershire County Councils (CSE teams)' 
+              | orders$Distribution.center=='Turning Point (substance misuse service)'
+              | orders$Distribution.center=='Leicestershire Partnership Trust (school nursing teams)'),]
+write.table (df, file="~/Reports/2.Ad-hoc-reports/2022.12.06_distributionCentres_Sarah.csv", row.names=F, sep=",")
 
 
 
 #########################
 install.packages("tidyverse",dependencies=TRUE)
+
+
+orders1 <- orders
+table(orders1$Gender,orders1$Default.LA=='Fettle')
+
+table(orders1$Genitals,orders1$Default.LA=='PHE')
 
 
 
