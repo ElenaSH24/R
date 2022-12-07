@@ -24,7 +24,7 @@ OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname1 = "Default
 
 
 # set reporting month
-v1 <- '2022-10'
+v1 <- '2022-11'
 
 
 table(OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
@@ -161,7 +161,7 @@ Summary1 <- rename(Summary1, Returned.Tests = Returns.x)
 
 # TO INPUT IN SUMMARY MANUALLY: TOT per Lab, based on 'LabResults' (change of methodology in June 2020, from 'LabReceipt' to 'LabResults') and for TDL and SPS separately----
 #Calculate overall TOT for current and previous month
-OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-09" 
+OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-10" 
                                & OrdersMonth$Area != "London"
                                & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOTPrev$TOT.Bands)
@@ -334,7 +334,7 @@ DiagnosisReturns <- DiagnosisReturns[,c(1,4,5,2,3,6,7,8,9)]
 #Merge diagnosis with the rest of the summary
 Summary3 = merge(x = Summary2, y = DiagnosisReturns, by = "Area", all = TRUE)
 
-write.table (Summary3, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/SummaryPerformance.NewRecoding.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary3, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_11/SummaryPerformance.NewRecoding.csv", col.names = F, row.names=T, sep=",")
 
 
 #CT TREATMENTS: Include 'Area', 'Site' and 'LA of residence' from 'orders' file. Like an Excel VLOOKUP, using merge()----
@@ -820,7 +820,7 @@ Summary93[is.na(Summary93)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary93 = t(Summary93)
 
-write.table (Summary93, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_10/SummaryPerformance.2022.10.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary93, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_11/SummaryPerformance.2022.11.csv", col.names = F, row.names=T, sep=",")
 
 
 
