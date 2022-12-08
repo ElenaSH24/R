@@ -2,62 +2,50 @@
 # read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2022-10'               #v1: reporting month
-v2 <- '01.10.2022-31.10.2022' #v2: activity period being invoiced
-v3 <- "31/10/2022"            #v3: InvoiceDate
-v4 <- "30/11/2022"            #v4: DueDate
+v1 <- '2022-11'               #v1: reporting month
+v2 <- '01.11.2022-30.11.2022' #v2: activity period being invoiced
+v3 <- "30/11/2022"            #v3: InvoiceDate
+v4 <- "31/12/2022"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
 # extract month from day date
-invSTI$Dispatched.MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
+invSTI$MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
 
 # summarise month results to double check with Performance Summary 
-STImonth <- invSTI[(invSTI$Dispatched.MonthYear == v1) , ]
-table(STImonth$overall_type, STImonth$repeat_kit)
+STImonth <- invSTI[(invSTI$MonthYear == v1) , ]
 table(STImonth$overall_type)
 
 
 
-
-# Count of RPR kits as per invoicing query (https://github.com/sh24/sql_reports/blob/master/MIME_KEEP/sti_invoice_detail.sql)
-# kits dispatched that include Syphilis RPR in reporting month = v1----
-test <- invSTI[(invSTI$overall_type == "kits_tested" & invSTI$Dispatched.MonthYear == v1),]
-test1 <- test[(test$includes_syphilis_rpr == 1),]
-
-table(invSTI$includes_syphilis_rpr)
-
-class(invSTI$includes_syphilis_rpr)
-invSTI$includes_syphilis_rprSTRING <- as.str
+# Count of RPR kits processed as per invoicing query (https://github.com/sh24/sql_reports/blob/master/MIME_KEEP/sti_invoice_detail.sql)
+# returns that include Syphilis RPR in reporting month = v1----
+# no need to count kits dispatched with RPR as we don't invoice extra for those
+RPR.Returned <- invSTI[(invSTI$overall_type == "kits_tested" & invSTI$MonthYear == v1),c("default_la","MonthYear","includes_syphilis_rpr")]
+RPR.Returned <- RPR.Returned[(RPR.Returned$includes_syphilis_rpr == 1),]
 
 
 
+# RPR.Dispatched <- orders[(orders$Dispatched.at.month.year == v1), c("Default.LA","Test.regime","Dispatched.at.month.year") ]
+# RPR.Dispatched <- RPR.Dispatched[grep('RPR',RPR.Dispatched$Test.regime),]
+# # Kits returned that include Syphilis RPR
+# RPR.Returned <- orders[(orders$Lab.results.at.month.year == v1), c("Default.LA","Test.regime","Lab.results.at.month.year") ]
+# RPR.Returned <- RPR.Returned[grep('RPR',RPR.Returned$Test.regime),]
 
-RPR.Dispatched_v1 <- invSTI[(invSTI$Dispatched.MonthYear == v1), c("default_la","Dispatched.MonthYear","includes_syphilis_rpr")]
-RPR.Dispatched_v1 <- RPR.Dispatched_v1[(RPR.Dispatched_v1$includes_syphilis_rpr == 1),]
-
-RPR.Dispatched_v2 <- invSTI[((invSTI$Dispatched.MonthYear == v1) & (invSTI$includes_syphilis_rpr == "1")),]
-
-table(RPR.Dispatched_v1$includes_syphilis_rpr)
-class(invSTI$includes_syphilis_rpr)
-
-RPR.Dispatched <- orders[(orders$Dispatched.at.month.year == v1), c("Default.LA","Test.regime","Dispatched.at.month.year") ]
-RPR.Dispatched <- RPR.Dispatched[grep('RPR',RPR.Dispatched$Test.regime),]
-# Kits returned that include Syphilis RPR
-RPR.Returned <- orders[(orders$Lab.results.at.month.year == v1), c("Default.LA","Test.regime","Lab.results.at.month.year") ]
-RPR.Returned <- RPR.Returned[grep('RPR',RPR.Returned$Test.regime),]
 
 # add column with description
-RPR.Dispatched$Description <- "RPR Syphilis tests dispatched"
+#RPR.Dispatched$Description <- "RPR Syphilis tests dispatched"
 RPR.Returned$Description <- "RPR Syphilis tests processed"
 
 # remove columns not needed any more
-RPR.Dispatched$Test.regime = NULL
+#RPR.Dispatched$Test.regime = NULL
 RPR.Returned$Test.regime = NULL
+RPR.Returned$includes_syphilis_rpr = NULL
+
 
 # rename (new variable name = existing variable name) to have same names in all data frames----
-RPR.Dispatched <- rename(RPR.Dispatched, default_la = Default.LA, MonthYear = Dispatched.at.month.year)
-RPR.Returned <- rename(RPR.Returned, default_la = Default.LA, MonthYear = Lab.results.at.month.year)
+# RPR.Dispatched <- rename(RPR.Dispatched, default_la = Default.LA, MonthYear = Dispatched.at.month.year)
+# RPR.Returned <- rename(RPR.Returned, default_la = Default.LA, MonthYear = Lab.results.at.month.year)
 # END count of Syphilis RPR----
 
 
@@ -67,23 +55,16 @@ RPR.Returned <- rename(RPR.Returned, default_la = Default.LA, MonthYear = Lab.re
 
 
 
-
-
-
-
-
-
-
-
+names(invSTI)
 
 
 # extract the columns we need for invoicing
-invSTI <- invSTI[,c("overall_type","default_la","Dispatched.MonthYear","invoice_category_billable","referred_from_token")]
+invSTI <- invSTI[,c("overall_type","default_la","MonthYear","invoice_category_billable","referred_from_token")]
 
 # assign values to 'overall_type' that align with invoicing
 invSTI$overall_type[invSTI$overall_type == 'kits_sent'] <- 'Orders'
 invSTI$overall_type[invSTI$overall_type == 'kits_tested'] <- 'Returns'
-table(invSTI$overall_type, invSTI$Dispatched.MonthYear == v1)
+table(invSTI$overall_type, invSTI$MonthYear == v1)
 
 # concatenate values of both variables (type and category) to create the invoicing Description
 invSTI$Description <- paste(invSTI$overall_type, invSTI$invoice_category_billable, sep=" - ")
@@ -98,8 +79,6 @@ table(invSTI$Description)
 # remove variables not needed anymore
 invSTI$overall_type = NULL
 invSTI$invoice_category_billable = NULL
-# rename (new variable name = existing variable name) to have same names in all data frames----
-invSTI  <- rename(invSTI, MonthYear = Dispatched.MonthYear)
 
 # account for Hertfordshire hertstestyourself Council, invoiced at a different fee than Hertfordshire
 # change name of default_LA
@@ -131,6 +110,8 @@ invEC <- ECNow[ , c("Region","Dispatched.at.month.year","Drug")]
 invInjectable <- Injectable[ , c("region","Injectable.months.prescribed","Dispatched.Month.Year")]
 invPatch <- Patch[ , c("region","Patch.months.prescribed","Dispatched.Month.Year")]
 invRing <- Ring[ , c("region","Ring.months.prescribed","Dispatched.Month.Year")]
+
+
 
 # concatenate values to create 'Description'
 invCOC$Description <- paste("Contraception COC",invCOC$Months.prescribed,"mth",invCOC$Drug)
@@ -185,8 +166,6 @@ invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
 
 
-
-
 names(invSTI)
 names(invCOC)
 names(invPOP)
@@ -194,7 +173,6 @@ names(invEC)
 names(invInjectable)
 names(invPatch)
 names(invTreatments)
-names(RPR.Dispatched)
 names(RPR.Returned)
 names(invPDConsult)
 names(invPDTreatm)
@@ -202,7 +180,7 @@ names(invPDTreatm)
 
 
 # Stack data sets one on top of the other ----
-invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Dispatched,RPR.Returned,invPDConsult,invPDTreatm)
+invoicing <- rbind(invSTI,invTreatments,invCOC,invPOP,invEC,invInjectable,invPatch,invRing,RPR.Returned,invPDConsult,invPDTreatm)
 
 
 # check
@@ -435,7 +413,6 @@ Description <- c('Orders - All STIs (dual site)','Orders - All STIs (single site
               'Photo Treatments 3007 Aciclovir_episodic 800mg',
               'Photo Treatments 3008 Aciclovir_suppressive 400mg',
               'Photo Treatments 3030 Condyline',
-              'RPR Syphilis tests dispatched',
               'RPR Syphilis tests processed',
               'Contraception Ring 3 mth',
               'Contraception Ring 6 mth',
@@ -456,7 +433,7 @@ Fee1DiscountRM <-c( 3.60, 3.04, 4.18, 2.99, 2.34, 3.16,2.72, 3.60, 3.04, 4.18, 2
                     3.48, 0.52, 0.79, 0.65, 4.25,#Bolt-ons prices: POP bolt-on, condoms, lube, preg test
                    28.50,15.00,15.00,#EC prices
                    18.95,64.54,33.77,22.87,18.79,33.77,#Photo diagnosis: consultations first, then treatments
-                   0.00,12.10,#Syphilis RPR: dispatched (0) and returned
+                   12.10,#Syphilis RPR returned
                    34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)#Ring (3,6, 12 months), Patch, Injectable
 
 Fee2Standard <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4.94, 4.94, 6.54, 5.52, 7.60, 4.94, 6.54, 5.52, 7.60, 4.94, 6.54, 5.52, 7.60, 4.94, 5.52, 6.54, 7.60, 4.94, 5.52, 6.54, 7.60,
@@ -467,7 +444,7 @@ Fee2Standard <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4
                    3.48, 0.52, 0.79, 0.65, 4.25,
                   28.50,15.00,15.00,
                   18.95,64.54,33.77,22.87,18.79,33.77,
-                  0.00,12.10,
+                  12.10,
                   34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
 Fee3Discount <- c( 3.60, 3.04, 4.18, 2.99, 2.34, 3.16,2.72, 3.60, 3.04, 4.18, 2.72,2.72, 3.60, 3.04, 4.18,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
@@ -478,7 +455,7 @@ Fee3Discount <- c( 3.60, 3.04, 4.18, 2.99, 2.34, 3.16,2.72, 3.60, 3.04, 4.18, 2.
                    3.48, 0.52, 0.79, 0.65, 4.25,
                   28.50,15.00,15.00,
                   18.95,64.54,33.77,22.87,18.79,33.77,
-                  0.00,12.10,
+                  12.10,
                   34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
 Fee4DiscountRM5 <- c( 3.42, 2.89, 3.97, 2.84, 2.22, 3.00,2.58, 3.42, 2.89, 3.97, 2.58,2.58, 3.42, 2.89, 3.97,2.72, 3.60, 3.04, 4.18, 2.72, 3.60, 3.04, 4.18, 2.72, 3.60, 3.04, 4.18, 2.72, 3.60, 3.04, 4.18,
@@ -489,7 +466,7 @@ Fee4DiscountRM5 <- c( 3.42, 2.89, 3.97, 2.84, 2.22, 3.00,2.58, 3.42, 2.89, 3.97,
                       3.48, 0.52, 0.79, 0.65, 4.25,
                      28.50,15.00,15.00,
                      18.95,64.54,33.77,22.87,18.79,33.77,
-                     0.00,12.10,
+                     12.10,
                      34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
 # freetesting invoices are quarterly and done separately
@@ -501,7 +478,7 @@ Fee5Freetesting <- c(0.00,0.00,0.00,0.00,0.00,0.00,2.72,0.00,0.00,0.00, 2.72,0.0
                      0.00,0.00,0.00,0.00,0.00,
                      0.00,0.00,0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,
-                     0.00,0.00,
+                     0.00,
                      0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00)
 
 eSRH <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4.94, 4.94, 6.54, 5.52, 7.60,4.94,6.54,5.52,7.60,4.94,6.54,5.52,7.60,4.94,5.52,6.54,7.60,4.94,5.52,6.54,7.60,
@@ -512,7 +489,7 @@ eSRH <- c( 6.54, 5.52, 7.60, 5.44, 4.25, 5.85, 4.94, 6.54, 5.52, 7.60, 4.94, 4.9
            3.48, 0.52, 0.79, 0.65, 4.25,
           28.50,15.00,15.00,
           18.95,64.54,33.77,22.87,18.79,33.77,
-          0.00,12.10,
+          12.10,
           34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
 eSRH5 <- c( 6.21, 5.24, 7.22, 5.17, 4.04, 5.56, 4.69, 6.21, 5.24, 7.22, 4.69, 4.69, 6.21, 5.24, 7.22,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
@@ -523,7 +500,7 @@ eSRH5 <- c( 6.21, 5.24, 7.22, 5.17, 4.04, 5.56, 4.69, 6.21, 5.24, 7.22, 4.69, 4.
             3.48, 0.52, 0.79, 0.65, 4.25,
            28.50,15.00,15.00,
            18.95,64.54,33.77,22.87,18.79,33.77,
-           0.00,12.10,
+           12.10,
            34.36,53.87,73.38,44.55,74.25,103.95,29.75,36.65,43.55)
 
 FeeZero <- c( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
@@ -534,7 +511,7 @@ FeeZero <- c( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0.00,0.00,0.00,0.00,0.
             0.00,0.00,0.00,0.00,0.00,
             0.00,0.00,0.00,
             0.00,0.00,0.00,0.00,0.00,0.00,
-            0.00,0.00,
+            0.00,
             0,0,0,0,0,0,0,0,0)
 
 # create data frame with prices per invoicing category
@@ -601,7 +578,7 @@ nrow(InvFeeZero)
 # merge each price data set with its correspondent areas
 InvoicesFee1 = merge(x = InvFee1, y = fee1, by = "Description", all.x = TRUE)
 InvoicesFee2 = merge(x = InvFee2, y = fee2, by = "Description", all.x = TRUE)
-InvoicesFee3 = merge(x = InvFee3, y = fee3, by = "Description", all.x = TRUE)
+# Berkshire tariff doesn't exist since Sep 2022: InvoicesFee3 = merge(x = InvFee3, y = fee3, by = "Description", all.x = TRUE)
 InvoicesFee4 = merge(x = InvFee4, y = fee4, by = "Description", all.x = TRUE)
 # freetesting done separately
 #InvoicesFee5 = merge(x = InvFee5, y = fee5, by = "Description", all.x = TRUE)
@@ -613,7 +590,7 @@ InvoicesFeeZero = merge(x = InvFeeZero, y = fee0, by = "Description", all.x = TR
 #rename(new variable name = existing variable name)
 InvoicesFee1 <- rename(InvoicesFee1, UnitAmount = Fee1DiscountRM)
 InvoicesFee2 <- rename(InvoicesFee2, UnitAmount = Fee2Standard)
-InvoicesFee3 <- rename(InvoicesFee3, UnitAmount = Fee3Discount)
+# Berkshire tariff doesn't exist since Sep 2022: InvoicesFee3 <- rename(InvoicesFee3, UnitAmount = Fee3Discount)
 InvoicesFee4 <- rename(InvoicesFee4, UnitAmount = Fee4DiscountRM5)
 # freetesting done separately
 #InvoicesFee5 <- rename(InvoicesFee5, UnitAmount = Fee5Freetesting)
@@ -641,7 +618,11 @@ InvoicesStack$Discount <- ""
 InvoicesStack$AccountCode <- "200"
 InvoicesStack$AccountCode[grepl("Contraception", InvoicesStack$Description)] <- "206"
 table(InvoicesStack$AccountCode)
-InvoicesStack$TaxType <- "No VAT"
+
+InvoicesStack$TaxType <- 0
+InvoicesStack$TaxType = ifelse(InvoicesStack$AccountCode =='200' ,"Exempt Income","Zero Rated Income")
+table(InvoicesStack$TaxType)
+
 InvoicesStack$TaxAmount <- ""
 InvoicesStack$TrackingName1 <- "Workstream"
 InvoicesStack$TrackingOption1 <- "Operations"
@@ -663,5 +644,5 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_08/20220905_Xero_Aug.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_11/20221207_Xero_Nov.csv", row.names=F, sep=",")
 
