@@ -792,35 +792,20 @@ PD <- merge(x = PhotoConsult1, y = PhotoTreatm1, by = "Area", all = TRUE)
 Summary92 = merge(x = Summary91, y = PD, by = "Area", all = TRUE)
 
 
-#kits dispatched and returned that include Syphilis RPR (for the invoicing report)----
-RPR.Dispatched <- KitsDispatched[grep('RPR',KitsDispatched$Test.regime),]
-RPR.Dispatched <- as.data.frame(table (RPR.Dispatched$Area))
-#name the columns
-colnames(RPR.Dispatched)[1] <- "Area"
-colnames(RPR.Dispatched)[2] <- "RPR Syphilis dispatched"
 
-RPR.Returned <- KitsReturned[grep('RPR',KitsReturned$Test.regime),]
-RPR.Returned <- as.data.frame(table (RPR.Returned$Area))
-#name the columns
-colnames(RPR.Returned)[1] <- "Area"
-colnames(RPR.Returned)[2] <- "RPR Syphilis returned"
-#Third, put both bits together:
-RPR = merge(x = RPR.Dispatched, y = RPR.Returned, by = "Area", all = TRUE)
-# END count of Syphilis RPR----
-
-Summary93 = merge(x = Summary92, y = RPR, by = "Area", all = TRUE)
+##### REMOVE 2022.12.08:  Summary93 = merge(x = Summary92, y = RPR, by = "Area", all = TRUE)
 
 # remove rows with no activity----
-Summary93 <- Summary93[!(Summary93$Area=="0" | Summary93$Area=="Gilead" | Summary93$Area=="Gogodoc" | Summary93$Area=="MTV event" | Summary93$Area=="Herefordshire"),]
+Summary92 <- Summary92[!(Summary92$Area=="0" | Summary92$Area=="Gilead" | Summary92$Area=="Gogodoc" | Summary92$Area=="MTV event" | Summary92$Area=="Herefordshire"),]
 
 # Replace <NA> with blank ----
-Summary93 <- sapply(Summary93, as.character)
-Summary93[is.na(Summary93)] <- "0"
+Summary92 <- sapply(Summary92, as.character)
+Summary92[is.na(Summary92)] <- "0"
 
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
-Summary93 = t(Summary93)
+Summary92 = t(Summary92)
 
-write.table (Summary93, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_11/SummaryPerformance.2022.11.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary92, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_11/SummaryPerformance.2022.11.csv", col.names = F, row.names=T, sep=",")
 
 
 
