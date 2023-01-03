@@ -24,7 +24,7 @@ OrdersMonth$Area <- recodeArea(DF=OrdersMonth,varname="Area",varname1 = "Default
 
 
 # set reporting month
-v1 <- '2022-11'
+v1 <- '2022-12'
 
 
 table(OrdersMonth$Dispatched.at.month.year == v1, useNA = "always")
@@ -161,7 +161,7 @@ Summary1 <- rename(Summary1, Returned.Tests = Returns.x)
 
 # TO INPUT IN SUMMARY MANUALLY: TOT per Lab, based on 'LabResults' (change of methodology in June 2020, from 'LabReceipt' to 'LabResults') and for TDL and SPS separately----
 #Calculate overall TOT for current and previous month
-OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-10" 
+OverallTOTPrev <- OrdersMonth[(OrdersMonth$Lab.results.at.month.year == "2022-11" 
                                & OrdersMonth$Area != "London"
                                & OrdersMonth$TOT.Bands != "0"),]
 table(OverallTOTPrev$TOT.Bands)
@@ -805,7 +805,7 @@ Summary92[is.na(Summary92)] <- "0"
 #Transpose the table at the end, after all calculations are done. Otherwise, calculations won't work in the columns, and you get lots of NAs----
 Summary92 = t(Summary92)
 
-write.table (Summary92, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_11/SummaryPerformance.2022.11.csv", col.names = F, row.names=T, sep=",")
+write.table (Summary92, file="~/Reports/1.Monthly_Reports/Performance_Reports/2022/2022_12/SummaryPerformance.2022.12.csv", col.names = F, row.names=T, sep=",")
 
 
 

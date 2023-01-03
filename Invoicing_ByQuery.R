@@ -2,10 +2,10 @@
 # read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2022-11'               #v1: reporting month
-v2 <- '01.11.2022-30.11.2022' #v2: activity period being invoiced
-v3 <- "30/11/2022"            #v3: InvoiceDate
-v4 <- "31/12/2022"            #v4: DueDate
+v1 <- '2022-12'               #v1: reporting month
+v2 <- '01.12.2022-31.12.2022' #v2: activity period being invoiced
+v3 <- "31/12/2022"            #v3: InvoiceDate
+v4 <- "31/01/2023"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -15,6 +15,7 @@ invSTI$MonthYear <- format(as.Date(invSTI$processed_at),"%Y-%m")
 # summarise month results to double check with Performance Summary 
 STImonth <- invSTI[(invSTI$MonthYear == v1) , ]
 table(STImonth$overall_type)
+table(STImonth$overall_type, STImonth$repeat_kit)
 
 
 
@@ -142,14 +143,14 @@ invRing$Ring.months.prescribed = NULL
 
 # Photo diagnosis consultations and treatments
 # invoice consultations as per the number of consultations with a diagnose time stamp in the relevant month
-invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","region")]
+invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","Region")]
 # rename (new variable name = existing variable name) to have same names in all data frames
-invPDConsult <- rename(invPDConsult, default_la = region, MonthYear = diagnosed_month_year)
+invPDConsult <- rename(invPDConsult, default_la = Region, MonthYear = diagnosed_month_year)
 # create variable Description
 invPDConsult$Description <- "Photo Diagnosis Consultations"
 
 # invoice PD treatments depending on the drug posted
-invPDTreatm <- PhotoTreatm[,c('dispatched_month_year','name',"Drug")]
+invPDTreatm <- PhotoTreatm[,c('dispatched_month_year','Region',"Drug")]
 # include the name of the drug, related to the drug code
 invPDTreatm$DrugName <- ""
 invPDTreatm$DrugName[invPDTreatm$Drug == "3005"] <- "Imiquimod"
@@ -160,7 +161,7 @@ invPDTreatm$DrugName[invPDTreatm$Drug == "3030"] <- "Condyline"
 # concatenate values to create 'Description'
 invPDTreatm$Description <- paste("Photo Treatments",invPDTreatm$Drug,invPDTreatm$DrugName)
 # rename (new variable name = existing variable name) to have same names in all data frames
-invPDTreatm <- rename(invPDTreatm, default_la = name, MonthYear = dispatched_month_year)
+invPDTreatm <- rename(invPDTreatm, default_la = Region, MonthYear = dispatched_month_year)
 # drop columns no needed
 invPDTreatm$Drug = NULL
 invPDTreatm$DrugName = NULL
@@ -176,7 +177,6 @@ names(invTreatments)
 names(RPR.Returned)
 names(invPDConsult)
 names(invPDTreatm)
-#names(invBolts)
 
 
 # Stack data sets one on top of the other ----
@@ -565,7 +565,7 @@ InvFee7 <- invMonth_3 [(invMonth_3$ContactName=="Essex" | invMonth_3$ContactName
 InvFeeZero <- invMonth_3 [(invMonth_3$ContactName=="Ireland") | (invMonth_3$ContactName=="Romania") | (invMonth_3$ContactName=="Fettle")
                         | (invMonth_3$ContactName == "Medway"),]
 
-# check that sum of the invoices grouped equals total of invoicing in file invMonth_3:
+# check that sum of the invoices grouped equals total of invoicing in file inv Month_3:
 nrow(InvFee1)
 nrow(InvFee2)
    ### DELETE? 5th.Sep.2022 Berkshire was the only Trust on this tariff - not since August: nrow(InvFee3)
@@ -644,5 +644,5 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_11/20221207_Xero_Nov.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/20230103_Xero_Dec.csv", row.names=F, sep=",")
 

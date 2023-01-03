@@ -87,7 +87,7 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.10.10.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.12.10.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 
@@ -112,7 +112,7 @@ RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = Roy
 
 # remove SH24 number!
 DataStack_RoyalLiverpool$SH24.UID = NULL
-write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2022.10.26.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
+write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2022.12.10.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
 
 
 
@@ -134,7 +134,7 @@ write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiv
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2022-09-30'
+v1 <- '2022-11-30'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
@@ -142,7 +142,7 @@ OrdersRepeat <- OrdersRepeat[(OrdersRepeat$Created.at <= v1),]
 
 
 # Subset for Fettle and dispatched orders (dispatched different than blank)
-FettleDispatched <- OrdersRepeat[(OrdersRepeat$Default.LA == "Fettle Hub" & OrdersRepeat$Dispatched.at != ''),]
+FettleDispatched <- OrdersRepeat[(OrdersRepeat$Default.LA == "Fettle" & OrdersRepeat$Dispatched.at != ''),]
 # new data frame with unique (no duplicate) customer IDs
 Fettle.Users = FettleDispatched[!duplicated(FettleDispatched$Customer.ID),]
 # create data frame with Customer.ID grouped (i.e. how many times each Customer.ID shows up) 
@@ -205,7 +205,7 @@ FettleDispatchedPOP <- FettlePOP[(FettlePOP$Region == "Fettle" & FettlePOP$Dispa
 
 # convert Created.at into date to be able to select by date, if need data up to a certain date----
 class(FettleDispatchedPOP$Created.at)
-FettleDispatchedPOP$Created.at <- as.Date(FettleDispatchedPOP$Created.at, format = "%Y-%m-%d")
+FettleDispatchedPOP$Created.at <- as.Date(FettleDispatchedPOP$Created.at, format = "%d/%m/%Y")
 FettleDispatchedPOP <- FettleDispatchedPOP[(FettleDispatchedPOP$Created.at <= v1),]
 # END if need data up to a certain date----
 
@@ -580,6 +580,39 @@ df <- orders[(orders$Distribution.center=='Leicester City and Leicestershire Cou
               | orders$Distribution.center=='Turning Point (substance misuse service)'
               | orders$Distribution.center=='Leicestershire Partnership Trust (school nursing teams)'),]
 write.table (df, file="~/Reports/2.Ad-hoc-reports/2022.12.06_distributionCentres_Sarah.csv", row.names=F, sep=",")
+
+
+# current MSM calculation vs 2022.12.12 discussion on gender definition
+MSM <- orders
+MSM$Area <- 0
+#run "recode Area" function and save output in Area; important to write your variable names in colons (but not the data frame name)
+MSM$Area <- recodeArea(DF=MSM,varname="Area",varname1 = "Default.LA")
+
+
+MSM_v1 <- MSM[(MSM$Dispatched.at.month.year == '2022-04' | MSM$Dispatched.at.month.year == '2022-05' | MSM$Dispatched.at.month.year == '2022-06' | MSM$Dispatched.at.month.year == '2022-07' |
+                 MSM$Dispatched.at.month.year == '2022-08' | MSM$Dispatched.at.month.year == '2022-09' | MSM$Dispatched.at.month.year == '2022-10' |     
+                 MSM$Dispatched.at.month.year == '2022-11'),]
+
+
+MSM_v1_old <- MSM_v1[(MSM_v1$Genitals=='Penis' & (MSM_v1$Sexual.preference=='men' | MSM_v1$Sexual.preference=='both')),]
+MSM_v1_old = as.data.frame(table(MSM_v1_old$Area))
+#name the columns
+colnames(MSM_v1_old)[1] <- "Area"
+colnames(MSM_v1_old)[2] <- "MSM_Old_Method"
+
+MSM_v1_new <- MSM_v1[(MSM_v1$Gender.Identity=='Male' & (MSM_v1$Sexual.preference=='men' | MSM_v1$Sexual.preference=='both')),]
+MSM_v1_new = as.data.frame(table(MSM_v1_new$Area))
+#name the columns
+colnames(MSM_v1_new)[1] <- "Area"
+colnames(MSM_v1_new)[2] <- "MSM_New_Method"
+
+#Put both data sets together, two by two:
+Comparison = merge(x = MSM_v1_old, y = MSM_v1_new, by = "Area", all = TRUE)
+write.table (Comparison, file="~/Reports/2.Ad-hoc-reports/2022.12.12_Comparison_MSM_calculation.csv", row.names=F, sep=",")
+
+offline <- MSM[(MSM$Distribution.method=='offline_kits'),]
+table(offline$Area)
+
 
 
 
