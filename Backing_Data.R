@@ -144,10 +144,10 @@ BackingMaximum <- OrdersToWork[,c('SH24.UID','Customer.ID','Reason.for.visit','P
                                   'Syphilis','HIV','Chlamydia','Gonorrhoea','Hep.B','Hep.C','Test.for.Hiv','Test.for.Syphilis.EIA','Test.for.Chlamydia.Urine',
                                   'Test.for.Chlamydia.Oral','Test.for.Chlamydia.Rectal','Test.for.Chlamydia.Vaginal','Test.for.Gonorrhoea.Urine','Test.for.Gonorrhoea.Oral',
                                   'Test.for.Gonorrhoea.Rectal','Test.for.Gonorrhoea.Vaginal','Test.for.Hepatitis.B','Test.for.Hepatitis.C',"Test.for.Syphilis.RPR")]
-Data_Essex <- BackingMaximum [BackingMaximum$Site == "Essex Hub",]
+Data_Essex <- BackingMaximum [BackingMaximum$Default.LA == "Essex",]
 Data_Thurrock <- BackingMaximum [BackingMaximum$Default.LA == "Thurrock",]
-Data_Essex$Site = NULL
-Data_Thurrock$Site = NULL
+Data_Essex$Default.LA = NULL
+Data_Thurrock$Default.LA = NULL
 # End ESSEX and Thurrock----
 
 # Areas needing the SH24.UID: LLR and Derby/shire----
@@ -259,7 +259,7 @@ Data_NIreland <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Northern Ire
                                        BackingMin_noSH24$Default.LA=="Northern Ireland South Eastern PCT" | BackingMin_noSH24$Default.LA=="Northern Ireland Southern PCT" |
                                        BackingMin_noSH24$Default.LA=="Northern Ireland Western PCT"),]
 
-Data_Worces_Hereford <- BackingMin_noSH24 [(BackingMin_noSH24$Site=="Worcestershire Hub" | BackingMin_noSH24$Site=="iSH Hereford"),]
+Data_Worces_Hereford <- BackingMin_noSH24 [(BackingMin_noSH24$Default.LA=="Worcestershire" | BackingMin_noSH24$Default.LA=="Herefordshire"),]
 Data_Worces_Hereford$Site = NULL
 # End REST OF AREAS----
 
@@ -331,13 +331,13 @@ TreatmentsMerge <- merge(OrdersToWork [, c('SH24.UID','Area','Site','LSOA.name',
                          Treatments, by.x = 'SH24.UID', by.y = 'sh24_uid')
 table(TreatmentsMerge$Region)
 #CT treatment files  
-Treatment.Essex <- TreatmentsMerge [(TreatmentsMerge$Site=="Essex Hub"), 
+Treatment.Essex <- TreatmentsMerge [(TreatmentsMerge$Region=="Essex"), 
                                     c("SH24.UID","customer_id",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
 
 Treatment.Thurrock <- TreatmentsMerge [(TreatmentsMerge$Region=="Thurrock"), 
                                        c("SH24.UID","customer_id",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
 
-Treatment.DerbyshireDerby <- TreatmentsMerge [(TreatmentsMerge$Site=="Wheatbridge Clinic" | TreatmentsMerge$Site=="London Road Community Hospital"), 
+Treatment.DerbyshireDerby <- TreatmentsMerge [(TreatmentsMerge$Region=="Derby" | TreatmentsMerge$Region=="Derbyshire"), 
                                               c("SH24.UID",'Site','Area',"created_at","offered_at","prescription_at","dispatched_at","Notified.at")]
 
 Treatment.LLR.MPFT <- TreatmentsMerge [(TreatmentsMerge$Area=="Rutland" | TreatmentsMerge$Area=="Leicester" | TreatmentsMerge$Area=="Leicestershire" |
@@ -373,7 +373,6 @@ write.table (Treatment.LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/202
 write.table (Treatment.NIreland, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2022 Month NIreland Treatments.csv", row.names=F, sep=",")
 
 
-
 # Backing data CONTRACEPTION----
 # run "recodeContraception" function and save output in Area
 COC$Area <- 0
@@ -385,6 +384,11 @@ POP$Area <- recodeContraception(DF=POP,varname="Area",varname2="Region")
 Zero <- COC[(COC$Area==0),]
 Zero <- POP[(POP$Area==0),]
 rm(Zero)
+
+
+### 2023.01.03 The variable 'Clinic' has been removed from the COC and POP tables in the database. Create blank ones:
+COC$Clinic <- ""
+POP$Clinic <- ""
 
 
 # OC backing data files Dorset
@@ -404,34 +408,26 @@ rm(Zero)
 
 
 # OC backing data files Derby and Derbyshire
-COC_DerbyshireDerby <- COC [(COC$Clinic=="Derby" | COC$Clinic=="Derbyshire")
+COC_DerbyshireDerby <- COC [(COC$Region=="Derby" | COC$Region=="Derbyshire")
                               ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year",
                                  "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
-                                 "Months.prescribed","Region",
+                                 "Months.prescribed","Clinic","Region",
                                  "Taken.COC.before.","Ordered.COC.from.SH.24.before.","LSOA.name")]
-
-### 2023.01.03 The variable 'Clinic' has been removed from the COC and POP tables in the database. Create blank ones:
-
-
-
-
-
 
 
 # 11.09.2022:add the columns we removed in Sep.2022
 # 11.09.2022: Sarah needs files with usual formatting, though they don't use those columns for reporting - they may be ok left blank: confirm with Sarah
 COC_DerbyshireDerby$Ordered.OC.from.SH.24.before. <- ""
-COC_DerbyshireDerby$Area <- "Region" #add this variable here to keep original order of columns
 
 
-POP_DerbyshireDerby <- POP [(POP$Clinic=="Wheatbridge Clinic" | POP$Clinic=="London Road Community Hospital")
+POP_DerbyshireDerby <- POP [(POP$Region=="Derby" | POP$Region=="Derbyshire")
                             ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year",
                                "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
                                "Months.prescribed","Clinic","Region","LSOA.name")]
 POP_DerbyshireDerby$Taken.POP.before. <- ""
 POP_DerbyshireDerby$Ordered.POP.from.SH.24.before. <- ""
 POP_DerbyshireDerby$Ordered.OC.from.SH.24.before. <- ""
-POP_DerbyshireDerby$Area <- "Region"
+
 
 # Merge contraception data with LSOA file, to get LSOA Code for LLR
 COC_DerbyshireDerby <- merge(COC_DerbyshireDerby, LSOA[,c("LSOA11CD",'LSOA11NM')], by.x = "LSOA.name", by.y = "LSOA11NM")
@@ -440,6 +436,7 @@ names(POP_DerbyshireDerby)
 
 write.table (COC_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2022 Month DerbyshireDerby COC.csv", row.names=F, sep=",")
 write.table (POP_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2022 Month DerbyshireDerby POP.csv", row.names=F, sep=",")
+
 
 
 # OC backing data files LLR.MPFT
@@ -486,7 +483,7 @@ invSTIessexThurr$MonthYear <- format(as.Date(invSTIessexThurr$MonthYear), "%Y-%m
 # extract data for reporting month and relevant columns
 invSTIessexThurrMonth <- invSTIessexThurr[(invSTIessexThurr$MonthYear == v1), c("overall_type","default_la","repeat_kit","processed_at","MonthYear","invoice_category_all","invoice_category_billable")]  
 
-write.table (invSTIessexThurrMonth, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2022 11 invoic_EssexThurrock.csv", row.names=F, sep=",")
+write.table (invSTIessexThurrMonth, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2022 12 invoic_EssexThurrock.csv", row.names=F, sep=",")
 # END Invoicing backing data Essex
 
 
@@ -590,20 +587,6 @@ Data_CheshireEast1 <- Data_CheshireEast[(Data_CheshireEast$Created.at > '2020-09
 write.table (Data_CheshireEast1, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2022\\2022_01\\backing_data\\2021.05.10 Justin CheshireEast STI.csv", row.names=F, sep=",")
 # END RoyalLiverpool----
 
-#CT treatment for Darlington
-Treatment.Durham.Darlington <- TreatmentsMerge [(TreatmentsMerge$Site=="Bishop Auckland Hospital, Centre for Sexual Health" |
-                                                   TreatmentsMerge$Site=="GUM Department, University Hospital of North Durham" |
-                                                   TreatmentsMerge$Site=="Darlington GUM Clinic" )
-                                                , c('Site','LA.of.residence',"Created.at","Offered.at","Prescription.at","Dispatched.at","customer.ID")]
-
-
-Treatment.Durham.Darlington <- TreatmentsMerge [(TreatmentsMerge$Area=="Darlington")
-                                                , c('Site','LA.of.residence',"Created.at","Offered.at","Prescription.at","Dispatched.at","Customer.ID")]
-
-
-table(TreatmentsMerge$Area=="Darlington")
-names(TreatmentsMerge)
-write.table (Treatment.Durham.Darlington, file="\\Users\\Elena Ardines\\Documents\\Reports\\1.Monthly_Reports\\Invoicing\\2020\\2020 05\\backing_dataata\\2020.01.Treatment.Durham.Darlington.csv", row.names=F, sep=",")
 
 # 2022.11.29 Hertfordshire Sarah
 Herts <- orders[(orders$Default.LA=="Hertfordshire"),]
