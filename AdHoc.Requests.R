@@ -614,6 +614,13 @@ offline <- MSM[(MSM$Distribution.method=='offline_kits'),]
 table(offline$Area)
 
 
+# 2023.Jan.04 Orders processed in Ireland per lab
+ireland <- orders
+ireland <- ireland[grep('Ireland -', ireland$Default.LA),]
+ireland1 <- ireland[(ireland$Lab.results.at.month.year == "2022-12"),]
+table(ireland1$Lab,ireland1$Lab.results.at.month.year)
+
+
 
 
 #########################
