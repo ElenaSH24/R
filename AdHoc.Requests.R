@@ -87,7 +87,7 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2022.12.10.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.01.06.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 
@@ -112,7 +112,7 @@ RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = Roy
 
 # remove SH24 number!
 DataStack_RoyalLiverpool$SH24.UID = NULL
-write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2022.12.10.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
+write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.01.06.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
 
 
 
@@ -134,7 +134,7 @@ write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiv
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2022-11-30'
+v1 <- '2022-12-31'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
@@ -205,7 +205,7 @@ FettleDispatchedPOP <- FettlePOP[(FettlePOP$Region == "Fettle" & FettlePOP$Dispa
 
 # convert Created.at into date to be able to select by date, if need data up to a certain date----
 class(FettleDispatchedPOP$Created.at)
-FettleDispatchedPOP$Created.at <- as.Date(FettleDispatchedPOP$Created.at, format = "%d/%m/%Y")
+FettleDispatchedPOP$Created.at <- as.Date(FettleDispatchedPOP$Created.at, format = "%Y-%m-%d")
 FettleDispatchedPOP <- FettleDispatchedPOP[(FettleDispatchedPOP$Created.at <= v1),]
 # END if need data up to a certain date----
 
