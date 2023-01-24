@@ -17,7 +17,6 @@ file.path("~", "Reports","1.Monthly_Reports","Invoicing","2022","2022_04","Xero_
 
 orders = read.csv("20230103_sti_order_report.csv")
 
-
 Treatments = read.csv("20230103_CT_Treatments.csv")
 COC = read.csv("20230103_COC.csv")
 POP = read.csv("20230103_POP.csv")
@@ -594,3 +593,11 @@ write.table (Herts, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_10/Bac
 
 # END One-off
 
+# 2023.01.11 Wirral extract oneoff
+Wirral <- orders[(orders$Default.LA=="Wirral"),]
+write.table (Wirral, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2023.01.11_Wirral_Natasha.csv", row.names=F, sep=",")
+
+# 2023.01.11 County Durham and Darlington extract oneoff
+Durham_Darling <- orders[(orders$Default.LA=="County Durham" | orders$Default.LA=="Darlington"),]
+table(Durham_Darling$Default.LA)
+write.table (Durham_Darling, file="~/Reports/1.Monthly_Reports/Invoicing/2022/2022_12/BackingData/2023.01.11_Durham_Darling_Natasha.csv", row.names=F, sep=",")
