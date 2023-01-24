@@ -143,7 +143,7 @@ invRing$Ring.months.prescribed = NULL
 
 # Photo diagnosis consultations and treatments
 # invoice consultations as per the number of consultations with a diagnose time stamp in the relevant month
-invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","Region")]
+invPDConsult <- PhotoConsult[ , c("diagnosed_month_year","region")]
 # rename (new variable name = existing variable name) to have same names in all data frames
 invPDConsult <- rename(invPDConsult, default_la = Region, MonthYear = diagnosed_month_year)
 # create variable Description
