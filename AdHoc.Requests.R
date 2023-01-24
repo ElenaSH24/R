@@ -621,6 +621,23 @@ ireland1 <- ireland[(ireland$Lab.results.at.month.year == "2022-12"),]
 table(ireland1$Lab,ireland1$Lab.results.at.month.year)
 
 
+# 2023.01012 one-off Stuart: num of HIV reactives in 2023 so far
+reactives = read.csv("20230112_sti_order_report_Reactives.csv")
+HepPositives <- reactives 
+HepPositives_1 <- reactives [(reactives$Hep.B == "positive" | reactives$Hep.C == "positive"),]
+table(reactives$Hep.C)  
+table(HepPositives_1$Hep.C)
+write.table (HepPositives_1, file="~/Reports/2.Ad-hoc-reports/2023.01.12_Hep_positive_Stuart.csv", row.names=F, sep=",")
+
+
+# 2023.01.17 one-off Stuart: total HIV 2022
+reactives <- orders
+table(reactives$Lab.results.at.month.year, reactives$HIV)
+react2022 <- reactives[grep('2022',reactives$Lab.results.at.month.year),]
+table(orders$Test.regime) #how HIV is named in the data
+hivSent2022 <- orders[grep('Hiv', orders$Test.regime),] #extract those kits that included a HIV test
+hivSent2022_1 <- hivSent2022[grep('2022', hivSent2022$Dispatched.at.month.year),] #extract kits sent with a HIV test in 2022
+
 
 
 #########################
@@ -631,6 +648,8 @@ orders1 <- orders
 table(orders1$Gender,orders1$Default.LA=='Fettle')
 
 table(orders1$Genitals,orders1$Default.LA=='PHE')
+
+
 
 
 
