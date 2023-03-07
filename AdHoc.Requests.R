@@ -52,6 +52,18 @@ EC1 <- rename(EC1, SH24.UID = sh24_uid)
 EC1 <- rename(EC1, Customer.ID = customer_id)
 EC1 <- rename(EC1, Default.LA = Region)
 
+
+############ 2023.02.08 Fran needs oter contraception data
+# create the 'other contraception' data sets
+Injectable1 <- Injectable
+Injectable1$Type <- 'Injectable'
+Injectable1 <- Injectable1[ , grep( )]
+
+names(Injectable)
+############# need to add 'Customer ID' to the query
+##########################################################
+
+
 # stack all data sets one of top of each other
 DataStack <- rbind(Orders1, Treatments1,COC1,POP1,EC1)
 
@@ -87,7 +99,7 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.01.06.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.03.07.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 
@@ -112,7 +124,7 @@ RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = Roy
 
 # remove SH24 number!
 DataStack_RoyalLiverpool$SH24.UID = NULL
-write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.01.06.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
+write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.03.07.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
 
 
 
@@ -134,7 +146,7 @@ write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiv
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2022-12-31'
+v1 <- '2023-02-28'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
@@ -493,9 +505,15 @@ Stuart <- orders[(orders$Default.LA == "Freetesting - Bolton" | orders$Default.L
 write.table (Stuart, file="\\Users\\ElenaArdinesTomas\\Documents\\Reports\\2.Ad-hoc-reports\\2022.06.20_freetesting_Stuart.csv", row.names=F, sep=",")
 
 
-# 2022.08.25 Blake - freetesting-Hertfordshire offline kits
+# 2022.08.25 Blake - freetesting-Hertfordshire offline kits. 
 ordersFreeHertsOffline <- orders[(orders$Default.LA=='Freetesting - Hertfordshire' & orders$Distribution.method=='offline_kits'),]
 table(ordersFreeHertsOffline$Dispatched.at.month.year)
+# 2023.02.08 Sarah Offline Kits (THT) Hertfordshire.  Number of test kits returned and any reactives.  Broken down by last two quarters.
+HertsOffline <- orders[((orders$Default.LA=='Freetesting - Hertfordshire' | orders$Default.LA=='Hertfordshire')
+                        & orders$Distribution.method=='offline_kits'),]
+table(HertsOffline$Lab.results.at.month.year, HertsOffline$HIV)
+
+HertsOfflineHIV
 
 
 # 2022.10.11 Safeguarding Andrew
@@ -638,6 +656,8 @@ table(orders$Test.regime) #how HIV is named in the data
 hivSent2022 <- orders[grep('Hiv', orders$Test.regime),] #extract those kits that included a HIV test
 hivSent2022_1 <- hivSent2022[grep('2022', hivSent2022$Dispatched.at.month.year),] #extract kits sent with a HIV test in 2022
 
+# 2023.01.26 Aras Romania Taran
+table(orders$Notified.at.month.year, orders$Default.LA=='Romania')
 
 
 #########################
