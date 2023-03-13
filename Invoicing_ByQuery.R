@@ -2,10 +2,10 @@
 # read files for invoicing from Backing_Data tab
 
 # set date variables 
-v1 <- '2023-01'               #v1: reporting month
-v2 <- '01.01.2023-31.01.2023' #v2: activity period being invoiced
-v3 <- "31/01/2023"            #v3: InvoiceDate
-v4 <- "28/02/2023"            #v4: DueDate
+v1 <- '2023-02'               #v1: reporting month
+v2 <- '01.02.2023-28.02.2023' #v2: activity period being invoiced
+v3 <- "28/02/2023"            #v3: InvoiceDate
+v4 <- "31/03/2023"            #v4: DueDate
 
 # convert character to date, first set the format the date is shown 
 invSTI$processed_at <- as.Date(invSTI$processed_at,"%Y-%m-%d")
@@ -644,5 +644,5 @@ InvoicesStack_Ordered <- InvoicesStack_Ordered[order(InvoicesStack_Ordered$Conta
 # Replace <NA> in Unit.Amount with zero ----
 InvoicesStack_Ordered[is.na(InvoicesStack_Ordered)] <- "0"
 
-write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_01/20230207_Xero_Dec_SH24.csv", row.names=F, sep=",")
+write.table (InvoicesStack_Ordered, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_02/20230310_Xero_Feb_SH24.csv", row.names=F, sep=",")
 
