@@ -99,7 +99,7 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.04.11.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.05.10.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 
@@ -124,7 +124,7 @@ RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = Roy
 
 # remove SH24 number!
 DataStack_RoyalLiverpool$SH24.UID = NULL
-write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.04.11.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
+write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.05.10.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
 
 
 
@@ -146,7 +146,7 @@ write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiv
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2023-03-31'
+v1 <- '2023-04-30'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
@@ -658,6 +658,8 @@ hivSent2022_1 <- hivSent2022[grep('2022', hivSent2022$Dispatched.at.month.year),
 
 # 2023.01.26 Aras Romania Taran
 table(orders$Notified.at.month.year, orders$Default.LA=='Romania')
+
+
 
 
 #########################
