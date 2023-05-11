@@ -55,6 +55,7 @@ recodeArea <- function(DF,varname,varname1){
   DF[,varname][DF[,varname1]=="Warrington"] <- "Warrington"
   DF[,varname][DF[,varname1]=="Wirral"] <- "Wirral"
   DF[,varname][DF[,varname1]=="Worcestershire"] <- "Worcestershire"
+  DF[,varname][DF[,varname1]=="HSE Hep C"] <- "HSE Hep C"
   
   DF[,varname][DF[,varname1]=="Oldham" | DF[,varname1]=="Rochdale" | DF[,varname1]=="Bury"] <- "Orbish"
   
