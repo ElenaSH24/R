@@ -396,13 +396,19 @@ COC_DerbyshireDerby <- COC [(COC$Region=="Derby" | COC$Region=="Derbyshire")
                               ,c("SH.24.UID",'ID','Customer.ID',"Age","Ethnicity","Sexuality","Created.at","Created.at.month.year",
                                  "Prescription.at","Prescription.at.month.year","Dispatched.at","Dispatched.at.month.year",
                                  "Months.prescribed","Clinic","Region",
-                                 "Taken.COC.before.","Ordered.COC.from.SH.24.before.","LSOA.name")]
-
+                                # "Taken.COC.before.","Ordered.COC.from.SH.24.before.",
+                                 "LSOA.name")]
 
 
 # 11.09.2022:add the columns we removed in Sep.2022
 # 11.09.2022: Sarah needs files with usual formatting, though they don't use those columns for reporting - they may be ok left blank: confirm with Sarah
 COC_DerbyshireDerby$Ordered.OC.from.SH.24.before. <- ""
+
+# 2023.06.05: these 2 variables aren't in the redacted DB any longer: "Taken.COC.before.","Ordered.COC.from.SH.24.before."
+# populate as blank
+COC_DerbyshireDerby$Taken.COC.before. <- ""
+COC_DerbyshireDerby$Ordered.COC.from.SH.24.before. <- ""
+
 
 
 POP_DerbyshireDerby <- POP [(POP$Region=="Derby" | POP$Region=="Derbyshire")
