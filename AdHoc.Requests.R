@@ -40,8 +40,13 @@ POP1 <- POP1[,grep("^customer|SH.24.UID|created|dispa|region|Type",colnames(POP1
 #rename column names, they should be identical in all data sets to be 'rbind'
 POP1 <- rename(POP1, SH24.UID = SH.24.UID, Default.LA = Region)
 
-ECNow1 <- ECNow [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")]
+ECNow1 <- ECNow [ ,c("eoc_customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")]
+# customer_id was renamed as eoc_customer_id some time in May 2023. Rename to be able to use rbind:
+ECNow1 <- rename(ECNow1, customer_id = eoc_customer_id)
 ECFut1 <- ECFuture [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")] 
+
+
+
 
 # stack both EC datasets one on top of the other one
 EC1 <- rbind(ECNow1, ECFut1)
@@ -53,15 +58,15 @@ EC1 <- rename(EC1, Customer.ID = customer_id)
 EC1 <- rename(EC1, Default.LA = Region)
 
 
-############ 2023.02.08 Fran needs oter contraception data
-# create the 'other contraception' data sets
-Injectable1 <- Injectable
-Injectable1$Type <- 'Injectable'
-Injectable1 <- Injectable1[ , grep( )]
-
-names(Injectable)
-############# need to add 'Customer ID' to the query
-##########################################################
+          ############ 2023.02.08 Fran needs oter contraception data
+          # create the 'other contraception' data sets
+                          Injectable1 <- Injectable
+                          Injectable1$Type <- 'Injectable'
+                          Injectable1 <- Injectable1[ , grep( )]
+                          
+                          names(Injectable)
+          ############# need to add 'Customer ID' to the query
+          ##########################################################
 
 
 # stack all data sets one of top of each other
@@ -99,7 +104,7 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.05.10.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.06.12.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 
@@ -146,7 +151,7 @@ write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiv
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2023-04-30'
+v1 <- '2023-05-31'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
