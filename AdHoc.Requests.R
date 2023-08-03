@@ -40,22 +40,22 @@ POP1 <- POP1[,grep("^customer|SH.24.UID|created|dispa|region|Type",colnames(POP1
 #rename column names, they should be identical in all data sets to be 'rbind'
 POP1 <- rename(POP1, SH24.UID = SH.24.UID, Default.LA = Region)
 
-ECNow1 <- ECNow [ ,c("eoc_customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")]
-# customer_id was renamed as eoc_customer_id some time in May 2023. Rename to be able to use rbind:
-ECNow1 <- rename(ECNow1, customer_id = eoc_customer_id)
-ECFut1 <- ECFuture [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")] 
+
+      # 2023.07.10 EC data directly from Databricks query
+      ECNow1 <- ECNow [ ,c("eoc_customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")]
+      # customer_id was renamed as eoc_customer_id some time in May 2023. Rename to be able to use rbind:
+      ECNow1 <- rename(ECNow1, customer_id = eoc_customer_id)
+      ECFut1 <- ECFuture [ ,c("customer_id","sh24_uid","Region","Created.at","Created.at.month.year","Dispatched.at","Dispatched.at.month.year")] 
 
 
-
-
-# stack both EC datasets one on top of the other one
-EC1 <- rbind(ECNow1, ECFut1)
-#add type of order
-EC1$Type <- 'EC'
-#rename column names (install dplyr and data.table packages), they should be identical in all data sets to use 'rbind'
-EC1 <- rename(EC1, SH24.UID = sh24_uid)
-EC1 <- rename(EC1, Customer.ID = customer_id)
-EC1 <- rename(EC1, Default.LA = Region)
+      # stack both EC datasets one on top of the other one
+      EC1 <- rbind(ECNow1, ECFut1)
+      #add type of order
+      EC1$Type <- 'EC'
+      #rename column names (install dplyr and data.table packages), they should be identical in all data sets to use 'rbind'
+      EC1 <- rename(EC1, SH24.UID = sh24_uid)
+      EC1 <- rename(EC1, Customer.ID = customer_id)
+      EC1 <- rename(EC1, Default.LA = Region)
 
 
           ############ 2023.02.08 Fran needs oter contraception data
@@ -70,11 +70,12 @@ EC1 <- rename(EC1, Default.LA = Region)
 
 
 # stack all data sets one of top of each other
-DataStack <- rbind(Orders1, Treatments1,COC1,POP1,EC1)
+DataStack <- rbind(Orders1, Treatments1,COC1,POP1)
 
 DataStackFettle <- DataStack[(DataStack$Default.LA == "Fettle"),]
 
-DataStack_RoyalLiverpool <- DataStack[(DataStack$Default.LA == "Warrington" |  DataStack$Default.LA == "Halton" |
+          #2023.07.10 remove, not needed anylonger as Royal Liverpool KPIs in perf reports now
+          DataStack_RoyalLiverpool <- DataStack[(DataStack$Default.LA == "Warrington" |  DataStack$Default.LA == "Halton" |
                                          DataStack$Default.LA == "Liverpool" | DataStack$Default.LA == "Cheshire East" |
                                          DataStack$Default.LA == "Knowsley"),]
 
@@ -104,46 +105,34 @@ print(Fettle.OrdersAndUnique)
 
 # remove SH24 number!
 DataStackFettle$SH24.UID = NULL
-write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.06.12.DataStack_Fettle.csv", row.names=F, sep=",")
+write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.07.11.DataStack_Fettle.csv", row.names=F, sep=",")
 
 
 
 
-# for Royal Liverpool
-nrow(DataStack_RoyalLiverpool) #number of orders from all Fettle products
-#number of orders per product
-RoyalLiverpool.OrdersCreated <- as.data.frame(table(DataStack_RoyalLiverpool$Type))
-colnames(RoyalLiverpool.OrdersCreated)[1] <- "Product"
-colnames(RoyalLiverpool.OrdersCreated)[2] <- "Orders created"  
+            # 2023.07.10 Royal Liverpool specific KPIs not needed any longer 
+            nrow(DataStack_RoyalLiverpool) #number of orders from all Fettle products
+            #number of orders per product
+            RoyalLiverpool.OrdersCreated <- as.data.frame(table(DataStack_RoyalLiverpool$Type))
+            colnames(RoyalLiverpool.OrdersCreated)[1] <- "Product"
+            colnames(RoyalLiverpool.OrdersCreated)[2] <- "Orders created"  
+            
+            # number of unique users per RoyalLiverpool product
+            RoyalLiverpool.Unique <- aggregate(x = DataStack_RoyalLiverpool$Customer.ID, # Specify data column
+                                       by = list(DataStack_RoyalLiverpool$Type), # Specify group indicator
+                                       FUN = function(x) length(unique(x))) #Desired function
+            
+            colnames(RoyalLiverpool.Unique)[1] <- "Product"
+            colnames(RoyalLiverpool.Unique)[2] <- "Count unique users"
+            
+            # put both data frames together:
+            RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = RoyalLiverpool.Unique, by = "Product", all = TRUE)
+            
+            # remove SH24 number!
+            DataStack_RoyalLiverpool$SH24.UID = NULL
+            write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.05.10.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
 
-# number of unique users per RoyalLiverpool product
-RoyalLiverpool.Unique <- aggregate(x = DataStack_RoyalLiverpool$Customer.ID, # Specify data column
-                           by = list(DataStack_RoyalLiverpool$Type), # Specify group indicator
-                           FUN = function(x) length(unique(x))) #Desired function
-
-colnames(RoyalLiverpool.Unique)[1] <- "Product"
-colnames(RoyalLiverpool.Unique)[2] <- "Count unique users"
-
-# put both data frames together:
-RoyalLiverpool.OrdersAndUnique = merge(x = RoyalLiverpool.OrdersCreated, y = RoyalLiverpool.Unique, by = "Product", all = TRUE)
-
-# remove SH24 number!
-DataStack_RoyalLiverpool$SH24.UID = NULL
-write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.05.10.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
-
-
-
-# DELETE 21st Sep 2022: Cross-product orders
-# Reshape the data frame
-################## CONTINUE FROM HERE 14.MARCH.2022 ###############
-#DataStackFettle.Wide <- DataStackFettle[,c('Customer.ID','Type')]
-#DataStackFettle.Wide1 <- reshape(DataStackFettle.Wide, idvar = "Customer.ID", timevar = "Type", direction = "wide")
-#reshape(dat1, idvar = "name", timevar = "numbers", direction = "wide")
-# TRY THIS?: convert to data frame to get the frequency of ordering per user
-#DataStackFettle_1 <- as.data.frame(table(DataStackFettle$Customer.ID,DataStackFettle$Type))
-
-# End Stack all data sets----
-
+            
 
 
 # Fran REPEAT USERS Fettle----
@@ -151,7 +140,7 @@ write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiv
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2023-05-31'
+v1 <- '2023-06-30'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
