@@ -7,7 +7,7 @@ library(reshape2)
 install.packages('tidyverse')
 
 # use ~ as a shortcut to the Home Directory, to avoid portability issues (i.e. changing Operating Systems, versions of R, or programming language)
-setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2023/2023_07")
+setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2023/2023_08")
 
 
 # to know the destination file used by the language
@@ -15,26 +15,27 @@ path.expand("~")
 # PATH JOIN: gold standard on setting working directory, to avoid syntax issues and address portability concerns (i.e. moving Operating Systems, different languages, etc)
 file.path("~", "Reports","1.Monthly_Reports","Invoicing","2022","2022_04","Xero_Quantities_2022.April_v9.csv")
 
-orders = read.csv("20230802_sti_order_report.csv")
+orders = read.csv("2023_09_02_sti_order_report.csv")
 
+Treatments = read.csv("2023_09_02_CT_Treatments.csv")
 
-Treatments = read.csv("20230803_CT_Treatments.csv")
-COC = read.csv("20230703_COC.csv")
-POP = read.csv("20230703_POP.csv")
-ECFuture = read.csv("20230703_ECFuture.csv")
-ECNow = read.csv("20230703_ECNow.csv")
-
-PhotoConsult = read.csv("20230605_PD_consultations.csv")
-PhotoTreatm = read.csv("20230605_PD_treatments.csv")
-Injectable = read.csv("20230605_Injectable.csv")
-Patch = read.csv("20230605_Patch.csv")  
-Ring = read.csv("20230605_Ring.csv")
+#### 2nd Sep 2023: csvs below not needed anylonger - all these processes migrated to Databricks
+# COC = read.csv("20230703_COC.csv")
+# POP = read.csv("20230703_POP.csv")
+# ECFuture = read.csv("20230703_ECFuture.csv")
+# ECNow = read.csv("20230703_ECNow.csv")
+# 
+# PhotoConsult = read.csv("20230605_PD_consultations.csv")
+# PhotoTreatm = read.csv("20230605_PD_treatments.csv")
+# Injectable = read.csv("20230605_Injectable.csv")
+# Patch = read.csv("20230605_Patch.csv")  
+# Ring = read.csv("20230605_Ring.csv")
 
 
 # Invoicing data set from sti_invoice_detail.sql query
-invSTI = read.csv("20230803_sti_invoicing_primary.csv")
+invSTI = read.csv("2023_09_02_sti_invoicing_primary.csv")
 # bolt-ons data for invoicing
-bolts = read.csv("20230605_Combined_BoltOns.csv")
+# bolts = read.csv("20230605_Combined_BoltOns.csv")
 
 
 # reactivity levels from the 'miscellaneous' query in DataGrip, for freetesting
@@ -100,7 +101,7 @@ OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname1 = "Defau
 
 
 # reporting month
-v1 <- '2023-07'
+v1 <- '2023-08'
 
 # check that all orders are allocated to an Area
 Zero <- OrdersToWork[(OrdersToWork$Area==0),]
