@@ -58,17 +58,6 @@ POP1 <- rename(POP1, SH24.UID = SH.24.UID, Default.LA = Region)
       EC1 <- rename(EC1, Default.LA = Region)
 
 
-          ############ 2023.02.08 Fran needs oter contraception data
-          # create the 'other contraception' data sets
-                          Injectable1 <- Injectable
-                          Injectable1$Type <- 'Injectable'
-                          Injectable1 <- Injectable1[ , grep( )]
-                          
-                          names(Injectable)
-          ############# need to add 'Customer ID' to the query
-          ##########################################################
-
-
 # stack all data sets one of top of each other
 DataStack <- rbind(Orders1, Treatments1,COC1,POP1)
 
@@ -132,7 +121,7 @@ write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.07.11.DataSt
             DataStack_RoyalLiverpool$SH24.UID = NULL
             write.table (DataStack_RoyalLiverpool, file="~/Reports/2.Ad-hoc-reports/RoyalLiverpool/outcome_queries/2023.05.10.DataStack_RoyalLiverpool.csv", row.names=F, sep=",")
 
-            
+##################################  2023.08.14: DON'T NEED THE ABOVE ANY LONGER  ####################################            
 
 
 # Fran REPEAT USERS Fettle----
@@ -140,7 +129,7 @@ write.table (DataStackFettle, file="~/Reports/2.Ad-hoc-reports/2023.07.11.DataSt
 OrdersRepeat <- orders[(order(as.Date(orders$Created.at))),]
 
 # adjust data to orders created by end of a given month
-v1 <- '2023-06-30'
+v1 <- '2023-07-31'
 class(OrdersRepeat$Created.at)
 OrdersRepeat$Created.at <- as.Date(OrdersRepeat$Created.at, format = "%Y-%m-%d")
 # extract data up to the end of the relevant month
