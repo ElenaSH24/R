@@ -7,7 +7,7 @@ library(reshape2)
 install.packages('tidyverse')
 
 # use ~ as a shortcut to the Home Directory, to avoid portability issues (i.e. changing Operating Systems, versions of R, or programming language)
-setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2023/2023_10")
+setwd("~/Reports/1.Monthly_Reports/Performance_Reports/2023/2023_11")
 
 
 # to know the destination file used by the language
@@ -15,9 +15,9 @@ path.expand("~")
 # PATH JOIN: gold standard on setting working directory, to avoid syntax issues and address portability concerns (i.e. moving Operating Systems, different languages, etc)
 file.path("~", "Reports","1.Monthly_Reports","Invoicing","2022","2022_04","Xero_Quantities_2022.April_v9.csv")
 
-orders = read.csv("2023_11_02_sti_order_report.csv")
+orders = read.csv("2023_12_04_sti_order_report.csv")
 
-Treatments = read.csv("2023_10_02_CT_Treatments.csv")
+Treatments = read.csv("2023_12_18_CT_Treatments.csv")
 
 #### 2nd Sep 2023: csvs below not needed anylonger - all these processes migrated to Databricks
 # COC = read.csv("20230703_COC.csv")
@@ -101,7 +101,7 @@ OrdersToWork$Area <- recodeArea(DF=OrdersToWork,varname="Area",varname1 = "Defau
 
 
 # reporting month
-v1 <- '2023-10'
+v1 <- '2023-11'
 
 # check that all orders are allocated to an Area
 Zero <- OrdersToWork[(OrdersToWork$Area==0),]
@@ -300,7 +300,7 @@ write.table (Data_Bromley, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023
 
 
 ###write.table (Data_DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month DerbyshireDerby STI.csv", row.names=F, sep=",")
-write.table (Data_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_10/2023 Month Dorset STI.csv", row.names=F, sep=",")
+write.table (Data_Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_11/2023 Month Dorset STI.csv", row.names=F, sep=",")
 ###write.table (Data_Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_07/BackingData/2023 Month Essex STI.csv", row.names=F, sep=",")
 ###write.table (Data_Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_07/BackingData/2023 Month Thurrock STI.csv", row.names=F, sep=",")
 ###write.table (Data_Hillingdon, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month Hillingdon STI.csv", row.names=F, sep=",")
@@ -352,9 +352,9 @@ Treatment.Bromley <- TreatmentsMerge [(TreatmentsMerge$Area=="Bromley")
 ###write.table (Treatment.Berkshire, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month Berkshire Treatments.csv", row.names=F, sep=",")
 ###write.table (Treatment.Bromley, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month Bromley Treatments.csv", row.names=F, sep=",")
 ###write.table (Treatment.DerbyshireDerby, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month DerbyshireDerby Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_09/2023 Month Dorset Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_07/BackingData/2023 Month Essex Treatments.csv", row.names=F, sep=",")
-write.table (Treatment.Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_07/BackingData/2023 Month Thurrock Treatments.csv", row.names=F, sep=",")
+write.table (Treatment.Dorset, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_11/2023 Month Dorset Treatments_v1.csv", row.names=F, sep=",")
+###write.table (Treatment.Essex, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_07/BackingData/2023 Month Essex Treatments.csv", row.names=F, sep=",")
+###write.table (Treatment.Thurrock, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_07/BackingData/2023 Month Thurrock Treatments.csv", row.names=F, sep=",")
 ###write.table (Treatment.LLR.MPFT, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month LLR.MPFT Treatments.csv", row.names=F, sep=",")
 ###write.table (Treatment.NIreland, file="~/Reports/1.Monthly_Reports/Invoicing/2023/2023_06/BackingData/2023 Month NIreland Treatments.csv", row.names=F, sep=",")
 
